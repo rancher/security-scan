@@ -1,7 +1,14 @@
 cis-k8s
 ========
 
-This repo is 
+This repo has all the stuff needed for running CIS scan on RKE clusters.
+
+Multi-purpose repo:
+- Packaging for all the components needed for CIS scan (sonobuoy, kube-bench)
+- kube-bench-summarizer
+- plugin script for sonobuoy tool (a different script is passed using command)
+
+The corresponding docker image (rancher/cis-k8s) is used in the system charts.
 
 ## Building
 

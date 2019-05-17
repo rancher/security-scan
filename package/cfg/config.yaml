@@ -1,0 +1,113 @@
+---
+## Controls Files.
+# These are YAML files that hold all the details for running checks.
+#
+## Uncomment to use different control file paths.
+# masterControls: ./cfg/master.yaml
+# nodeControls: ./cfg/node.yaml
+# federatedControls: ./cfg/federated.yaml
+
+master:
+  components:
+    - apiserver
+    - scheduler
+    - controllermanager
+    - etcd
+    - flanneld
+    # kubernetes is a component to cover the config file /etc/kubernetes/config that is referred to in the benchmark
+    - kubernetes
+
+  kubernetes:
+    defaultconf: /etc/kubernetes/config
+
+  apiserver:
+    bins:
+      - "kube-apiserver"
+      - "hyperkube apiserver"
+      - "hyperkube kube-apiserver"
+      - "apiserver"
+    confs:
+      - /etc/kubernetes/apiserver.conf
+      - /etc/kubernetes/apiserver
+    defaultconf: /etc/kubernetes/apiserver
+
+  scheduler:
+    bins:
+      - "kube-scheduler"
+      - "hyperkube scheduler"
+      - "hyperkube kube-scheduler"
+      - "scheduler"
+    confs:
+      - /etc/kubernetes/scheduler.conf
+      - /etc/kubernetes/scheduler
+    defaultconf: /etc/kubernetes/scheduler
+
+  controllermanager:
+    bins:
+      - "kube-controller-manager"
+      - "hyperkube controller-manager"
+      - "hyperkube kube-controller-manager"
+      - "controller-manager"
+    confs:
+      - /etc/kubernetes/controller-manager.conf
+      - /etc/kubernetes/controller-manager
+    defaultconf: /etc/kubernetes/controller-manager
+
+  etcd:
+    optional: true
+    bins:
+      - "etcd"
+    confs:
+      - /etc/etcd/etcd.conf
+    defaultconf: /etc/etcd/etcd.conf
+
+  flanneld:
+    optional: true
+    bins:
+      - flanneld
+    defaultconf: /etc/sysconfig/flanneld
+
+node:
+  components:
+    - kubelet
+    - proxy
+    # kubernetes is a component to cover the config file /etc/kubernetes/config that is referred to in the benchmark
+    - kubernetes
+
+  kubernetes:
+    defaultconf: /etc/kubernetes/config
+
+  kubelet:
+    bins:
+      - "hyperkube kubelet"
+      - "kubelet"
+    defaultconf: "/var/lib/kubelet/config.yaml"
+    defaultsvc: "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
+    defaultkubeconfig: "/etc/kubernetes/kubelet.conf"
+
+  proxy:
+    bins:
+      - "kube-proxy"
+      - "hyperkube proxy"
+      - "proxy"
+    confs:
+      - /etc/kubernetes/proxy
+      - /etc/kubernetes/addons/kube-proxy-daemonset.yaml
+    defaultkubeconfig: "/etc/kubernetes/proxy.conf"
+
+federated:
+  components:
+    - fedapiserver
+    - fedcontrollermanager
+
+  fedapiserver:
+    bins:
+      - "hyperkube federation-apiserver"
+      - "kube-federation-apiserver"
+      - "federation-apiserver"
+
+  fedcontrollermanager:
+    bins:
+      - "hyperkube federation-controller-manager"
+      - "kube-federation-controller-manager"
+      - "federation-controller-manager"
