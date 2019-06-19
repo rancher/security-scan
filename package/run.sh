@@ -4,6 +4,9 @@ set -x
 
 echo "Rancher: Running CIS Benchmarks"
 
+defaultCMName=cis-$(date +"%Y-%m-%d-%H-%M-%S-%N")
+CONFIGMAPNAME=${CONFIGMAPNAME:-${defaultCMName}}
+
 # Run sonobuoy first
 sonobuoy master -v 3
 if [ $? -ne 0 ]; then
@@ -32,7 +35,7 @@ KBS_INPUT_DIR=${KUBE_BENCH_SUMMARIZER_ROOT}/input/plugins/${PLUGIN_NAME}/results
 KBS_OUTPUT_DIR=${KUBE_BENCH_SUMMARIZER_ROOT}/output
 KBS_OUPTPUT_FILENAME=report.json
 
-kube-bench-summarizer --input-dir ${KBS_INPUT_DIR} --output-dir ${KBS_OUTPUT_DIR}
+kube-bench-summarizer --failures-only --input-dir ${KBS_INPUT_DIR} --output-dir ${KBS_OUTPUT_DIR}
 if [ $? -ne 0 ]; then
   echo "error running kube-bench-summarizer"
   exit 1
@@ -40,7 +43,7 @@ fi
 
 # Create a config map with results
 kubectl -n ${SONOBUOY_NS} \
-  create cm cis-$(date +"%Y-%m-%d-%H-%M-%S-%N") \
+  create cm  ${CONFIGMAPNAME} \
   --from-file ${KBS_OUTPUT_DIR}/${KBS_OUPTPUT_FILENAME}
 if [ $? -ne 0 ]; then
   echo "error creating configmap for storing the report"
@@ -53,4 +56,5 @@ kubectl -n ${SONOBUOY_NS} \
   ${DONE_ANNOTATION_KEY}=${DONE_ANNOTATION_VALUE}
 
 # Wait
+# The controller will remove this chart once the done annotation is detected
 sleep infinity

@@ -1,5 +1,14 @@
 #!/bin/bash
 
+DEBUG_TIME_IN_SEC=${DEBUG_TIME_IN_SEC:-300}
+
+while test $# != 0
+do
+    case "$1" in
+    -d) DEBUG=true ;;
+    esac
+    shift
+done
 
 KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
 K8S_API_VERSION=$(curl -sSk \
@@ -30,8 +39,12 @@ if [[ "$(pgrep etcd)" -gt 0 ]]; then
   MASTER_GROUPS="${MASTER_GROUPS},1.5"
 fi
 
+# Skip 1.6, no scored
+MASTER_GROUPS="${MASTER_GROUPS},1.7"
+
 if [[ "${IS_MASTER}" -gt 0 ]]; then
   kube-bench master \
+    --v=5 \
     --config-dir=${CONFIG_DIR} \
     --group=${MASTER_GROUPS} \
     --version ${K8S_API_VERSION} \
@@ -45,6 +58,7 @@ fi
 # Run kube-bench on node
 if [[ "$(pgrep kubelet)" -gt 0 ]]; then
   kube-bench node \
+    --v=5 \
     --config-dir=${CONFIG_DIR} \
     --version ${K8S_API_VERSION} \
     --json \
@@ -56,6 +70,10 @@ fi
 
 cd ${RESULTS_DIR}
 tar -czf ${TAR_FILE_NAME}.tar.gz *
+
+if [[ "${DEBUG}" == "true" ]]; then
+    sleep ${DEBUG_TIME_IN_SEC}
+fi
 
 # Inform sonobuoy worker about completion of the job
 echo -n "${RESULTS_DIR}/${TAR_FILE_NAME}.tar.gz" > "${RESULTS_DIR}/done"

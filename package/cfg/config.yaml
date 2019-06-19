@@ -83,7 +83,8 @@ node:
       - "kubelet"
     defaultconf: "/var/lib/kubelet/config.yaml"
     defaultsvc: "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
-    defaultkubeconfig: "/etc/kubernetes/kubelet.conf"
+    defaultkubeconfig: "/node/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
+    defaultcafile: "/node/etc/kubernetes/ssl/kube-ca.pem"
 
   proxy:
     bins:
@@ -93,21 +94,5 @@ node:
     confs:
       - /etc/kubernetes/proxy
       - /etc/kubernetes/addons/kube-proxy-daemonset.yaml
-    defaultkubeconfig: "/etc/kubernetes/proxy.conf"
+    defaultkubeconfig: "/node/etc/kubernetes/ssl/kubecfg-kube-proxy.yaml"
 
-federated:
-  components:
-    - fedapiserver
-    - fedcontrollermanager
-
-  fedapiserver:
-    bins:
-      - "hyperkube federation-apiserver"
-      - "kube-federation-apiserver"
-      - "federation-apiserver"
-
-  fedcontrollermanager:
-    bins:
-      - "hyperkube federation-controller-manager"
-      - "kube-federation-controller-manager"
-      - "federation-controller-manager"

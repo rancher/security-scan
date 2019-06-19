@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/rancher/cis-k8s/cmd/kube-bench-summarizer/summarizer"
@@ -9,8 +10,9 @@ import (
 )
 
 const (
-	INPUT_DIR_FLAG  = "input-dir"
-	OUTPUT_DIR_FLAG = "output-dir"
+	INPUT_DIR_FLAG     = "input-dir"
+	OUTPUT_DIR_FLAG    = "output-dir"
+	FAILURES_ONLY_FLAG = "failures-only"
 )
 
 var (
@@ -32,6 +34,9 @@ func main() {
 			Name:  OUTPUT_DIR_FLAG,
 			Value: "",
 		},
+		cli.BoolFlag{
+			Name: FAILURES_ONLY_FLAG,
+		},
 	}
 	app.Action = run
 
@@ -44,24 +49,23 @@ func run(c *cli.Context) error {
 	logrus.Info("Running Summarizer")
 	inputDir := c.String(INPUT_DIR_FLAG)
 	outputDir := c.String(OUTPUT_DIR_FLAG)
+	failuresOnly := c.Bool(FAILURES_ONLY_FLAG)
 
 	if inputDir == "" {
-		logrus.Errorf("error: %v not specified", INPUT_DIR_FLAG)
-		return nil
+		return fmt.Errorf("error: %v not specified", INPUT_DIR_FLAG)
 	}
 
 	if outputDir == "" {
-		logrus.Errorf("error: %v not specified", OUTPUT_DIR_FLAG)
-		return nil
+		return fmt.Errorf("error: %v not specified", OUTPUT_DIR_FLAG)
 	}
 
 	s := summarizer.NewSummarizer(
 		inputDir,
 		outputDir,
+		failuresOnly,
 	)
 	if err := s.Summarize(); err != nil {
-		logrus.Fatalf("error summarizing: %v", err)
-		return err
+		return fmt.Errorf("error summarizing: %v", err)
 	}
 
 	return nil
