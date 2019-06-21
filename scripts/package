@@ -17,7 +17,7 @@ fi
 
 mkdir -p dist/artifacts
 
-IMAGE=${REPO}/cis-k8s:${TAG}
+IMAGE=${REPO}/security-scan:${TAG}
 DOCKERFILE=package/Dockerfile
 if [ -e ${DOCKERFILE}.${ARCH} ]; then
     DOCKERFILE=${DOCKERFILE}.${ARCH}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rancher/cis-k8s/cmd/kube-bench-summarizer/summarizer"
+	"github.com/rancher/security-scan/cmd/kube-bench-summarizer/summarizer"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
