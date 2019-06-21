@@ -1,4 +1,4 @@
-cis-k8s
+security-scan
 ========
 
 This repo has all the stuff needed for running CIS scan on RKE clusters.
@@ -8,7 +8,7 @@ Multi-purpose repo:
 - kube-bench-summarizer
 - plugin script for sonobuoy tool (a different script is passed using command)
 
-The corresponding docker image (rancher/cis-k8s) is used in the system charts.
+The corresponding docker image (rancher/security-scan) is used in the system charts.
 
 ## Building
 
