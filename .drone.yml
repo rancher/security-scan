@@ -10,6 +10,7 @@ steps:
 - name: build
   image: rancher/dapper:v0.4.1
   commands:
+  - export REPO=${DRONE_REPO_NAMESPACE}
   - dapper ci
   volumes:
   - name: docker
