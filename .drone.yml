@@ -73,6 +73,7 @@ steps:
 - name: build
   image: rancher/dapper:v0.4.1
   commands:
+  - export REPO=${DRONE_REPO_NAMESPACE}
   - dapper ci
   volumes:
   - name: docker
@@ -135,6 +136,7 @@ steps:
 - name: build
   image: rancher/dapper:v0.4.1
   commands:
+  - export REPO=${DRONE_REPO_NAMESPACE}
   - dapper ci
   volumes:
   - name: docker
@@ -205,8 +207,8 @@ steps:
       - linux/amd64
       - linux/arm64
       - linux/arm
-    target: "rancher/security-scan:${DRONE_TAG}"
-    template: "rancher/security-scan:${DRONE_TAG}-ARCH"
+    target: "${DRONE_REPO_NAMESPACE}/security-scan:${DRONE_TAG}"
+    template: "${DRONE_REPO_NAMESPACE}/security-scan:${DRONE_TAG}-ARCH"
   when:
     instance:
     - drone-publish.rancher.io
