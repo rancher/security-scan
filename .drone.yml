@@ -10,6 +10,7 @@ steps:
 - name: build
   image: rancher/dapper:v0.4.1
   commands:
+  - export REPO=${DRONE_REPO_NAMESPACE}
   - dapper ci
   volumes:
   - name: docker
@@ -42,7 +43,7 @@ steps:
     dockerfile: package/Dockerfile
     password:
       from_secret: docker_password
-    repo: "rancher/security-scan"
+    repo: "${DRONE_REPO_NAMESPACE}/security-scan"
     tag: "${DRONE_TAG}-amd64"
     username:
       from_secret: docker_username
@@ -72,6 +73,7 @@ steps:
 - name: build
   image: rancher/dapper:v0.4.1
   commands:
+  - export REPO=${DRONE_REPO_NAMESPACE}
   - dapper ci
   volumes:
   - name: docker
@@ -104,7 +106,7 @@ steps:
     dockerfile: package/Dockerfile
     password:
       from_secret: docker_password
-    repo: "rancher/security-scan"
+    repo: "${DRONE_REPO_NAMESPACE}/security-scan"
     tag: "${DRONE_TAG}-arm64"
     username:
       from_secret: docker_username
@@ -134,6 +136,7 @@ steps:
 - name: build
   image: rancher/dapper:v0.4.1
   commands:
+  - export REPO=${DRONE_REPO_NAMESPACE}
   - dapper ci
   volumes:
   - name: docker
@@ -166,7 +169,7 @@ steps:
     dockerfile: package/Dockerfile
     password:
       from_secret: docker_password
-    repo: "rancher/security-scan"
+    repo: "${DRONE_REPO_NAMESPACE}/security-scan"
     tag: "${DRONE_TAG}-arm"
     username:
       from_secret: docker_username
@@ -204,8 +207,8 @@ steps:
       - linux/amd64
       - linux/arm64
       - linux/arm
-    target: "rancher/security-scan:${DRONE_TAG}"
-    template: "rancher/security-scan:${DRONE_TAG}-ARCH"
+    target: "${DRONE_REPO_NAMESPACE}/security-scan:${DRONE_TAG}"
+    template: "${DRONE_REPO_NAMESPACE}/security-scan:${DRONE_TAG}-ARCH"
   when:
     instance:
     - drone-publish.rancher.io
