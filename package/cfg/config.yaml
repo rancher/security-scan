@@ -5,7 +5,6 @@
 ## Uncomment to use different control file paths.
 # masterControls: ./cfg/master.yaml
 # nodeControls: ./cfg/node.yaml
-# federatedControls: ./cfg/federated.yaml
 
 master:
   components:
@@ -27,9 +26,10 @@ master:
       - "hyperkube kube-apiserver"
       - "apiserver"
     confs:
-      - /etc/kubernetes/apiserver.conf
-      - /etc/kubernetes/apiserver
-    defaultconf: /etc/kubernetes/apiserver
+      - /etc/kubernetes/manifests/kube-apiserver.yaml
+      - /etc/kubernetes/manifests/kube-apiserver.manifest
+      - /var/snap/kube-apiserver/current/args
+    defaultconf: /etc/kubernetes/manifests/kube-apiserver.yaml
 
   scheduler:
     bins:
@@ -38,28 +38,34 @@ master:
       - "hyperkube kube-scheduler"
       - "scheduler"
     confs:
-      - /etc/kubernetes/scheduler.conf
-      - /etc/kubernetes/scheduler
-    defaultconf: /etc/kubernetes/scheduler
+      - /etc/kubernetes/manifests/kube-scheduler.yaml
+      - /etc/kubernetes/manifests/kube-scheduler.manifest
+      - /var/snap/kube-scheduler/current/args
+    defaultconf: /etc/kubernetes/manifests/kube-scheduler.yaml
 
   controllermanager:
     bins:
       - "kube-controller-manager"
+      - "kube-controller"
       - "hyperkube controller-manager"
       - "hyperkube kube-controller-manager"
       - "controller-manager"
     confs:
-      - /etc/kubernetes/controller-manager.conf
-      - /etc/kubernetes/controller-manager
-    defaultconf: /etc/kubernetes/controller-manager
+      - /etc/kubernetes/manifests/kube-controller-manager.yaml
+      - /etc/kubernetes/manifests/kube-controller-manager.manifest
+      - /var/snap/kube-controller-manager/current/args
+    defaultconf: /etc/kubernetes/manifests/kube-controller-manager.yaml
 
   etcd:
     optional: true
     bins:
       - "etcd"
     confs:
+      - /etc/kubernetes/manifests/etcd.yaml
+      - /etc/kubernetes/manifests/etcd.manifest
       - /etc/etcd/etcd.conf
-    defaultconf: /etc/etcd/etcd.conf
+      - /var/snap/etcd/common/etcd.conf.yml
+    defaultconf: /etc/kubernetes/manifests/etcd.yaml
 
   flanneld:
     optional: true
@@ -75,24 +81,67 @@ node:
     - kubernetes
 
   kubernetes:
-    defaultconf: /etc/kubernetes/config
+    defaultconf: "/etc/kubernetes/config"
 
   kubelet:
+    cafile:
+      - "/etc/kubernetes/pki/ca.crt"
+      - "/etc/kubernetes/certs/ca.crt"
+      - "/etc/kubernetes/cert/ca.pem"
+    svc:
+      # These paths must also be included
+      #  in the 'confs' property below
+      - "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
+      - "/etc/systemd/system/kubelet.service"
+      - "/lib/systemd/system/kubelet.service"
+      - "/etc/systemd/system/snap.kubelet.daemon.service"
     bins:
       - "hyperkube kubelet"
       - "kubelet"
+    kubeconfig:
+      - "/etc/kubernetes/kubelet.conf"
+      - "/var/lib/kubelet/kubeconfig"
+      - "/etc/kubernetes/kubelet-kubeconfig"
+    confs:
+      - "/var/lib/kubelet/config.yaml"
+      - "/etc/kubernetes/kubelet/kubelet-config.json"
+      - "/home/kubernetes/kubelet-config.yaml"
+      - "/etc/default/kubelet"
+      - "/var/lib/kubelet/kubeconfig"
+      - "/var/snap/kubelet/current/args"
+      ## Due to the fact that the kubelet might be configured
+      ## without a kubelet-config file, we use a work-around
+      ## of pointing to the systemd service file (which can also
+      ## hold kubelet configuration).
+      ## Note: The following paths must match the one under 'svc'
+      - "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
+      - "/etc/systemd/system/kubelet.service"
+      - "/lib/systemd/system/kubelet.service"
+      - "/etc/systemd/system/snap.kubelet.daemon.service"
     defaultconf: "/var/lib/kubelet/config.yaml"
     defaultsvc: "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
-    defaultkubeconfig: "/node/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
-    defaultcafile: "/node/etc/kubernetes/ssl/kube-ca.pem"
+    defaultkubeconfig: "/etc/kubernetes/kubelet.conf"
+    defaultcafile: "/etc/kubernetes/pki/ca.crt"
 
   proxy:
+    optional: true
     bins:
       - "kube-proxy"
       - "hyperkube proxy"
+      - "hyperkube kube-proxy"
       - "proxy"
     confs:
       - /etc/kubernetes/proxy
       - /etc/kubernetes/addons/kube-proxy-daemonset.yaml
-    defaultkubeconfig: "/node/etc/kubernetes/ssl/kubecfg-kube-proxy.yaml"
+      - /var/snap/kube-proxy/current/args
+    kubeconfig:
+      - /etc/kubernetes/kubelet-kubeconfig
+    svc:
+      - "/lib/systemd/system/kube-proxy.service"
+    defaultconf: /etc/kubernetes/addons/kube-proxy-daemonset.yaml
+    defaultkubeconfig: "/etc/kubernetes/proxy.conf"
 
+version_mapping:
+  "rke-1.13": "rke-cis-1.4"
+  "rke-1.14": "rke-cis-1.4"
+  "rke-1.15": "rke-cis-1.4"
