@@ -1,8 +1,0 @@
-kube-bench
-*.swp
-vendor
-dist
-.vscode/
-hack/kind.test.yaml
-
-.idea/

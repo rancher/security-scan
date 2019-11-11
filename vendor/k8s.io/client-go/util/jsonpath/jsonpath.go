@@ -93,17 +93,17 @@ func (j *JSONPath) FindResults(data interface{}) ([][]reflect.Value, error) {
 
 		// encounter an end node, break the current block
 		if j.endRange > 0 && j.endRange <= j.inRange {
-			j.endRange--
+			j.endRange -= 1
 			break
 		}
 		// encounter a range node, start a range loop
 		if j.beginRange > 0 {
-			j.beginRange--
-			j.inRange++
+			j.beginRange -= 1
+			j.inRange += 1
 			for k, value := range results {
 				j.parser.Root.Nodes = nodes[i+1:]
 				if k == len(results)-1 {
-					j.inRange--
+					j.inRange -= 1
 				}
 				nextResults, err := j.FindResults(value.Interface())
 				if err != nil {
@@ -213,11 +213,11 @@ func (j *JSONPath) evalIdentifier(input []reflect.Value, node *IdentifierNode) (
 	switch node.Name {
 	case "range":
 		j.stack = append(j.stack, j.cur)
-		j.beginRange++
+		j.beginRange += 1
 		results = input
 	case "end":
 		if j.endRange < j.inRange { // inside a loop, break the current block
-			j.endRange++
+			j.endRange += 1
 			break
 		}
 		// the loop is about to end, pop value and continue the following execution
@@ -255,9 +255,10 @@ func (j *JSONPath) evalArray(input []reflect.Value, node *ArrayNode) ([]reflect.
 			params[1].Value = value.Len()
 		}
 
-		if params[1].Value < 0 || (params[1].Value == 0 && params[1].Derived) {
+		if params[1].Value < 0 {
 			params[1].Value += value.Len()
 		}
+
 		sliceLength := value.Len()
 		if params[1].Value != params[0].Value { // if you're requesting zero elements, allow it through.
 			if params[0].Value >= sliceLength || params[0].Value < 0 {
@@ -266,23 +267,14 @@ func (j *JSONPath) evalArray(input []reflect.Value, node *ArrayNode) ([]reflect.
 			if params[1].Value > sliceLength || params[1].Value < 0 {
 				return input, fmt.Errorf("array index out of bounds: index %d, length %d", params[1].Value-1, sliceLength)
 			}
-			if params[0].Value > params[1].Value {
-				return input, fmt.Errorf("starting index %d is greater than ending index %d", params[0].Value, params[1].Value)
-			}
+		}
+
+		if !params[2].Known {
+			value = value.Slice(params[0].Value, params[1].Value)
 		} else {
-			return result, nil
+			value = value.Slice3(params[0].Value, params[1].Value, params[2].Value)
 		}
-
-		value = value.Slice(params[0].Value, params[1].Value)
-
-		step := 1
-		if params[2].Known {
-			if params[2].Value <= 0 {
-				return input, fmt.Errorf("step must be > 0")
-			}
-			step = params[2].Value
-		}
-		for i := 0; i < value.Len(); i += step {
+		for i := 0; i < value.Len(); i++ {
 			result = append(result, value.Index(i))
 		}
 	}
