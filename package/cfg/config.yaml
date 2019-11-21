@@ -102,6 +102,7 @@ node:
       - "/etc/kubernetes/kubelet.conf"
       - "/var/lib/kubelet/kubeconfig"
       - "/etc/kubernetes/kubelet-kubeconfig"
+      - "/node/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
     confs:
       - "/var/lib/kubelet/config.yaml"
       - "/etc/kubernetes/kubelet/kubelet-config.json"
@@ -145,3 +146,4 @@ version_mapping:
   "rke-1.13": "rke-cis-1.4"
   "rke-1.14": "rke-cis-1.4"
   "rke-1.15": "rke-cis-1.4"
+  "rke-1.16": "rke-cis-1.4"

@@ -4,4 +4,4 @@
 /bin
 /dist
 *.swp
-/cmd/kube-bench-summarizer/kube-bench-summarizer
+/cmd/kb-summarizer/kb-summarizer

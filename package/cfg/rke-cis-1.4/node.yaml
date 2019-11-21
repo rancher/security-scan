@@ -271,22 +271,6 @@ groups:
       Certificate Rotation is handled by RKE directly.
     scored: true
 
-  - id: 2.1.14
-    text: "Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Not Scored)"
-    audit: "ps -fC $kubeletbin"
-    tests:
-      test_items:
-      - flag: "--tls-cipher-suites"
-        compare:
-          op: eq
-          value: "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256"
-        set: true
-    remediation: |
-      If using a Kubelet config file, edit the file to set TLSCipherSuites: to TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 ,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 ,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 ,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
-      If using executable arguments, edit the kubelet service file $kubeletconf on each worker node and set the below parameter.
-      --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
-    scored: false
-
 - id: 2.2
   text: "Configuration Files"
   checks:
@@ -376,6 +360,7 @@ groups:
       scored: true
 
     - id: 2.2.5
+      type: skip
       text: "Ensure that the proxy kubeconfig file permissions are set to 644 or more restrictive (Scored)"
       audit: "/bin/sh -c 'if test -e $proxykubeconfig; then stat -c %a $proxykubeconfig; fi'"
       tests:
@@ -397,12 +382,12 @@ groups:
             value: "600"
           set: true
       remediation: |
-        Run the below command (based on the file location on your system) on the each worker
-        node. For example,
-        chmod 644 $proxykubeconfig
+        Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-proxy.
+        All configuration is passed in as arguments at container run time.
       scored: true
 
     - id: 2.2.6
+      type: skip
       text: "Ensure that the proxy kubeconfig file ownership is set to root:root (Scored)"
       audit: "/bin/sh -c 'if test -e $proxykubeconfig; then stat -c %U:%G $proxykubeconfig; fi'"
       tests:
@@ -410,9 +395,8 @@ groups:
         - flag: "root:root"
           set: true
       remediation: |
-          Run the below command (based on the file location on your system) on the each worker
-          node. For example,
-          chown root:root $proxykubeconfig
+        Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-proxy.
+        All configuration is passed in as arguments at container run time.
       scored: true
 
     - id: 2.2.7
