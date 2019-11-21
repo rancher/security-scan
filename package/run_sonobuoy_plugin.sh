@@ -24,48 +24,58 @@ set -x
 
 TAR_FILE_NAME="${TAR_FILE_NAME:-kb}"
 CONFIG_DIR="${CONFIG_DIR:-/cfg}"
+ETCD_CONFIG_DIR="${ETCD_CONFIG_DIR:-/etcdcfg}"
 RESULTS_DIR="${RESULTS_DIR:-/tmp/results}"
 
 mkdir -p "${RESULTS_DIR}"
 
-# Run kube-bench on master
-IS_MASTER=0
-MASTER_GROUPS="1.1,1.2,1.3,1.4"
-
-if [[ "$(pgrep apiserver)" -gt 0 ]]; then
-  IS_MASTER=1
-fi
-
+# etcd
 if [[ "$(pgrep etcd)" -gt 0 ]]; then
-  MASTER_GROUPS="${MASTER_GROUPS},1.5"
-fi
-
-# Skip 1.6, not scored
-MASTER_GROUPS="${MASTER_GROUPS},1.7"
-
-if [[ "${IS_MASTER}" -gt 0 ]]; then
   if ! kube-bench master \
+    -f etcd.yaml \
+    --scored \
+    --nosummary \
+    --noremediations \
     --v=5 \
-    --config-dir="${CONFIG_DIR}" \
-    --group="${MASTER_GROUPS}" \
+    --config-dir="${ETCD_CONFIG_DIR}" \
     --version "${RANCHER_K8S_VERSION}" \
     --json \
-  > "${RESULTS_DIR}/master.json"
+    --outputfile "${RESULTS_DIR}/etcd.json"
   then
-    echo "error running kube-bench master"
+    echo "error running kube-bench: etcd"
   fi
 fi
 
-# Run kube-bench on node
+# master (no etcd)
+if [[ "$(pgrep apiserver)" -gt 0 ]]; then
+  if ! kube-bench master \
+    -f master.yaml \
+    --scored \
+    --nosummary \
+    --noremediations \
+    --v=5 \
+    --config-dir="${CONFIG_DIR}" \
+    --version "${RANCHER_K8S_VERSION}" \
+    --json \
+    --outputfile "${RESULTS_DIR}/master.json"
+  then
+    echo "error running kube-bench: master"
+  fi
+fi
+
 if [[ "$(pgrep kubelet)" -gt 0 ]]; then
   if ! kube-bench node \
+    -f node.yaml \
+    --scored \
+    --nosummary \
+    --noremediations \
     --v=5 \
     --config-dir="${CONFIG_DIR}" \
     --version "${RANCHER_K8S_VERSION}" \
     --json \
   > "${RESULTS_DIR}/node.json"
   then
-    echo "error running kube-bench node"
+    echo "error running kube-bench: node"
   fi
 fi
 

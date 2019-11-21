@@ -1,0 +1,26 @@
+---
+## Controls Files.
+# These are YAML files that hold all the details for running checks.
+#
+## Uncomment to use different control file paths.
+# masterControls: ./cfg/master.yaml
+# nodeControls: ./cfg/node.yaml
+
+master:
+  components:
+    - etcd
+  etcd:
+    optional: true
+    bins:
+      - "etcd"
+    confs:
+      - /etc/kubernetes/manifests/etcd.yaml
+      - /etc/kubernetes/manifests/etcd.manifest
+      - /etc/etcd/etcd.conf
+      - /var/snap/etcd/common/etcd.conf.yml
+    defaultconf: /etc/kubernetes/manifests/etcd.yaml
+
+version_mapping:
+  "rke-1.13": "rke-cis-1.4"
+  "rke-1.14": "rke-cis-1.4"
+  "rke-1.15": "rke-cis-1.4"

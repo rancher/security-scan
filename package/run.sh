@@ -1,11 +1,34 @@
 #!/bin/bash
 
 set -x
-
-echo "Rancher: Running CIS Benchmarks"
+set -eE
 
 defaultCMName=cis-$(date +"%Y-%m-%d-%H-%M-%S-%N")
-CONFIGMAPNAME=${CONFIGMAPNAME:-${defaultCMName}}
+OUTPUT_CONFIGMAPNAME=${OUTPUT_CONFIGMAPNAME:-${defaultCMName}}
+
+SONOBUOY_NS=${SONOBUOY_NS:-sonobuoy}
+SONOBUOY_POD_NAME=${SONOBUOY_POD_NAME:-sonobuoy}
+
+DONE_ANNOTATION_KEY="field.cattle.io/sonobuoyDone"
+DONE_ANNOTATION_VALUE="true"
+ERROR_ANNOTATION_VALUE="error"
+
+KBS_CONFIG_FILE_LOCATION=/etc/kbs/config.json
+
+handle_error() {
+  # Annotate self (pod) to signal "error"
+  if ! kubectl -n "${SONOBUOY_NS}" \
+    annotate pod "${SONOBUOY_POD_NAME}" \
+    ${DONE_ANNOTATION_KEY}=${ERROR_ANNOTATION_VALUE}
+  then
+    echo "error annotating self pod"
+  fi
+  sleep infinity
+}
+
+trap 'handle_error' ERR
+
+echo "Rancher: Running CIS Benchmarks"
 
 # Run sonobuoy first
 if ! sonobuoy master -v 3
@@ -14,21 +37,14 @@ then
   exit 1
 fi
 
-# This is hardcoded in the tool itself
-SONOBUOY_NS=${SONOBUOY_NS:-sonobuoy}
-SONOBUOY_POD_NAME=${SONOBUOY_POD_NAME:-sonobuoy}
-
-DONE_ANNOTATION_KEY="field.cattle.io/sonobuoyDone"
-DONE_ANNOTATION_VALUE="true"
-
 # Run summarizer
 SONOBUOY_OUTPUT_DIR=${SONOBUOY_OUTPUT_DIR:-/tmp/sonobuoy}
 SONOBUOY_OUTPUT_FILE=$(ls -1 "${SONOBUOY_OUTPUT_DIR}"/*.tar.gz)
 
-KUBE_BENCH_SUMMARIZER_ROOT=${KUBE_BENCH_SUMMARIZER_ROOT:-/tmp/kube-bench-summarizer}
+KB_SUMMARIZER_ROOT=${KB_SUMMARIZER_ROOT:-/tmp/kb-summarizer}
 
-mkdir -p "${KUBE_BENCH_SUMMARIZER_ROOT}"/{input,output}
-if ! tar -C "${KUBE_BENCH_SUMMARIZER_ROOT}"/input \
+mkdir -p "${KB_SUMMARIZER_ROOT}"/{input,output}
+if ! tar -C "${KB_SUMMARIZER_ROOT}"/input \
          -xvf "${SONOBUOY_OUTPUT_FILE}" \
          --warning=no-timestamp
 then
@@ -37,9 +53,9 @@ then
 fi
 
 PLUGIN_NAME=${PLUGIN_NAME:-rancher-kube-bench}
-KBS_INPUT_DIR=${KUBE_BENCH_SUMMARIZER_ROOT}/input/plugins/${PLUGIN_NAME}/results
-KBS_OUTPUT_DIR=${KUBE_BENCH_SUMMARIZER_ROOT}/output
-KBS_OUPTPUT_FILENAME=report.json
+KBS_INPUT_DIR=${KB_SUMMARIZER_ROOT}/input/plugins/${PLUGIN_NAME}/results
+KBS_OUTPUT_DIR=${KB_SUMMARIZER_ROOT}/output
+KBS_OUTPUT_FILENAME=output.json
 
 KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
 K8S_API_VERSION=$(curl -sSk \
@@ -49,31 +65,43 @@ K8S_API_VERSION=$(curl -sSk \
 RANCHER_K8S_VERSION="rke-${K8S_API_VERSION}"
 echo "Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 
-if ! kube-bench-summarizer \
+if [[ "${SKIP}" != "" ]]; then
+  echo "found SKIP=${SKIP}, ignoring configmap"
+else
+  if [[ -f "${KBS_CONFIG_FILE_LOCATION}" ]]; then
+    echo "using skip config from configmap"
+    export SKIP_CONFIG_FILE="${KBS_CONFIG_FILE_LOCATION}"
+  fi
+fi
+# Env Vars:
+#   - SKIP
+#   - SKIP_CONFIG_FILE
+if ! kb-summarizer \
       --k8s-version "${RANCHER_K8S_VERSION}" \
       --input-dir "${KBS_INPUT_DIR}" \
-      --output-dir "${KBS_OUTPUT_DIR}"
+      --output-dir "${KBS_OUTPUT_DIR}" \
+      --output-filename "${KBS_OUTPUT_FILENAME}"
 then
-  echo "error running kube-bench-summarizer"
-  exit 1
+  echo "error running kb-summarizer"
+  handle_error
 fi
 
 # Create a config map with results
 if ! kubectl -n "${SONOBUOY_NS}" \
-  create cm  "${CONFIGMAPNAME}" \
-  --from-file "${KBS_OUTPUT_DIR}"/${KBS_OUPTPUT_FILENAME}
+  create cm  "${OUTPUT_CONFIGMAPNAME}" \
+  --from-file "${KBS_OUTPUT_DIR}"/${KBS_OUTPUT_FILENAME}
 then
   echo "error creating configmap for storing the report"
-  exit 1
+  handle_error
 fi
 
 # Annotate self (pod) to signal "done"
 if ! kubectl -n "${SONOBUOY_NS}" \
-  annotate pod ${SONOBUOY_POD_NAME} \
+  annotate pod "${SONOBUOY_POD_NAME}" \
   ${DONE_ANNOTATION_KEY}=${DONE_ANNOTATION_VALUE}
 then
   echo "error annotating self pod"
-  exit 1
+  handle_error
 fi
 
 # Wait
