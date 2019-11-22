@@ -582,7 +582,7 @@ groups:
             - flag: "--audit-policy-file"
               compare:
                 op: eq
-                value: "/node/etc/kubernetes/audit-policy.yaml"
+                value: "/etc/kubernetes/audit-policy.yaml"
               set: true
         remediation: |
           Follow the Kubernetes documentation and set the desired audit policy in the
@@ -952,39 +952,6 @@ groups:
         remediation: |
           Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
           All configuration is passed in as arguments at container run time.
-        scored: true
-
-      - id: 1.4.11
-        text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Scored)"
-        audit: stat -c %a /node/var/lib/etcd
-        tests:
-          test_items:
-            - flag: "700"
-              compare:
-                op: eq
-                value: "700"
-              set: true
-        remediation: |
-          On the etcd server node, get the etcd data directory, passed as an argument --data-dir ,
-          from the below command:
-          ps -ef | grep $etcdbin
-          Run the below command (based on the etcd data directory found above). For example,
-          chmod 700 /var/lib/etcd
-        scored: true
-
-      - id: 1.4.12
-        text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Scored)"
-        audit: stat -c %U:%G /node/var/lib/etcd
-        tests:
-          test_items:
-            - flag: "etcd:etcd"
-              set: true
-        remediation: |
-          On the etcd server node, get the etcd data directory, passed as an argument --data-dir ,
-          from the below command:
-          ps -ef | grep $etcdbin
-          Run the below command (based on the etcd data directory found above). For example,
-          chown etcd:etcd /var/lib/etcd
         scored: true
 
       - id: 1.4.13
