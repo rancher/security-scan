@@ -95,6 +95,10 @@ then
   handle_error
 fi
 
+if [[ "${DEBUG}" == "true" ]]; then
+    sleep "${DEBUG_TIME_IN_SEC}"
+fi
+
 # Annotate self (pod) to signal "done"
 if ! kubectl -n "${SONOBUOY_NS}" \
   annotate pod "${SONOBUOY_POD_NAME}" \

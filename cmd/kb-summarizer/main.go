@@ -120,6 +120,7 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	logrus.Infof("skip: %+v", skip)
 	if version == "" {
 		return fmt.Errorf("error: %v not specified", K8SVersionFlag)
 	}
