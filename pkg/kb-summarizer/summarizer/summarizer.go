@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -38,8 +39,8 @@ type Summarizer struct {
 	OutputFilename        string
 	FailuresOnly          bool
 	fullReport            *SummarizedReport
-	groupsMap             map[string]*GroupWrapper
-	checksMaps            map[string]*CheckWrapper
+	groupWrappersMap      map[string]*GroupWrapper
+	checkWrappersMaps     map[string]*CheckWrapper
 	skip                  map[string]bool
 	nodeSeen              map[NodeType]map[string]bool
 }
@@ -60,9 +61,9 @@ const (
 type NodeType string
 
 const (
-	NodeTypeEtcd   NodeType = "etcd"
-	NodeTypeMaster NodeType = "master"
-	NodeTypeNode   NodeType = "node"
+	NodeTypeEtcd   NodeType = "e"
+	NodeTypeMaster NodeType = "m"
+	NodeTypeNode   NodeType = "n"
 )
 
 type CheckWrapper struct {
@@ -73,23 +74,24 @@ type CheckWrapper struct {
 	State       State                 `json:"s"`
 	Scored      bool                  `json:"-"`
 	Result      map[kb.State][]string `json:"-"`
+	NodeType    []NodeType            `json:"t"`
 	Nodes       []string              `json:"n,omitempty"`
 }
 
 type GroupWrapper struct {
-	ID     string          `yaml:"id" json:"id"`
-	Text   string          `json:"d"`
-	Checks []*CheckWrapper `json:"o"`
+	ID            string          `yaml:"id" json:"id"`
+	Text          string          `json:"d"`
+	CheckWrappers []*CheckWrapper `json:"o"`
 }
 
 type SummarizedReport struct {
-	Version string                       `json:"-"`
-	Total   int                          `json:"t"`
-	Fail    int                          `json:"f"`
-	Pass    int                          `json:"p"`
-	Skip    int                          `json:"s"`
-	Nodes   map[NodeType][]string        `json:"n"`
-	Results map[NodeType][]*GroupWrapper `json:"o"`
+	Version       string                `json:"-"`
+	Total         int                   `json:"t"`
+	Fail          int                   `json:"f"`
+	Pass          int                   `json:"p"`
+	Skip          int                   `json:"s"`
+	Nodes         map[NodeType][]string `json:"n"`
+	GroupWrappers []*GroupWrapper       `json:"o"`
 }
 
 func NewSummarizer(k8sVersion, controlsDir, etcdControlsDir, inputDir, outputDir, outputFilename, skipStr string, failuresOnly bool) (*Summarizer, error) {
@@ -102,13 +104,13 @@ func NewSummarizer(k8sVersion, controlsDir, etcdControlsDir, inputDir, outputDir
 		OutputFilename:        outputFilename,
 		FailuresOnly:          failuresOnly,
 		fullReport: &SummarizedReport{
-			Nodes:   map[NodeType][]string{},
-			Results: map[NodeType][]*GroupWrapper{},
+			Nodes:         map[NodeType][]string{},
+			GroupWrappers: []*GroupWrapper{},
 		},
-		groupsMap:  map[string]*GroupWrapper{},
-		checksMaps: map[string]*CheckWrapper{},
-		skip:       getSkipMap(skipStr),
-		nodeSeen:   map[NodeType]map[string]bool{},
+		groupWrappersMap:  map[string]*GroupWrapper{},
+		checkWrappersMaps: map[string]*CheckWrapper{},
+		skip:              getSkipMap(skipStr),
+		nodeSeen:          map[NodeType]map[string]bool{},
 	}
 	if err := s.loadControls(); err != nil {
 		return nil, fmt.Errorf("error loading controls: %v", err)
@@ -135,9 +137,9 @@ func (s *Summarizer) processOneResultFileForHost(results *kb.Controls, hostname 
 				continue
 			}
 			logrus.Infof("host:%v id: %v %v", hostname, check.ID, check.State)
-			logrus.Debugf("check: %+v", check)
-			c := s.checksMaps[check.ID]
-			if c == nil {
+			printCheck(check)
+			cw := s.checkWrappersMaps[check.ID]
+			if cw == nil {
 				logrus.Errorf("check %v found in results but not in spec", check.ID)
 				continue
 			}
@@ -151,10 +153,10 @@ func (s *Summarizer) processOneResultFileForHost(results *kb.Controls, hostname 
 				check.State = kb.PASS
 			}
 
-			if c.Result[check.State] == nil {
-				c.Result[check.State] = []string{hostname}
+			if cw.Result[check.State] == nil {
+				cw.Result[check.State] = []string{hostname}
 			} else {
-				c.Result[check.State] = append(c.Result[check.State], hostname)
+				cw.Result[check.State] = append(cw.Result[check.State], hostname)
 			}
 		}
 	}
@@ -300,6 +302,7 @@ func (s *Summarizer) loadControls() error {
 
 	controlsFiles := getNodeTypeControlsFileMapping()
 
+	var groupWrappers []*GroupWrapper
 	for nodeType, controlsFile := range controlsFiles {
 		s.nodeSeen[nodeType] = map[string]bool{}
 		filePath := fmt.Sprintf("%v/%v/%v", s.getControlsDir(nodeType), benchmarkVersion, controlsFile)
@@ -308,30 +311,44 @@ func (s *Summarizer) loadControls() error {
 			logrus.Errorf("error loading controls from file %v: %v", filePath, err)
 			continue
 		}
-		var groups []*GroupWrapper
-		for _, group := range controls.Groups {
-			g := getGroupWrapper(group)
-			groups = append(groups, g)
-			for _, check := range group.Checks {
+		for _, g := range controls.Groups {
+			var gw *GroupWrapper
+			if gw, ok = s.groupWrappersMap[g.ID]; !ok {
+				gw = getGroupWrapper(g)
+				groupWrappers = append(groupWrappers, gw)
+				s.groupWrappersMap[g.ID] = gw
+			}
+			for _, check := range g.Checks {
 				if !check.Scored {
 					continue
 				}
-				s.fullReport.Total++
-				c := getCheckWrapper(check)
-				g.Checks = append(g.Checks, c)
-				s.checksMaps[check.ID] = c
+				if cw, ok := s.checkWrappersMaps[check.ID]; !ok {
+					s.fullReport.Total++
+					c := getCheckWrapper(check)
+					c.NodeType = []NodeType{nodeType}
+					gw.CheckWrappers = append(gw.CheckWrappers, c)
+					s.checkWrappersMaps[check.ID] = c
+				} else {
+					cw.NodeType = append(cw.NodeType, nodeType)
+				}
 			}
 		}
-		s.fullReport.Results[nodeType] = groups
 	}
+
+	sort.Slice(groupWrappers, func(i, j int) bool {
+		return groupWrappers[i].ID < groupWrappers[j].ID
+	})
+	s.fullReport.GroupWrappers = groupWrappers
+	logrus.Debugf("total groups loaded: %v", len(s.fullReport.GroupWrappers))
+	logrus.Debugf("total controls loaded: %v", s.fullReport.Total)
 	return nil
 }
 
 func getGroupWrapper(group *kb.Group) *GroupWrapper {
 	return &GroupWrapper{
-		ID:     group.ID,
-		Text:   group.Text,
-		Checks: []*CheckWrapper{},
+		ID:            group.ID,
+		Text:          group.Text,
+		CheckWrappers: []*CheckWrapper{},
 	}
 }
 
@@ -362,62 +379,113 @@ func getCheckWrapper(check *kb.Check) *CheckWrapper {
 	}
 }
 
+func (s *Summarizer) getNodesMapOfCheckWrapper(check *CheckWrapper) map[string]bool {
+	nodes := map[string]bool{}
+	for _, nodeType := range check.NodeType {
+		for _, v := range s.fullReport.Nodes[nodeType] {
+			nodes[v] = true
+		}
+	}
+	return nodes
+}
+
+func (s *Summarizer) getMissingNodesMapOfCheckWrapper(check *CheckWrapper, nodes []string) []string {
+	allNodes := map[string]bool{}
+	for _, nodeType := range check.NodeType {
+		for _, v := range s.fullReport.Nodes[nodeType] {
+			allNodes[v] = true
+		}
+	}
+	for _, n := range nodes {
+		if _, ok := allNodes[n]; ok {
+			delete(allNodes, n)
+		}
+	}
+	logrus.Debugf("ID: %v, missing nodes: %v", check.ID, allNodes)
+	var missingNodes []string
+	for k := range allNodes {
+		missingNodes = append(missingNodes, k)
+	}
+	return missingNodes
+}
+
 // Logic:
 // - If a check has a non-PASS state on any host, the check is considered mixed.
 //   Nodes will list the ones where the check has failed.
 // - If a check has all pass, then nodes is empty. All nodes in that host type have passed.
 // - If a check has all fail, then nodes is empty. All nodes in that host type have failed.
 // - If a check is skipped, then nodes is empty.
-func (s *Summarizer) runFinalPassOnCheck(check *CheckWrapper, nodeType NodeType) {
-	if len(check.Result) == 1 {
-		if _, ok := check.Result[kb.FAIL]; ok {
-			if len(check.Result[kb.FAIL]) == len(s.fullReport.Nodes[nodeType]) {
-				check.State = Fail
+func (s *Summarizer) runFinalPassOnCheckWrapper(cw *CheckWrapper) {
+	nodesMap := s.getNodesMapOfCheckWrapper(cw)
+	nodeCount := len(nodesMap)
+	logrus.Debugf("id: %v nodeCount: %v", cw.ID, nodeCount)
+	if len(cw.Result) == 1 {
+		if _, ok := cw.Result[kb.FAIL]; ok {
+			if len(cw.Result[kb.FAIL]) == nodeCount {
+				cw.State = Fail
 				s.fullReport.Fail++
+			} else {
+				cw.State = Mixed
+				s.fullReport.Fail++
+				cw.Nodes = s.getMissingNodesMapOfCheckWrapper(cw, cw.Result[kb.FAIL])
 			}
 			return
 		}
-		if _, ok := check.Result[kb.PASS]; ok {
-			if len(check.Result[kb.PASS]) == len(s.fullReport.Nodes[nodeType]) {
-				check.State = Pass
+		if _, ok := cw.Result[kb.PASS]; ok {
+			if len(cw.Result[kb.PASS]) == nodeCount {
+				cw.State = Pass
 				s.fullReport.Pass++
-			}
-			return
-		}
-		if _, ok := check.Result[SKIP]; ok {
-			if len(check.Result[SKIP]) == len(s.fullReport.Nodes[nodeType]) {
-				check.State = Skip
-				s.fullReport.Skip++
-			}
-			return
-		}
-		for k := range check.Result {
-			if len(check.Result[k]) == len(s.fullReport.Nodes[nodeType]) {
-				check.State = Fail
+			} else {
+				cw.State = Mixed
 				s.fullReport.Fail++
-				check.Result[k] = nil
+				cw.Nodes = s.getMissingNodesMapOfCheckWrapper(cw, cw.Result[kb.PASS])
+			}
+			return
+		}
+		if _, ok := cw.Result[SKIP]; ok {
+			if len(cw.Result[SKIP]) == nodeCount {
+				cw.State = Skip
+				s.fullReport.Skip++
+			} else {
+				cw.State = Mixed
+				s.fullReport.Fail++
+				cw.Nodes = s.getMissingNodesMapOfCheckWrapper(cw, cw.Result[SKIP])
+			}
+			return
+		}
+		for k := range cw.Result {
+			if len(cw.Result[k]) == nodeCount {
+				cw.State = Fail
+				s.fullReport.Fail++
+				cw.Result[k] = nil
+			} else {
+				cw.State = Mixed
+				s.fullReport.Fail++
+				cw.Nodes = s.getMissingNodesMapOfCheckWrapper(cw, cw.Result[k])
 			}
 		}
 		return
 	}
 	s.fullReport.Fail++
-	check.State = Mixed
-	for k := range check.Result {
+	cw.State = Mixed
+	for k := range cw.Result {
 		if k == kb.PASS {
 			continue
 		}
-		check.Nodes = append(check.Nodes, check.Result[k]...)
+		cw.Nodes = append(cw.Nodes, cw.Result[k]...)
 	}
 }
 
 func (s *Summarizer) runFinalPass() error {
 	logrus.Debugf("running final pass")
-	for _, nodeType := range getNodeTypes() {
-		groups := s.fullReport.Results[nodeType]
-		for _, group := range groups {
-			for _, check := range group.Checks {
-				s.runFinalPassOnCheck(check, nodeType)
-			}
+	groups := s.fullReport.GroupWrappers
+	for _, group := range groups {
+		for _, cw := range group.CheckWrappers {
+			logrus.Debugf("before final pass on check")
+			printCheckWrapper(cw)
+			s.runFinalPassOnCheckWrapper(cw)
+			logrus.Debugf("after final pass on check")
+			printCheckWrapper(cw)
 		}
 	}
 
@@ -446,21 +514,48 @@ func (s *Summarizer) Summarize() error {
 		}
 	}
 
+	logrus.Debugf("--- before final pass")
+	s.printReport()
 	if err := s.runFinalPass(); err != nil {
 		return fmt.Errorf("error running final pass on the report: %v", err)
 	}
-
+	logrus.Debugf("--- before final pass")
+	s.printReport()
 	return s.save()
 }
 
-func (s *Summarizer) printFinalReport() error {
-	logrus.Debugf("printing final report")
+func (s *Summarizer) printReport() error {
+	logrus.Debugf("printing report")
+
+	for _, gw := range s.fullReport.GroupWrappers {
+		for _, cw := range gw.CheckWrappers {
+			printCheckWrapper(cw)
+		}
+	}
+
 	bytes, err := json.MarshalIndent(s.fullReport, "", " ")
 	if err != nil {
-		return fmt.Errorf("error marshalling final report: %v", err)
+		return fmt.Errorf("error marshalling report: %v", err)
 	}
 
 	txt := string(bytes)
-	logrus.Debugf("txt: %+v", txt)
+	logrus.Debugf("json txt: %+v", txt)
 	return nil
+}
+
+func printCheck(check *kb.Check) {
+	logrus.Debugf("check: ")
+	logrus.Debugf("ID: %v", check.ID)
+	logrus.Debugf("State: %v", check.State)
+	logrus.Debugf("Text: %v", check.Text)
+	logrus.Debugf("Audit: %v", check.Audit)
+	logrus.Debugf("ActualValue: %v", check.ActualValue)
+}
+func printCheckWrapper(cw *CheckWrapper) {
+	logrus.Debugf("checkWrapper:")
+	logrus.Debugf("id: %v", cw.ID)
+	logrus.Debugf("state: %v", cw.State)
+	logrus.Debugf("node_type: %+v", cw.NodeType)
+	logrus.Debugf("nodes: %+v", cw.Nodes)
+	logrus.Debugf("result: %+v", cw.Result)
 }

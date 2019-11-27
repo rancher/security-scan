@@ -41,6 +41,51 @@ groups:
           chown etcd:etcd /var/lib/etcd
         scored: true
 
+      - id: 1.4.19
+        text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Scored)"
+        audit: "check_files_owner_in_dir.sh /node/etc/kubernetes/ssl"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on the master node.
+          For example, chown -R root:root /etc/kubernetes/pki/
+        scored: true
+
+      - id: 1.4.20
+        text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Scored)"
+        audit: "check_files_permissions.sh /node/etc/kubernetes/ssl/!(*key).pem"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on the master node.
+          For example, chmod -R 644 /etc/kubernetes/ssl/!(*key).pem
+        scored: true
+
+      - id: 1.4.21
+        text: "Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Scored)"
+        audit: "check_files_permissions.sh /node/etc/kubernetes/ssl/*key.pem 600"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on the master node.
+          For example, chmod -R 600 /etc/kubernetes/ssl/*key.pem
+        scored: true
+
   - id: 1.5
     text: "etcd"
     checks:
@@ -99,7 +144,6 @@ groups:
         text: "Ensure that the --peer-cert-file and --peer-key-file arguments are
       set as appropriate (Scored)"
         audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
-        type: "manual"
         tests:
           bin_op: and
           test_items:
@@ -118,7 +162,6 @@ groups:
       - id: 1.5.5
         text: "Ensure that the --peer-client-cert-auth argument is set to true (Scored)"
         audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
-        type: "manual"
         tests:
           test_items:
             - flag: "--peer-client-cert-auth"
@@ -135,7 +178,6 @@ groups:
       - id: 1.5.6
         text: "Ensure that the --peer-auto-tls argument is not set to true (Scored)"
         audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
-        type: "manual"
         tests:
           bin_op: or
           test_items:
