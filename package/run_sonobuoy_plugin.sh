@@ -21,7 +21,6 @@ echo "Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 #set -e
 set -x
 
-
 TAR_FILE_NAME="${TAR_FILE_NAME:-kb}"
 CONFIG_DIR="${CONFIG_DIR:-/cfg}"
 ETCD_CONFIG_DIR="${ETCD_CONFIG_DIR:-/etcdcfg}"
@@ -30,52 +29,109 @@ RESULTS_DIR="${RESULTS_DIR:-/tmp/results}"
 mkdir -p "${RESULTS_DIR}"
 
 # etcd
-if [[ "$(pgrep etcd)" -gt 0 ]]; then
-  if ! kube-bench master \
-    -f etcd.yaml \
-    --scored \
-    --nosummary \
-    --noremediations \
-    --v=5 \
-    --config-dir="${ETCD_CONFIG_DIR}" \
-    --version "${RANCHER_K8S_VERSION}" \
-    --json \
-    --outputfile "${RESULTS_DIR}/etcd.json"
-  then
-    echo "error running kube-bench: etcd"
+if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
+  echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
+  if [[ "$(pgrep etcd)" -gt 0 ]]; then
+    if ! kube-bench master \
+      -f etcd.yaml \
+      --scored \
+      --nosummary \
+      --noremediations \
+      --v=5 \
+      --config-dir="${ETCD_CONFIG_DIR}" \
+      --benchmark "${OVERRIDE_BENCHMARK_VERSION}" \
+      --json \
+      --outputfile "${RESULTS_DIR}/etcd.json"
+    then
+      echo "error running kube-bench: etcd"
+    fi
+  fi
+else
+  if [[ "$(pgrep etcd)" -gt 0 ]]; then
+    if ! kube-bench master \
+      -f etcd.yaml \
+      --scored \
+      --nosummary \
+      --noremediations \
+      --v=5 \
+      --config-dir="${ETCD_CONFIG_DIR}" \
+      --version "${RANCHER_K8S_VERSION}" \
+      --json \
+      --outputfile "${RESULTS_DIR}/etcd.json"
+    then
+      echo "error running kube-bench: etcd"
+    fi
   fi
 fi
 
 # master (no etcd)
-if [[ "$(pgrep apiserver)" -gt 0 ]]; then
-  if ! kube-bench master \
-    -f master.yaml \
-    --scored \
-    --nosummary \
-    --noremediations \
-    --v=5 \
-    --config-dir="${CONFIG_DIR}" \
-    --version "${RANCHER_K8S_VERSION}" \
-    --json \
-    --outputfile "${RESULTS_DIR}/master.json"
-  then
-    echo "error running kube-bench: master"
+if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
+  echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
+  if [[ "$(pgrep apiserver)" -gt 0 ]]; then
+    if ! kube-bench master \
+      -f master.yaml \
+      --scored \
+      --nosummary \
+      --noremediations \
+      --v=5 \
+      --config-dir="${CONFIG_DIR}" \
+      --benchmark "${OVERRIDE_BENCHMARK_VERSION}" \
+      --json \
+      --outputfile "${RESULTS_DIR}/master.json"
+    then
+      echo "error running kube-bench: master"
+    fi
+  fi
+else
+  if [[ "$(pgrep apiserver)" -gt 0 ]]; then
+    if ! kube-bench master \
+      -f master.yaml \
+      --scored \
+      --nosummary \
+      --noremediations \
+      --v=5 \
+      --config-dir="${CONFIG_DIR}" \
+      --version "${RANCHER_K8S_VERSION}" \
+      --json \
+      --outputfile "${RESULTS_DIR}/master.json"
+    then
+      echo "error running kube-bench: master"
+    fi
   fi
 fi
 
-if [[ "$(pgrep kubelet)" -gt 0 ]]; then
-  if ! kube-bench node \
-    -f node.yaml \
-    --scored \
-    --nosummary \
-    --noremediations \
-    --v=5 \
-    --config-dir="${CONFIG_DIR}" \
-    --version "${RANCHER_K8S_VERSION}" \
-    --json \
-  > "${RESULTS_DIR}/node.json"
-  then
-    echo "error running kube-bench: node"
+if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
+  echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
+  if [[ "$(pgrep kubelet)" -gt 0 ]]; then
+    if ! kube-bench node \
+      -f node.yaml \
+      --scored \
+      --nosummary \
+      --noremediations \
+      --v=5 \
+      --config-dir="${CONFIG_DIR}" \
+      --benchmark "${OVERRIDE_BENCHMARK_VERSION}" \
+      --json \
+      --outputfile "${RESULTS_DIR}/node.json"
+    then
+      echo "error running kube-bench: node"
+    fi
+  fi
+else
+  if [[ "$(pgrep kubelet)" -gt 0 ]]; then
+    if ! kube-bench node \
+      -f node.yaml \
+      --scored \
+      --nosummary \
+      --noremediations \
+      --v=5 \
+      --config-dir="${CONFIG_DIR}" \
+      --version "${RANCHER_K8S_VERSION}" \
+      --json \
+      --outputfile "${RESULTS_DIR}/node.json"
+    then
+      echo "error running kube-bench: node"
+    fi
   fi
 fi
 
