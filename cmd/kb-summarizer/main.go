@@ -1,11 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/rancher/security-scan/pkg/kb-summarizer/summarizer"
 	"github.com/sirupsen/logrus"
@@ -14,14 +11,13 @@ import (
 
 const (
 	K8SVersionFlag       = "k8s-version"
+	BenchmarkVersionFlag = "benchmark-version"
 	ControlsDirFlag      = "controls-dir"
 	EtcdControlsDirFlag  = "etcd-controls-dir"
 	InputDirFlag         = "input-dir"
 	OutputDirFlag        = "output-dir"
 	OutputFileNameFlag   = "output-filename"
 	FailuresOnlyFlag     = "failures-only"
-	SkipFlag             = "skip"
-	SkipFlagEnvVar       = "SKIP"
 	SkipConfigFileFlag   = "skip-config-file"
 	SkipConfigFileEnvVar = "SKIP_CONFIG_FILE"
 )
@@ -39,6 +35,10 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:  K8SVersionFlag,
+			Value: "",
+		},
+		cli.StringFlag{
+			Name:  BenchmarkVersionFlag,
 			Value: "",
 		},
 		cli.StringFlag{
@@ -62,11 +62,6 @@ func main() {
 			Value: summarizer.DefaultOutputFileName,
 		},
 		cli.StringFlag{
-			Name:   SkipFlag,
-			EnvVar: SkipFlagEnvVar,
-			Value:  "",
-		},
-		cli.StringFlag{
 			Name:   SkipConfigFileFlag,
 			EnvVar: SkipConfigFileEnvVar,
 			Value:  "",
@@ -82,47 +77,22 @@ func main() {
 	}
 }
 
-type SkipConfig struct {
-	Skip []string `json:"skip"`
-}
-
-func getSkipInfo(skipStr, skipConfigFileStr string) (string, error) {
-	if skipStr != "" {
-		return skipStr, nil
-	}
-	if skipConfigFileStr == "" {
-		return "", nil
-	}
-	data, err := ioutil.ReadFile(skipConfigFileStr)
-	if err != nil {
-		return "", fmt.Errorf("error reading file %v: %v", skipConfigFileStr, err)
-	}
-	skipConfig := &SkipConfig{}
-	err = json.Unmarshal(data, skipConfig)
-	if err != nil {
-		return "", fmt.Errorf("error unmarshalling config file %v: %v", skipConfigFileStr, err)
-	}
-	return strings.Join(skipConfig.Skip, ","), nil
-}
-
 func run(c *cli.Context) error {
 	logrus.Info("Running Summarizer")
-	version := c.String(K8SVersionFlag)
+	k8sversion := c.String(K8SVersionFlag)
+	benchmarkVersion := c.String(BenchmarkVersionFlag)
 	controlsDir := c.String(ControlsDirFlag)
 	etcdControlsDir := c.String(EtcdControlsDirFlag)
 	inputDir := c.String(InputDirFlag)
 	outputDir := c.String(OutputDirFlag)
 	outputFilename := c.String(OutputFileNameFlag)
 	failuresOnly := c.Bool(FailuresOnlyFlag)
-	skipStr := c.String(SkipFlag)
-	skipConfigFileStr := c.String(SkipConfigFileFlag)
-	skip, err := getSkipInfo(skipStr, skipConfigFileStr)
-	if err != nil {
-		return err
+	skipConfigFile := c.String(SkipConfigFileFlag)
+	if k8sversion == "" && benchmarkVersion == "" {
+		return fmt.Errorf("error: either of the flags %v, %v not specified", K8SVersionFlag, BenchmarkVersionFlag)
 	}
-	logrus.Infof("skip: %+v", skip)
-	if version == "" {
-		return fmt.Errorf("error: %v not specified", K8SVersionFlag)
+	if k8sversion != "" && benchmarkVersion != "" {
+		return fmt.Errorf("error: both flags %v, %v can not be specified at the same time", K8SVersionFlag, BenchmarkVersionFlag)
 	}
 	if controlsDir == "" {
 		return fmt.Errorf("error: %v not specified", ControlsDirFlag)
@@ -137,13 +107,14 @@ func run(c *cli.Context) error {
 		return fmt.Errorf("error: %v not specified", OutputDirFlag)
 	}
 	s, err := summarizer.NewSummarizer(
-		version,
+		k8sversion,
+		benchmarkVersion,
 		controlsDir,
 		etcdControlsDir,
 		inputDir,
 		outputDir,
 		outputFilename,
-		skip,
+		skipConfigFile,
 		failuresOnly,
 	)
 	if err != nil {

@@ -57,33 +57,51 @@ KBS_INPUT_DIR=${KB_SUMMARIZER_ROOT}/input/plugins/${PLUGIN_NAME}/results
 KBS_OUTPUT_DIR=${KB_SUMMARIZER_ROOT}/output
 KBS_OUTPUT_FILENAME=output.json
 
-KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
-K8S_API_VERSION=$(curl -sSk \
--H "Authorization: Bearer $KUBE_TOKEN" \
-"https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
+get_k8s_api_version() {
+  KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
+  api_version=$(curl -sSk \
+  -H "Authorization: Bearer $KUBE_TOKEN" \
+  "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
+  echo "${api_version}"
+}
 
-RANCHER_K8S_VERSION="rke-${K8S_API_VERSION}"
-echo "Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
-
-if [[ "${SKIP}" != "" ]]; then
-  echo "found SKIP=${SKIP}, ignoring configmap"
+if [[ "${RANCHER_K8S_VERSION}" == "" ]]; then
+  K8S_API_VERSION=$(get_k8s_api_version)
+  RANCHER_K8S_VERSION="rke-${K8S_API_VERSION}"
+  echo "Calculated Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 else
-  if [[ -f "${KBS_CONFIG_FILE_LOCATION}" ]]; then
-    echo "using skip config from configmap"
-    export SKIP_CONFIG_FILE="${KBS_CONFIG_FILE_LOCATION}"
-  fi
+  echo "Provided Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 fi
+
+if [[ -f "${KBS_CONFIG_FILE_LOCATION}" ]]; then
+  echo "using skip config from configmap"
+  export SKIP_CONFIG_FILE="${KBS_CONFIG_FILE_LOCATION}"
+fi
+
+
 # Env Vars:
-#   - SKIP
 #   - SKIP_CONFIG_FILE
-if ! kb-summarizer \
-      --k8s-version "${RANCHER_K8S_VERSION}" \
-      --input-dir "${KBS_INPUT_DIR}" \
-      --output-dir "${KBS_OUTPUT_DIR}" \
-      --output-filename "${KBS_OUTPUT_FILENAME}"
-then
-  echo "error running kb-summarizer"
-  handle_error
+if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
+  echo "using OVERRIDE_BENCHMARK_VERSION: ${OVERRIDE_BENCHMARK_VERSION}"
+  if ! kb-summarizer \
+        --benchmark-version "${OVERRIDE_BENCHMARK_VERSION}" \
+        --input-dir "${KBS_INPUT_DIR}" \
+        --output-dir "${KBS_OUTPUT_DIR}" \
+        --output-filename "${KBS_OUTPUT_FILENAME}"
+  then
+    echo "error running kb-summarizer"
+    handle_error
+  fi
+else
+  if ! kb-summarizer \
+        --k8s-version "${RANCHER_K8S_VERSION}" \
+        --input-dir "${KBS_INPUT_DIR}" \
+        --output-dir "${KBS_OUTPUT_DIR}" \
+        --output-filename "${KBS_OUTPUT_FILENAME}"
+  then
+    echo "error running kb-summarizer"
+    handle_error
+  fi
 fi
 
 # Create a config map with results

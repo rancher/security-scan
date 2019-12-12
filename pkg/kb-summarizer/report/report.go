@@ -42,7 +42,7 @@ type Group struct {
 }
 
 type Report struct {
-	Version string                `json:"-"`
+	Version string                `json:"version"`
 	Total   int                   `json:"total"`
 	Pass    int                   `json:"pass"`
 	Fail    int                   `json:"fail"`
