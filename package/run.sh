@@ -75,6 +75,9 @@ fi
 
 if [[ -f "${KBS_CONFIG_FILE_LOCATION}" ]]; then
   echo "using skip config from configmap"
+  if [[ "${DEBUG}" == "true" ]]; then
+    cat ${KBS_CONFIG_FILE_LOCATION}
+  fi
   export SKIP_CONFIG_FILE="${KBS_CONFIG_FILE_LOCATION}"
 fi
 

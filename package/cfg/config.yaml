@@ -147,3 +147,4 @@ version_mapping:
   "rke-1.14": "rke-cis-1.4"
   "rke-1.15": "rke-cis-1.4"
   "rke-1.16": "rke-cis-1.4"
+  "rke-1.17": "rke-cis-1.4"
