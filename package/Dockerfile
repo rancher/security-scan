@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-ARG kube_bench_tag=0.1.0
+ARG kube_bench_tag=0.2.2
 ARG sonobuoy_version=0.16.3
 
 RUN apt-get update \
