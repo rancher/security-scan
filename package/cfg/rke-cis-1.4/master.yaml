@@ -445,7 +445,7 @@ groups:
           --client-ca-file=<path/to/client-ca-file>
         scored: true
 
-      - id: 1.1.31
+      - id: 1.1.30
         text: "Ensure that the --etcd-cafile argument is set as appropriate (Scored)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
