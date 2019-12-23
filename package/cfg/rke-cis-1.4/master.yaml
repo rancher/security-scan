@@ -445,7 +445,7 @@ groups:
           --client-ca-file=<path/to/client-ca-file>
         scored: true
 
-      - id: 1.1.31
+      - id: 1.1.30
         text: "Ensure that the --etcd-cafile argument is set as appropriate (Scored)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
@@ -1123,4 +1123,62 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example, chmod -R 600 /etc/kubernetes/ssl/*key.pem
+        scored: true
+  - id: 1.7
+    text: "PodSecurityPolicies"
+    checks:
+      - id: 1.7.2
+        text: "Do not admit containers wishing to share the host process ID namespace (Scored)"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostPID == null) or (.spec.hostPID == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
+        remediation: |
+          Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostPID field is omitted or set to false.
+        scored: true
+
+      - id: 1.7.3
+        text: "Do not admit containers wishing to share the host IPC namespace (Scored)"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostIPC == null) or (.spec.hostIPC == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
+        remediation: |
+          Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostIPC field is omitted or set to false.
+        scored: true
+
+      - id: 1.7.4
+        text: "Do not admit containers wishing to share the host network namespace (Scored)"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostNetwork == null) or (.spec.hostNetwork == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
+        remediation: |
+          Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostNetwork field is omitted or set to false.
+        scored: true
+
+      - id: 1.7.5
+        text: " Do not admit containers with allowPrivilegeEscalation (Scored)"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.allowPrivilegeEscalation == null) or (.spec.allowPrivilegeEscalation == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
+        remediation: |
+          Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.allowPrivilegeEscalation field is omitted or set to false.
         scored: true
