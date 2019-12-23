@@ -1506,7 +1506,7 @@ groups:
     remediation: |
      [Manual test]
      Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostPID field is omitted or set to false.
-    scored: false
+    scored: true
 
   - id: 1.7.3
     text: "Do not admit containers wishing to share the host IPC namespace (Scored)"
@@ -1514,7 +1514,7 @@ groups:
     remediation: |
       [Manual test]
       Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostIPC field is omitted or set to false.
-    scored: false
+    scored: true
 
   - id: 1.7.4
     text: "Do not admit containers wishing to share the host network namespace (Scored)"
@@ -1522,7 +1522,7 @@ groups:
     remediation: |
       [Manual test]
       Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.hostNetwork field is omitted or set to false.
-    scored: false
+    scored: true
 
   - id: 1.7.5
     text: " Do not admit containers with allowPrivilegeEscalation (Scored)"
@@ -1530,7 +1530,7 @@ groups:
     remediation: |
       [Manual test]
       Create a PSP as described in the Kubernetes documentation, ensuring that the .spec.allowPrivilegeEscalation field is omitted or set to false.
-    scored: false
+    scored: true
 
   - id: 1.7.6
     text: "Do not admit root containers (Not Scored)"
