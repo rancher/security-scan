@@ -31,7 +31,7 @@ mkdir -p "${RESULTS_DIR}"
 # etcd
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
-  if [[ "$(pgrep etcd)" -gt 0 ]]; then
+  if [[ "$(pgrep etcd | wc -l)" -gt 0 ]]; then
     if ! kube-bench master \
       -f etcd.yaml \
       --scored \
@@ -47,7 +47,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
     fi
   fi
 else
-  if [[ "$(pgrep etcd)" -gt 0 ]]; then
+  if [[ "$(pgrep etcd | wc -l)" -gt 0 ]]; then
     if ! kube-bench master \
       -f etcd.yaml \
       --scored \
@@ -67,7 +67,7 @@ fi
 # master (no etcd)
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
-  if [[ "$(pgrep apiserver)" -gt 0 ]]; then
+  if [[ "$(pgrep apiserver | wc -l)" -gt 0 ]]; then
     if ! kube-bench master \
       -f master.yaml \
       --scored \
@@ -83,7 +83,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
     fi
   fi
 else
-  if [[ "$(pgrep apiserver)" -gt 0 ]]; then
+  if [[ "$(pgrep apiserver | wc -l)" -gt 0 ]]; then
     if ! kube-bench master \
       -f master.yaml \
       --scored \
@@ -102,7 +102,7 @@ fi
 
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
-  if [[ "$(pgrep kubelet)" -gt 0 ]]; then
+  if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]]; then
     if ! kube-bench node \
       -f node.yaml \
       --scored \
@@ -118,7 +118,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
     fi
   fi
 else
-  if [[ "$(pgrep kubelet)" -gt 0 ]]; then
+  if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]]; then
     if ! kube-bench node \
       -f node.yaml \
       --scored \
