@@ -16,35 +16,34 @@ import (
 )
 
 const (
-	DefaultOutputFileName        = "report.json"
-	DefaultControlsDirectory     = "/cfg"
-	EtcdDefaultControlsDirectory = "/etcdcfg"
-	VersionMappingKey            = "version_mapping"
-	ConfigFilename               = "config.yaml"
-	MasterControlsFilename       = "master.yaml"
-	EtcdControlsFilename         = "etcd.yaml"
-	NodeControlsFilename         = "node.yaml"
-	MasterResultsFilename        = "master.json"
-	EtcdResultsFilename          = "etcd.json"
-	NodeResultsFilename          = "node.json"
-	CurrentBenchmarkKey          = "current"
+	DefaultOutputFileName    = "report.json"
+	DefaultControlsDirectory = "/etc/kube-bench/cfg"
+	VersionMappingKey        = "version_mapping"
+	ConfigFilename           = "config.yaml"
+	MasterControlsFilename   = "master.yaml"
+	EtcdControlsFilename     = "etcd.yaml"
+	NodeControlsFilename     = "node.yaml"
+	MasterResultsFilename    = "master.json"
+	EtcdResultsFilename      = "etcd.json"
+	NodeResultsFilename      = "node.json"
+	CurrentBenchmarkKey      = "current"
+	DefaultErrorLogFileName  = "error.log"
 )
 
 type Summarizer struct {
 	// mapping for k8s version to default benchmark version
-	kubeToBenchmarkMap    map[string]string
-	BenchmarkVersion      string
-	ControlsDirectory     string
-	EtcdControlsDirectory string
-	InputDirectory        string
-	OutputDirectory       string
-	OutputFilename        string
-	FailuresOnly          bool
-	fullReport            *SummarizedReport
-	groupWrappersMap      map[string]*GroupWrapper
-	checkWrappersMaps     map[string]*CheckWrapper
-	skip                  map[string]bool
-	nodeSeen              map[NodeType]map[string]bool
+	kubeToBenchmarkMap map[string]string
+	BenchmarkVersion   string
+	ControlsDirectory  string
+	InputDirectory     string
+	OutputDirectory    string
+	OutputFilename     string
+	FailuresOnly       bool
+	fullReport         *SummarizedReport
+	groupWrappersMap   map[string]*GroupWrapper
+	checkWrappersMaps  map[string]*CheckWrapper
+	skip               map[string]bool
+	nodeSeen           map[NodeType]map[string]bool
 }
 
 type State string
@@ -63,6 +62,7 @@ const (
 type NodeType string
 
 const (
+	NodeTypeNone   NodeType = ""
 	NodeTypeEtcd   NodeType = "e"
 	NodeTypeMaster NodeType = "m"
 	NodeTypeNode   NodeType = "n"
@@ -101,15 +101,18 @@ type skipConfig struct {
 	Skip map[string][]string `json:"skip"`
 }
 
-func NewSummarizer(k8sVersion, benchmarkVersion, controlsDir, etcdControlsDir, inputDir, outputDir, outputFilename, skipConfigFile string, failuresOnly bool) (*Summarizer, error) {
+var controlFilesToIgnore = map[string]bool{
+	"config.yaml": true,
+}
+
+func NewSummarizer(k8sVersion, benchmarkVersion, controlsDir, inputDir, outputDir, outputFilename, skipConfigFile string, failuresOnly bool) (*Summarizer, error) {
 	var err error
 	s := &Summarizer{
-		ControlsDirectory:     controlsDir,
-		EtcdControlsDirectory: etcdControlsDir,
-		InputDirectory:        inputDir,
-		OutputDirectory:       outputDir,
-		OutputFilename:        outputFilename,
-		FailuresOnly:          failuresOnly,
+		ControlsDirectory: controlsDir,
+		InputDirectory:    inputDir,
+		OutputDirectory:   outputDir,
+		OutputFilename:    outputFilename,
+		FailuresOnly:      failuresOnly,
 		fullReport: &SummarizedReport{
 			Nodes:         map[NodeType][]string{},
 			GroupWrappers: []*GroupWrapper{},
@@ -325,32 +328,44 @@ func getResultsFileNodeTypeMapping() map[string]NodeType {
 	}
 }
 
-func getNodeTypeControlsFileMapping() map[NodeType]string {
-	return map[NodeType]string{
-		NodeTypeMaster: MasterControlsFilename,
-		NodeTypeEtcd:   EtcdControlsFilename,
-		NodeTypeNode:   NodeControlsFilename,
-	}
+func (s *Summarizer) getControlsFilePath(filename string) string {
+	return fmt.Sprintf("%v/%v/%v", s.ControlsDirectory, s.BenchmarkVersion, filename)
 }
 
-func (s *Summarizer) getControlsDir(nodeType NodeType) string {
-	if nodeType == NodeTypeEtcd {
-		return s.EtcdControlsDirectory
+func (s *Summarizer) getNodeTypeControlsFileMapping() map[string]NodeType {
+	// load node type files first
+	filepaths := map[string]NodeType{
+		s.getControlsFilePath(MasterControlsFilename): NodeTypeMaster,
+		s.getControlsFilePath(EtcdControlsFilename):   NodeTypeEtcd,
+		s.getControlsFilePath(NodeControlsFilename):   NodeTypeNode,
 	}
-	return s.ControlsDirectory
+	allFiles, err := filepath.Glob(fmt.Sprintf("%v/%v/*.yaml", s.ControlsDirectory, s.BenchmarkVersion))
+	if err != nil {
+		logrus.Errorf("error globing files: %v", err)
+		return filepaths
+	}
+	for _, f := range allFiles {
+		if controlFilesToIgnore[f] {
+			continue
+		}
+		if _, ok := filepaths[f]; ok {
+			continue
+		}
+		filepaths[f] = NodeTypeNone
+	}
+	return filepaths
 }
 
 func (s *Summarizer) loadControls() error {
 	var ok bool
-	controlsFiles := getNodeTypeControlsFileMapping()
+	controlsFiles := s.getNodeTypeControlsFileMapping()
 
 	var groupWrappers []*GroupWrapper
-	for nodeType, controlsFile := range controlsFiles {
+	for controlsFile, nodeType := range controlsFiles {
 		s.nodeSeen[nodeType] = map[string]bool{}
-		filePath := fmt.Sprintf("%v/%v/%v", s.getControlsDir(nodeType), s.BenchmarkVersion, controlsFile)
-		controls, err := s.loadControlsFromFile(filePath)
+		controls, err := s.loadControlsFromFile(controlsFile)
 		if err != nil {
-			logrus.Errorf("error loading controls from file %v: %v", filePath, err)
+			logrus.Errorf("error loading controls from file %v: %v", controlsFile, err)
 			continue
 		}
 		for _, g := range controls.Groups {
@@ -553,6 +568,24 @@ func (s *Summarizer) Summarize() error {
 		}
 		hostname := hostDir.Name()
 		logrus.Debugf("hostDir: %v", hostname)
+
+		// Check for errors before proceeding
+		errorLogFile := fmt.Sprintf("%v/%v/%v", s.InputDirectory, hostname, DefaultErrorLogFileName)
+		_, err := os.Stat(errorLogFile)
+		if err == nil {
+			data, err := ioutil.ReadFile(errorLogFile)
+			if err != nil {
+				return fmt.Errorf("error reading file %v: %v", errorLogFile, err)
+			}
+			// error.log file gets created due to redirection, hence check if not empty
+			if len(data) > 0 {
+				logrus.Infof("found error file")
+				return fmt.Errorf("%v", string(data))
+			}
+			logrus.Infof("found empty error log file: %v for host: %v, ignoring", DefaultErrorLogFileName, hostname)
+		} else if !os.IsNotExist(err) {
+			return fmt.Errorf("unexpected error finding file %v: %v", errorLogFile, err)
+		}
 
 		if err := s.summarizeForHost(hostname); err != nil {
 			return fmt.Errorf("error summarizeForHost %v: %v", hostname, err)

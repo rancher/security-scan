@@ -12,43 +12,59 @@ SONOBUOY_POD_NAME=${SONOBUOY_POD_NAME:-sonobuoy}
 DONE_ANNOTATION_KEY="field.cattle.io/sonobuoyDone"
 DONE_ANNOTATION_VALUE="true"
 ERROR_ANNOTATION_VALUE="error"
+ERROR_LOG_FILE="/tmp/kbs.error.log"
 
 KBS_CONFIG_FILE_LOCATION=/etc/kbs/config.json
 
+SONOBUOY_OUTPUT_DIR=${SONOBUOY_OUTPUT_DIR:-/tmp/sonobuoy}
+
+KB_SUMMARIZER_ROOT=${KB_SUMMARIZER_ROOT:-/tmp/kb-summarizer}
+
 handle_error() {
+  if [[ "${DEBUG}" == "true" ]]; then
+      sleep infinity
+  fi
   # Annotate self (pod) to signal "error"
-  if ! kubectl -n "${SONOBUOY_NS}" \
-    annotate pod "${SONOBUOY_POD_NAME}" \
-    ${DONE_ANNOTATION_KEY}=${ERROR_ANNOTATION_VALUE}
-  then
-    echo "error annotating self pod"
+  if [[ -f  "${ERROR_LOG_FILE}" ]]; then
+      if ! kubectl -n "${SONOBUOY_NS}" \
+        annotate pod "${SONOBUOY_POD_NAME}" \
+        ${DONE_ANNOTATION_KEY}="$(cat ${ERROR_LOG_FILE})"
+      then
+        echo "error annotating self pod"
+      fi
+  else
+      if ! kubectl -n "${SONOBUOY_NS}" \
+        annotate pod "${SONOBUOY_POD_NAME}" \
+        ${DONE_ANNOTATION_KEY}=${ERROR_ANNOTATION_VALUE}
+      then
+        echo "error annotating self pod"
+      fi
   fi
   sleep infinity
 }
 
-trap 'handle_error' ERR
+trap 'handle_error' EXIT
 
 echo "Rancher: Running CIS Benchmarks"
+
+# Clean up the output directory, just in case
+rm -rf "${SONOBUOY_OUTPUT_DIR}"/*.tar.gz
 
 # Run sonobuoy first
 if ! sonobuoy master -v 3
 then
-  echo "error running sonobuoy"
+  echo "error running sonobuoy" | tee -a ${ERROR_LOG_FILE}
   exit 1
 fi
 
-# Run summarizer
-SONOBUOY_OUTPUT_DIR=${SONOBUOY_OUTPUT_DIR:-/tmp/sonobuoy}
-SONOBUOY_OUTPUT_FILE=$(ls -1 "${SONOBUOY_OUTPUT_DIR}"/*.tar.gz)
-
-KB_SUMMARIZER_ROOT=${KB_SUMMARIZER_ROOT:-/tmp/kb-summarizer}
-
+SONOBUOY_OUTPUT_FILE=$(ls -1t "${SONOBUOY_OUTPUT_DIR}"/*.tar.gz | head -1)
+# Extract the results
 mkdir -p "${KB_SUMMARIZER_ROOT}"/{input,output}
 if ! tar -C "${KB_SUMMARIZER_ROOT}"/input \
          -xvf "${SONOBUOY_OUTPUT_FILE}" \
-         --warning=no-timestamp
+         --warning=no-timestamp 2> ${ERROR_LOG_FILE}
 then
-  echo "error extracting ${SONOBUOY_OUTPUT_FILE}"
+  echo "error extracting output file: \"${SONOBUOY_OUTPUT_FILE}\"" | tee -a ${ERROR_LOG_FILE}
   exit 1
 fi
 
@@ -58,10 +74,12 @@ KBS_OUTPUT_DIR=${KB_SUMMARIZER_ROOT}/output
 KBS_OUTPUT_FILENAME=output.json
 
 get_k8s_api_version() {
+  set +x # don't print the token
   KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
   api_version=$(curl -sSk \
   -H "Authorization: Bearer $KUBE_TOKEN" \
   "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
+  set -x
   echo "${api_version}"
 }
 
@@ -82,6 +100,7 @@ if [[ -f "${KBS_CONFIG_FILE_LOCATION}" ]]; then
 fi
 
 
+# Run summarizer
 # Env Vars:
 #   - SKIP_CONFIG_FILE
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
@@ -90,30 +109,30 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
         --benchmark-version "${OVERRIDE_BENCHMARK_VERSION}" \
         --input-dir "${KBS_INPUT_DIR}" \
         --output-dir "${KBS_OUTPUT_DIR}" \
-        --output-filename "${KBS_OUTPUT_FILENAME}"
+        --output-filename "${KBS_OUTPUT_FILENAME}" 2> "${ERROR_LOG_FILE}"
   then
-    echo "error running kb-summarizer"
-    handle_error
+    echo "error running kb-summarizer using override benchmark version" | tee -a "${ERROR_LOG_FILE}"
+    exit 1
   fi
 else
   if ! kb-summarizer \
         --k8s-version "${RANCHER_K8S_VERSION}" \
         --input-dir "${KBS_INPUT_DIR}" \
         --output-dir "${KBS_OUTPUT_DIR}" \
-        --output-filename "${KBS_OUTPUT_FILENAME}"
+        --output-filename "${KBS_OUTPUT_FILENAME}" 2> "${ERROR_LOG_FILE}"
   then
-    echo "error running kb-summarizer"
-    handle_error
+    echo "error running kb-summarizer" | tee -a "${ERROR_LOG_FILE}"
+    exit 1
   fi
 fi
 
 # Create a config map with results
 if ! kubectl -n "${SONOBUOY_NS}" \
   create cm  "${OUTPUT_CONFIGMAPNAME}" \
-  --from-file "${KBS_OUTPUT_DIR}"/${KBS_OUTPUT_FILENAME}
+  --from-file "${KBS_OUTPUT_DIR}"/${KBS_OUTPUT_FILENAME} 2> ${ERROR_LOG_FILE}
 then
-  echo "error creating configmap for storing the report"
-  handle_error
+  echo "error creating configmap for storing the report" | tee -a ${ERROR_LOG_FILE}
+  exit 1
 fi
 
 if [[ "${DEBUG}" == "true" ]]; then
@@ -123,10 +142,10 @@ fi
 # Annotate self (pod) to signal "done"
 if ! kubectl -n "${SONOBUOY_NS}" \
   annotate pod "${SONOBUOY_POD_NAME}" \
-  ${DONE_ANNOTATION_KEY}=${DONE_ANNOTATION_VALUE}
+  ${DONE_ANNOTATION_KEY}=${DONE_ANNOTATION_VALUE} 2> ${ERROR_LOG_FILE}
 then
-  echo "error annotating self pod"
-  handle_error
+  echo "error annotating self pod" | tee -a ${ERROR_LOG_FILE}
+  exit 1
 fi
 
 # Wait

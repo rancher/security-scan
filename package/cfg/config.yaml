@@ -142,9 +142,38 @@ node:
     defaultconf: /etc/kubernetes/addons/kube-proxy-daemonset.yaml
     defaultkubeconfig: "/etc/kubernetes/proxy.conf"
 
+etcd:
+  components:
+    - etcd
+
+  etcd:
+    bins:
+      - "etcd"
+    confs:
+      - /etc/kubernetes/manifests/etcd.yaml
+      - /etc/kubernetes/manifests/etcd.manifest
+      - /etc/etcd/etcd.conf
+      - /var/snap/etcd/common/etcd.conf.yml
+    defaultconf: /etc/kubernetes/manifests/etcd.yaml
+
+controlplane:
+  components: []
+
+policies:
+  components: []
+
 version_mapping:
   "rke-1.13": "rke-cis-1.4"
   "rke-1.14": "rke-cis-1.4"
   "rke-1.15": "rke-cis-1.4"
   "rke-1.16": "rke-cis-1.4"
   "rke-1.17": "rke-cis-1.4"
+
+target_mapping:
+  "cis-1.4":
+    - "master"
+    - "node"
+  "rke-cis-1.4":
+    - "master"
+    - "node"
+    - "etcd"

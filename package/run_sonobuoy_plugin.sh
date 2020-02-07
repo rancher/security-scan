@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eE
+
 DEBUG_TIME_IN_SEC=${DEBUG_TIME_IN_SEC:-300}
 
 while test $# != 0
@@ -10,6 +12,15 @@ do
     shift
 done
 
+handle_error() {
+  if [[ "${DEBUG}" == "true" ]]; then
+      sleep "${DEBUG_TIME_IN_SEC}"
+  fi
+  echo -n "${ERROR_LOG_FILE}" > "${RESULTS_DIR}/done"
+}
+
+trap 'handle_error' ERR
+
 KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
 K8S_API_VERSION=$(curl -sSk \
 -H "Authorization: Bearer $KUBE_TOKEN" \
@@ -18,13 +29,13 @@ K8S_API_VERSION=$(curl -sSk \
 RANCHER_K8S_VERSION="rke-${K8S_API_VERSION}"
 echo "Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 
-#set -e
 set -x
 
 TAR_FILE_NAME="${TAR_FILE_NAME:-kb}"
-CONFIG_DIR="${CONFIG_DIR:-/cfg}"
-ETCD_CONFIG_DIR="${ETCD_CONFIG_DIR:-/etcdcfg}"
+CONFIG_DIR="${CONFIG_DIR:-/etc/kube-bench/cfg}"
 RESULTS_DIR="${RESULTS_DIR:-/tmp/results}"
+ERROR_LOG_FILE="${RESULTS_DIR}/error.log"
+LOG_DIR="${RESULTS_DIR}/logs"
 
 mkdir -p "${RESULTS_DIR}"
 
@@ -32,35 +43,31 @@ mkdir -p "${RESULTS_DIR}"
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
   if [[ "$(pgrep etcd | wc -l)" -gt 0 ]]; then
-    if ! kube-bench master \
-      -f etcd.yaml \
+    kube-bench run \
+      --targets etcd \
       --scored \
       --nosummary \
       --noremediations \
       --v=5 \
-      --config-dir="${ETCD_CONFIG_DIR}" \
+      --config-dir="${CONFIG_DIR}" \
       --benchmark "${OVERRIDE_BENCHMARK_VERSION}" \
       --json \
-      --outputfile "${RESULTS_DIR}/etcd.json"
-    then
-      echo "error running kube-bench: etcd"
-    fi
+      --log_dir "${LOG_DIR}" \
+      --outputfile "${RESULTS_DIR}/etcd.json" 2> "${ERROR_LOG_FILE}"
   fi
 else
   if [[ "$(pgrep etcd | wc -l)" -gt 0 ]]; then
-    if ! kube-bench master \
-      -f etcd.yaml \
+    kube-bench run \
+      --targets etcd \
       --scored \
       --nosummary \
       --noremediations \
       --v=5 \
-      --config-dir="${ETCD_CONFIG_DIR}" \
+      --config-dir "${CONFIG_DIR}" \
       --version "${RANCHER_K8S_VERSION}" \
       --json \
-      --outputfile "${RESULTS_DIR}/etcd.json"
-    then
-      echo "error running kube-bench: etcd"
-    fi
+      --log_dir "${LOG_DIR}" \
+      --outputfile "${RESULTS_DIR}/etcd.json" 2> "${ERROR_LOG_FILE}"
   fi
 fi
 
@@ -68,8 +75,8 @@ fi
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
   if [[ "$(pgrep apiserver | wc -l)" -gt 0 ]]; then
-    if ! kube-bench master \
-      -f master.yaml \
+    kube-bench run \
+      --targets master \
       --scored \
       --nosummary \
       --noremediations \
@@ -77,15 +84,13 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
       --config-dir="${CONFIG_DIR}" \
       --benchmark "${OVERRIDE_BENCHMARK_VERSION}" \
       --json \
-      --outputfile "${RESULTS_DIR}/master.json"
-    then
-      echo "error running kube-bench: master"
-    fi
+      --log_dir "${LOG_DIR}" \
+      --outputfile "${RESULTS_DIR}/master.json" 2> "${ERROR_LOG_FILE}"
   fi
 else
   if [[ "$(pgrep apiserver | wc -l)" -gt 0 ]]; then
-    if ! kube-bench master \
-      -f master.yaml \
+    kube-bench run \
+      --targets master \
       --scored \
       --nosummary \
       --noremediations \
@@ -93,18 +98,16 @@ else
       --config-dir="${CONFIG_DIR}" \
       --version "${RANCHER_K8S_VERSION}" \
       --json \
-      --outputfile "${RESULTS_DIR}/master.json"
-    then
-      echo "error running kube-bench: master"
-    fi
+      --log_dir "${LOG_DIR}" \
+      --outputfile "${RESULTS_DIR}/master.json" 2> "${ERROR_LOG_FILE}"
   fi
 fi
 
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
   if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]]; then
-    if ! kube-bench node \
-      -f node.yaml \
+    kube-bench run \
+      --targets node \
       --scored \
       --nosummary \
       --noremediations \
@@ -112,15 +115,13 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
       --config-dir="${CONFIG_DIR}" \
       --benchmark "${OVERRIDE_BENCHMARK_VERSION}" \
       --json \
-      --outputfile "${RESULTS_DIR}/node.json"
-    then
-      echo "error running kube-bench: node"
-    fi
+      --log_dir "${LOG_DIR}" \
+      --outputfile "${RESULTS_DIR}/node.json" 2> "${ERROR_LOG_FILE}"
   fi
 else
   if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]]; then
-    if ! kube-bench node \
-      -f node.yaml \
+    kube-bench run \
+      --targets node \
       --scored \
       --nosummary \
       --noremediations \
@@ -128,10 +129,8 @@ else
       --config-dir="${CONFIG_DIR}" \
       --version "${RANCHER_K8S_VERSION}" \
       --json \
-      --outputfile "${RESULTS_DIR}/node.json"
-    then
-      echo "error running kube-bench: node"
-    fi
+      --log_dir "${LOG_DIR}" \
+      --outputfile "${RESULTS_DIR}/node.json" 2> "${ERROR_LOG_FILE}"
   fi
 fi
 

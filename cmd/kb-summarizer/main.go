@@ -13,7 +13,6 @@ const (
 	K8SVersionFlag       = "k8s-version"
 	BenchmarkVersionFlag = "benchmark-version"
 	ControlsDirFlag      = "controls-dir"
-	EtcdControlsDirFlag  = "etcd-controls-dir"
 	InputDirFlag         = "input-dir"
 	OutputDirFlag        = "output-dir"
 	OutputFileNameFlag   = "output-filename"
@@ -44,10 +43,6 @@ func main() {
 		cli.StringFlag{
 			Name:  ControlsDirFlag,
 			Value: summarizer.DefaultControlsDirectory,
-		},
-		cli.StringFlag{
-			Name:  EtcdControlsDirFlag,
-			Value: summarizer.EtcdDefaultControlsDirectory,
 		},
 		cli.StringFlag{
 			Name:  InputDirFlag,
@@ -82,7 +77,6 @@ func run(c *cli.Context) error {
 	k8sversion := c.String(K8SVersionFlag)
 	benchmarkVersion := c.String(BenchmarkVersionFlag)
 	controlsDir := c.String(ControlsDirFlag)
-	etcdControlsDir := c.String(EtcdControlsDirFlag)
 	inputDir := c.String(InputDirFlag)
 	outputDir := c.String(OutputDirFlag)
 	outputFilename := c.String(OutputFileNameFlag)
@@ -97,9 +91,6 @@ func run(c *cli.Context) error {
 	if controlsDir == "" {
 		return fmt.Errorf("error: %v not specified", ControlsDirFlag)
 	}
-	if etcdControlsDir == "" {
-		return fmt.Errorf("error: %v not specified", EtcdControlsDirFlag)
-	}
 	if inputDir == "" {
 		return fmt.Errorf("error: %v not specified", InputDirFlag)
 	}
@@ -110,7 +101,6 @@ func run(c *cli.Context) error {
 		k8sversion,
 		benchmarkVersion,
 		controlsDir,
-		etcdControlsDir,
 		inputDir,
 		outputDir,
 		outputFilename,

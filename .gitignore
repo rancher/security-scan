@@ -5,3 +5,4 @@
 /dist
 *.swp
 /cmd/kb-summarizer/kb-summarizer
+/.idea
