@@ -3,6 +3,7 @@ package summarizer
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -16,18 +17,20 @@ import (
 )
 
 const (
-	DefaultOutputFileName    = "report.json"
-	DefaultControlsDirectory = "/etc/kube-bench/cfg"
-	VersionMappingKey        = "version_mapping"
-	ConfigFilename           = "config.yaml"
-	MasterControlsFilename   = "master.yaml"
-	EtcdControlsFilename     = "etcd.yaml"
-	NodeControlsFilename     = "node.yaml"
-	MasterResultsFilename    = "master.json"
-	EtcdResultsFilename      = "etcd.json"
-	NodeResultsFilename      = "node.json"
-	CurrentBenchmarkKey      = "current"
-	DefaultErrorLogFileName  = "error.log"
+	DefaultOutputFileName       = "report.json"
+	DefaultControlsDirectory    = "/etc/kube-bench/cfg"
+	VersionMappingKey           = "version_mapping"
+	ConfigFilename              = "config.yaml"
+	MasterControlsFilename      = "master.yaml"
+	EtcdControlsFilename        = "etcd.yaml"
+	NodeControlsFilename        = "node.yaml"
+	MasterResultsFilename       = "master.json"
+	EtcdResultsFilename         = "etcd.json"
+	NodeResultsFilename         = "node.json"
+	ControlPlaneResultsFilename = "controlplane.json"
+	PoliciesResultsFilename     = "policies.json"
+	CurrentBenchmarkKey         = "current"
+	DefaultErrorLogFileName     = "error.log"
 )
 
 type Summarizer struct {
@@ -215,6 +218,9 @@ func (s *Summarizer) processOneResultFileForHost(results *kb.Controls, hostname 
 }
 
 func (s *Summarizer) addNode(nodeType NodeType, hostname string) {
+	if nodeType == NodeTypeNone {
+		return
+	}
 	if !s.nodeSeen[nodeType][hostname] {
 		s.nodeSeen[nodeType][hostname] = true
 		s.fullReport.Nodes[nodeType] = append(s.fullReport.Nodes[nodeType], hostname)
@@ -261,22 +267,24 @@ func (s *Summarizer) summarizeForHost(hostname string) error {
 }
 
 func (s *Summarizer) save() error {
-	data, err := json.MarshalIndent(s.fullReport, "", " ")
-	if err != nil {
-		return fmt.Errorf("error marshaling summarized report: %v", err)
-	}
 	if _, err := os.Stat(s.OutputDirectory); os.IsNotExist(err) {
 		if err2 := os.Mkdir(s.OutputDirectory, 0755); err2 != nil {
 			return fmt.Errorf("error creating output directory: %v", err)
 		}
 	}
 	outputFilePath := fmt.Sprintf("%s/%s", s.OutputDirectory, s.OutputFilename)
-	err = ioutil.WriteFile(outputFilePath, data, 0644)
+	jsonFile, err := os.Create(outputFilePath)
 	if err != nil {
-		return fmt.Errorf("error writing report file: %v", err)
+		return fmt.Errorf("error creating file %v: %v", outputFilePath, err)
+	}
+	jsonWriter := io.Writer(jsonFile)
+	encoder := json.NewEncoder(jsonWriter)
+	encoder.SetIndent("", " ")
+	err = encoder.Encode(s.fullReport)
+	if err != nil {
+		return fmt.Errorf("error encoding: %v", err)
 	}
 	logrus.Infof("successfully saved report file: %v", outputFilePath)
-
 	return nil
 }
 
@@ -322,9 +330,11 @@ func getNodeTypes() []NodeType {
 
 func getResultsFileNodeTypeMapping() map[string]NodeType {
 	return map[string]NodeType{
-		MasterResultsFilename: NodeTypeMaster,
-		EtcdResultsFilename:   NodeTypeEtcd,
-		NodeResultsFilename:   NodeTypeNode,
+		MasterResultsFilename:       NodeTypeMaster,
+		EtcdResultsFilename:         NodeTypeEtcd,
+		NodeResultsFilename:         NodeTypeNode,
+		ControlPlaneResultsFilename: NodeTypeNone,
+		PoliciesResultsFilename:     NodeTypeNone,
 	}
 }
 
@@ -437,9 +447,15 @@ func getCheckWrapper(check *kb.Check) *CheckWrapper {
 }
 
 func (s *Summarizer) getNodesMapOfCheckWrapper(check *CheckWrapper) map[string]bool {
+	nodeTypeSlice := check.NodeType
+	// simple hack to get the count to match for empty node type
+	// TODO: Modify this when a new plugin of Job type is created
+	if len(nodeTypeSlice) == 1 && nodeTypeSlice[0] == NodeTypeNone {
+		nodeTypeSlice = []NodeType{NodeTypeMaster}
+	}
 	nodes := map[string]bool{}
-	for _, nodeType := range check.NodeType {
-		for _, v := range s.fullReport.Nodes[nodeType] {
+	for _, t := range nodeTypeSlice {
+		for _, v := range s.fullReport.Nodes[t] {
 			nodes[v] = true
 		}
 	}
