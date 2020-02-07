@@ -9,6 +9,7 @@ groups:
     text: "Master Node Configuration Files "
     checks:
       - id: 1.1.1
+        type: skip
         text: "Ensure that the API server pod specification file permissions are set to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c %a $apiserverconf; fi'"
         tests:
@@ -50,12 +51,12 @@ groups:
                 value: "000"
               set: true
         remediation: |
-          Run the below command (based on the file location on your system) on the
-          master node.
-          For example, chmod 644 $apiserverconf
+          Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 1.1.2
+        type: skip
         text: "Ensure that the API server pod specification file ownership is set to root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c %U:%G $apiserverconf; fi'"
         tests:
@@ -66,12 +67,12 @@ groups:
                 value: "root:root"
               set: true
         remediation: |
-          Run the below command (based on the file location on your system) on the master node.
-          For example,
-          chown root:root $apiserverconf
+          Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 1.1.3
+        type: skip
         text: "Ensure that the controller manager pod specification file permissions are set to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c %a $controllermanagerconf; fi'"
         tests:
@@ -113,12 +114,12 @@ groups:
                 value: "000"
               set: true
         remediation: |
-          Run the below command (based on the file location on your system) on the master node.
-          For example,
-          chmod 644 $controllermanagerconf
+          Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 1.1.4
+        type: skip
         text: "Ensure that the controller manager pod specification file ownership is set to root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c %U:%G $controllermanagerconf; fi'"
         tests:
@@ -129,12 +130,12 @@ groups:
                 value: "root:root"
               set: true
         remediation: |
-          Run the below command (based on the file location on your system) on the master node.
-          For example,
-          chown root:root $controllermanagerconf
+          Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 1.1.5
+        type: skip
         text: "Ensure that the scheduler pod specification file permissions are set to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c %a $schedulerconf; fi'"
         tests:
@@ -176,12 +177,12 @@ groups:
                 value: "000"
               set: true
         remediation: |
-          Run the below command (based on the file location on your system) on the master node.
-          For example,
-          chmod 644 $schedulerconf
+          Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 1.1.6
+        type: skip
         text: "Ensure that the scheduler pod specification file ownership is set to root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c %U:%G $schedulerconf; fi'"
         tests:
@@ -192,12 +193,12 @@ groups:
                 value: "root:root"
               set: true
         remediation: |
-          Run the below command (based on the file location on your system) on the master node.
-          For example,
-          chown root:root $schedulerconf
+          Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 1.1.7
+        type: skip
         text: "Ensure that the etcd pod specification file permissions are set to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $etcdconf; then stat -c %a $etcdconf; fi'"
         tests:
@@ -239,12 +240,12 @@ groups:
                 value: "000"
               set: true
         remediation: |
-          Run the below command (based on the file location on your system) on the master node.
-          For example,
-          chmod 644 $etcdconf
+          Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 1.1.8
+        type: skip
         text: "Ensure that the etcd pod specification file ownership is set to root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $etcdconf; then stat -c %U:%G $etcdconf; fi'"
         tests:
@@ -255,61 +256,8 @@ groups:
                 value: "root:root"
               set: true
         remediation: |
-          Run the below command (based on the file location on your system) on the master node.
-          For example,
-          chown root:root $etcdconf
-        scored: true
-
-      - id: 1.1.9
-        text: "Ensure that the Container Network Interface file permissions are set to 644 or more restrictive (Not Scored)"
-        audit: "stat -c %a <path/to/cni/files>"
-        type: "manual"
-        remediation: |
-          Run the below command (based on the file location on your system) on the master node.
-          For example,
-          chmod 644 <path/to/cni/files>
-        scored: false
-
-      - id: 1.1.10
-        text: "Ensure that the Container Network Interface file ownership is set to root:root (Not Scored)"
-        audit: "stat -c %U:%G <path/to/cni/files>"
-        type: "manual"
-        remediation: |
-          Run the below command (based on the file location on your system) on the master node.
-          For example,
-          chown root:root <path/to/cni/files>
-        scored: false
-
-      - id: 1.1.11
-        text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Scored)"
-        audit: ps -ef | grep $etcdbin | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | xargs stat -c %a
-        tests:
-          test_items:
-            - flag: "700"
-              compare:
-                op: eq
-                value: "700"
-              set: true
-        remediation: |
-          On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
-          from the below command:
-          ps -ef | grep etcd Run the below command (based on the etcd data directory found above). For example,
-          chmod 700 /var/lib/etcd
-        scored: true
-
-      - id: 1.1.12
-        text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Scored)"
-        audit: ps -ef | grep $etcdbin | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | xargs stat -c %U:%G
-        tests:
-          test_items:
-            - flag: "etcd:etcd"
-              set: true
-        remediation: |
-          On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
-          from the below command:
-          ps -ef | grep etcd
-          Run the below command (based on the etcd data directory found above).
-          For example, chown etcd:etcd /var/lib/etcd
+          Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 1.1.13
@@ -503,8 +451,14 @@ groups:
 
       - id: 1.1.19
         text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Scored)"
-        audit: "ls -laR /etc/kubernetes/pki/"
-        type: "manual"
+        audit: "check_files_owner_in_dir.sh /node/etc/kubernetes/ssl"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,
@@ -513,8 +467,14 @@ groups:
 
       - id: 1.1.20
         text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Scored) "
-        audit: "stat -c %n\ %a /etc/kubernetes/pki/*.crt"
-        type: "manual"
+        audit: "check_files_permissions.sh /node/etc/kubernetes/ssl/!(*key).pem"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,
@@ -523,33 +483,23 @@ groups:
 
       - id: 1.1.21
         text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Scored)"
-        audit: "stat -c %n\ %a /etc/kubernetes/pki/*.key"
-        type: "manual"
+        audit: "check_files_permissions.sh /node/etc/kubernetes/ssl/*key.pem 600"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,
-          chmod -R 600 /etc/kubernetes/pki/*.key
+          chmod -R 600 /etc/kubernetes/ssl/*key.pem
         scored: true
 
   - id: 1.2
     text: "API Server"
     checks:
-      - id: 1.2.1
-        text: "Ensure that the --anonymous-auth argument is set to false (Not Scored)"
-        audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        tests:
-          test_items:
-            - flag: "--anonymous-auth"
-              compare:
-                op: eq
-                value: false
-              set: true
-        remediation: |
-          Edit the API server pod specification file $apiserverconf
-          on the master node and set the below parameter.
-          --anonymous-auth=false
-        scored: false
-
       - id: 1.2.2
         text: "Ensure that the --basic-auth-file argument is not set (Scored)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
@@ -678,24 +628,6 @@ groups:
           --authorization-mode=Node,RBAC
         scored: true
 
-      - id: 1.2.10
-        text: "Ensure that the admission control plugin EventRateLimit is set (Not Scored)"
-        audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        tests:
-          test_items:
-            - flag: "--enable-admission-plugins"
-              compare:
-                op: has
-                value: "EventRateLimit"
-              set: true
-        remediation: |
-          Follow the Kubernetes documentation and set the desired limits in a configuration file.
-          Then, edit the API server pod specification file $apiserverconf
-          and set the below parameters.
-          --enable-admission-plugins=...,EventRateLimit,...
-          --admission-control-config-file=<path/to/configuration/file>
-        scored: false
-
       - id: 1.2.11
         text: "Ensure that the admission control plugin AlwaysAdmit is not set (Scored)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
@@ -714,40 +646,6 @@ groups:
           on the master node and either remove the --enable-admission-plugins parameter, or set it to a
           value that does not include AlwaysAdmit.
         scored: true
-
-      - id: 1.2.12
-        text: "Ensure that the admission control plugin AlwaysPullImages is set (Not Scored)"
-        audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        tests:
-          test_items:
-            - flag: "--enable-admission-plugins"
-              compare:
-                op: has
-                value: "AlwaysPullImages"
-              set: true
-        remediation: |
-          Edit the API server pod specification file $apiserverconf
-          on the master node and set the --enable-admission-plugins parameter to include
-          AlwaysPullImages.
-          --enable-admission-plugins=...,AlwaysPullImages,...
-        scored: false
-
-      - id: 1.2.13
-        text: "Ensure that the admission control plugin SecurityContextDeny is set if PodSecurityPolicy is not used (Not Scored)"
-        audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        tests:
-          test_items:
-            - flag: "--enable-admission-plugins"
-              compare:
-                op: has
-                value: "SecurityContextDeny"
-              set: true
-        remediation: |
-          Edit the API server pod specification file $apiserverconf
-          on the master node and set the --enable-admission-plugins parameter to include
-          SecurityContextDeny, unless PodSecurityPolicy is already in place.
-          --enable-admission-plugins=...,SecurityContextDeny,...
-        scored: false
 
       - id: 1.2.14
         text: "Ensure that the admission control plugin ServiceAccount is set (Scored)"
@@ -1089,22 +987,6 @@ groups:
           Follow the Kubernetes documentation and configure a EncryptionConfig file.
           In this file, choose aescbc, kms or secretbox as the encryption provider.
         scored: true
-
-      - id: 1.2.35
-        text: "Ensure that the API Server only makes use of Strong Cryptographic Ciphers (Not Scored)"
-        audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        tests:
-          test_items:
-            - flag: "--tls-cipher-suites"
-              compare:
-                op: has
-                value: "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256"
-              set: true
-        remediation: |
-          Edit the API server pod specification file $apiserverconf
-          on the master node and set the below parameter.
-          --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
-        scored: false
 
   - id: 1.3
     text: "Controller Manager"
