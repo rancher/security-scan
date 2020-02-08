@@ -41,8 +41,8 @@ mkdir -p "${RESULTS_DIR}"
 
 # etcd
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
   if [[ "$(pgrep etcd | wc -l)" -gt 0 ]]; then
+    echo "etcd: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets etcd \
       --scored \
@@ -57,6 +57,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   fi
 else
   if [[ "$(pgrep etcd | wc -l)" -gt 0 ]]; then
+    echo "etcd: Using RANCHER_K8S_VERSION=${RANCHER_K8S_VERSION}"
     kube-bench run \
       --targets etcd \
       --scored \
@@ -73,8 +74,8 @@ fi
 
 # master (no etcd)
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
   if [[ "$(pgrep apiserver | wc -l)" -gt 0 ]]; then
+    echo "master: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets master \
       --scored \
@@ -89,6 +90,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   fi
 else
   if [[ "$(pgrep apiserver | wc -l)" -gt 0 ]]; then
+    echo "master: Using RANCHER_K8S_VERSION=${RANCHER_K8S_VERSION}"
     kube-bench run \
       --targets master \
       --scored \
@@ -104,8 +106,8 @@ else
 fi
 
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  echo "Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
   if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]]; then
+    echo "node: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets node \
       --scored \
@@ -120,6 +122,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   fi
 else
   if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]]; then
+    echo "node: Using RANCHER_K8S_VERSION=${RANCHER_K8S_VERSION}"
     kube-bench run \
       --targets node \
       --scored \
@@ -131,6 +134,32 @@ else
       --json \
       --log_dir "${LOG_DIR}" \
       --outputfile "${RESULTS_DIR}/node.json" 2> "${ERROR_LOG_FILE}"
+  fi
+fi
+
+# Run the scan for remaining controls
+# TODO:
+#   For now run on master nodes, refactor later to run as a
+#   separate sonobuoy plugin of type=Job. But not sure if
+#   there would be some controls which require running on
+#   master nodes only
+if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
+  if [[ "$(pgrep apiserver | wc -l)" -gt 0 ]]; then
+    for controlFile in $(find ${CONFIG_DIR}/${OVERRIDE_BENCHMARK_VERSION} -name '*.yaml' ! -name config.yaml ! -name master.yaml ! -name node.yaml ! -name etcd.yaml); do
+        echo "controlFile: ${controlFile}"
+        target=$(basename "${controlFile}" .yaml)
+        kube-bench run \
+          --targets "${target}" \
+          --scored \
+          --nosummary \
+          --noremediations \
+          --v=5 \
+          --config-dir="${CONFIG_DIR}" \
+          --benchmark "${OVERRIDE_BENCHMARK_VERSION}" \
+          --json \
+          --log_dir "${LOG_DIR}" \
+          --outputfile "${RESULTS_DIR}/${target}.json" 2> "${ERROR_LOG_FILE}"
+    done
   fi
 fi
 
