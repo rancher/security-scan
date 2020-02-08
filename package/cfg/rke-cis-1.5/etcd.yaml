@@ -5,6 +5,89 @@ id: 2
 text: "Etcd Node Configuration"
 type: "etcd"
 groups:
+  - id: 1.1
+    text: "Master Node Configuration Files "
+    checks:
+      - id: 1.1.11
+        text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Scored)"
+        audit: stat -c %a /node/var/lib/etcd
+        tests:
+          test_items:
+            - flag: "700"
+              compare:
+                op: eq
+                value: "700"
+              set: true
+        remediation: |
+          On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
+          from the below command:
+          ps -ef | grep etcd Run the below command (based on the etcd data directory found above). For example,
+          chmod 700 /var/lib/etcd
+        scored: true
+
+      - id: 1.1.12
+        text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Scored)"
+        audit: stat -c %U:%G /node/var/lib/etcd
+        tests:
+          test_items:
+            - flag: "etcd:etcd"
+              set: true
+        remediation: |
+          On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
+          from the below command:
+          ps -ef | grep etcd
+          Run the below command (based on the etcd data directory found above).
+          For example, chown etcd:etcd /var/lib/etcd
+        scored: true
+
+      - id: 1.1.19
+        text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Scored)"
+        audit: "check_files_owner_in_dir.sh /node/etc/kubernetes/ssl"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on the master node.
+          For example,
+          chown -R root:root /etc/kubernetes/pki/
+        scored: true
+
+      - id: 1.1.20
+        text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Scored) "
+        audit: "check_files_permissions.sh /node/etc/kubernetes/ssl/!(*key).pem"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on the master node.
+          For example,
+          chmod -R 644 /etc/kubernetes/pki/*.crt
+        scored: true
+
+      - id: 1.1.21
+        text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Scored)"
+        audit: "check_files_permissions.sh /node/etc/kubernetes/ssl/*key.pem 600"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on the master node.
+          For example,
+          chmod -R 600 /etc/kubernetes/ssl/*key.pem
+        scored: true
+
   - id: 2
     text: "Etcd Node Configuration Files"
     checks:
