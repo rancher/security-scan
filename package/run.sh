@@ -14,7 +14,9 @@ DONE_ANNOTATION_VALUE="true"
 ERROR_ANNOTATION_VALUE="error"
 ERROR_LOG_FILE="/tmp/kbs.error.log"
 
-KBS_CONFIG_FILE_LOCATION=/etc/kbs/config.json
+USER_SKIP_LOCATION="/etc/kbs/userskip/config.json"
+NA_SKIP_LOCATION="/etc/kbs/notapplicable/config.json"
+DS_SKIP_LOCATION="/etc/kbs/defaultskip/config.json"
 
 SONOBUOY_OUTPUT_DIR=${SONOBUOY_OUTPUT_DIR:-/tmp/sonobuoy}
 
@@ -91,12 +93,28 @@ else
   echo "Provided Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 fi
 
-if [[ -f "${KBS_CONFIG_FILE_LOCATION}" ]]; then
-  echo "using skip config from configmap"
+if [[ -f "${NA_SKIP_LOCATION}" ]]; then
+  echo "using not applicable config from configmap: ${NA_SKIP_LOCATION}"
   if [[ "${DEBUG}" == "true" ]]; then
-    cat ${KBS_CONFIG_FILE_LOCATION}
+    cat ${NA_SKIP_LOCATION}
   fi
-  export SKIP_CONFIG_FILE="${KBS_CONFIG_FILE_LOCATION}"
+  export NOT_APPLICABLE_CONFIG_FILE="${NA_SKIP_LOCATION}"
+fi
+
+if [[ -f "${DS_SKIP_LOCATION}" ]]; then
+  echo "using default skip config from configmap: ${DS_SKIP_LOCATION}"
+  if [[ "${DEBUG}" == "true" ]]; then
+    cat ${DS_SKIP_LOCATION}
+  fi
+  export DEFAULT_SKIP_CONFIG_FILE="${DS_SKIP_LOCATION}"
+fi
+
+if [[ -f "${USER_SKIP_LOCATION}" ]]; then
+  echo "using user skip config from configmap"
+  if [[ "${DEBUG}" == "true" ]]; then
+    cat ${USER_SKIP_LOCATION}
+  fi
+  export USER_SKIP_CONFIG_FILE="${USER_SKIP_LOCATION}"
 fi
 
 

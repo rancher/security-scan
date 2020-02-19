@@ -512,7 +512,7 @@ groups:
 
       - id: 1.1.35
         text: "Ensure that the encryption provider is set to aescbc (Scored)"
-        audit: "check_encryption_provider_config.sh"
+        audit: "check_encryption_provider_config.sh aescbc"
         tests:
           test_items:
             - flag: "true"

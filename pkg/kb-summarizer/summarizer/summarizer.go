@@ -45,19 +45,23 @@ type Summarizer struct {
 	fullReport         *SummarizedReport
 	groupWrappersMap   map[string]*GroupWrapper
 	checkWrappersMaps  map[string]*CheckWrapper
-	skip               map[string]bool
+	userSkip           map[string]bool
+	defaultSkip        map[string]string
+	notApplicable      map[string]string
 	nodeSeen           map[NodeType]map[string]bool
 }
 
 type State string
 
 const (
-	Pass  State = "P"
-	Fail  State = "F"
-	Skip  State = "S"
-	Mixed State = "M"
+	Pass          State = "P"
+	Fail          State = "F"
+	Skip          State = "S"
+	Mixed         State = "M"
+	NotApplicable State = "N"
 
 	SKIP kb.State = "SKIP"
+	NA   kb.State = "NA"
 
 	CheckTypeSkip = "skip"
 )
@@ -96,6 +100,7 @@ type SummarizedReport struct {
 	Fail          int                   `json:"f"`
 	Pass          int                   `json:"p"`
 	Skip          int                   `json:"s"`
+	NotApplicable int                   `json:"na"`
 	Nodes         map[NodeType][]string `json:"n"`
 	GroupWrappers []*GroupWrapper       `json:"o"`
 }
@@ -108,7 +113,18 @@ var controlFilesToIgnore = map[string]bool{
 	"config.yaml": true,
 }
 
-func NewSummarizer(k8sVersion, benchmarkVersion, controlsDir, inputDir, outputDir, outputFilename, skipConfigFile string, failuresOnly bool) (*Summarizer, error) {
+func NewSummarizer(
+	k8sVersion,
+	benchmarkVersion,
+	controlsDir,
+	inputDir,
+	outputDir,
+	outputFilename,
+	userSkipConfigFile,
+	defaultSkipConfigFile,
+	notApplicableConfigFile string,
+	failuresOnly bool,
+) (*Summarizer, error) {
 	var err error
 	s := &Summarizer{
 		ControlsDirectory: controlsDir,
@@ -135,18 +151,32 @@ func NewSummarizer(k8sVersion, benchmarkVersion, controlsDir, inputDir, outputDi
 			return nil, fmt.Errorf("error getting benchmarkVersion for k8s version %v: %v", k8sVersion, err)
 		}
 	}
+
+	userSkip, err := GetUserSkipInfo(s.BenchmarkVersion, userSkipConfigFile)
+	if err != nil {
+		return nil, fmt.Errorf("error getting user skip info: %v", err)
+	}
+	s.userSkip = userSkip
+
+	defaultSkip, err := GetChecksMapFromConfigFile(defaultSkipConfigFile)
+	if err != nil {
+		return nil, fmt.Errorf("error getting default skip info: %v", err)
+	}
+	s.defaultSkip = defaultSkip
+
+	notApplicable, err := GetChecksMapFromConfigFile(notApplicableConfigFile)
+	if err != nil {
+		return nil, fmt.Errorf("error getting default skip info: %v", err)
+	}
+	s.notApplicable = notApplicable
+
 	if err := s.loadControls(); err != nil {
 		return nil, fmt.Errorf("error loading controls: %v", err)
 	}
-	skip, err := GetSkipInfo(s.BenchmarkVersion, skipConfigFile)
-	if err != nil {
-		logrus.Errorf("error getting skip info: %v, but ignoring", err)
-	}
-	s.skip = skip
 	return s, nil
 }
 
-func GetSkipInfo(benchmark, skipConfigFile string) (map[string]bool, error) {
+func GetUserSkipInfo(benchmark, skipConfigFile string) (map[string]bool, error) {
 	skipMap := map[string]bool{}
 	sc := &skipConfig{}
 	if skipConfigFile == "" {
@@ -174,6 +204,26 @@ func GetSkipInfo(benchmark, skipConfigFile string) (map[string]bool, error) {
 	return skipMap, nil
 }
 
+func GetChecksMapFromConfigFile(configFile string) (map[string]string, error) {
+	checksMap := map[string]string{}
+	if configFile == "" {
+		return checksMap, nil
+	}
+	logrus.Infof("loading checks from config file: %v", configFile)
+	data, err := ioutil.ReadFile(configFile)
+	if err != nil {
+		return checksMap, fmt.Errorf("error reading file %v: %v", configFile, err)
+	}
+	if len(data) == 0 {
+		return checksMap, nil
+	}
+	err = json.Unmarshal(data, &checksMap)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshalling config file %v: %v", configFile, err)
+	}
+	return checksMap, nil
+}
+
 func (s *Summarizer) getBenchmarkFor(k8sVersion string) (string, error) {
 	if k8sVersion == "" {
 		return "", nil
@@ -198,14 +248,15 @@ func (s *Summarizer) processOneResultFileForHost(results *kb.Controls, hostname 
 				logrus.Errorf("check %v found in results but not in spec", check.ID)
 				continue
 			}
-			// Order is important here
-			// User passed skip is interpreted as skip
-			if s.skip[check.ID] {
+
+			if msg, ok := s.notApplicable[check.ID]; ok {
+				check.State = NA
+				check.Remediation = msg
+			} else if msg, ok := s.defaultSkip[check.ID]; ok {
 				check.State = SKIP
-			}
-			// skip from backend config is considered as pass
-			if check.Type == CheckTypeSkip {
-				check.State = kb.PASS
+				check.Remediation = msg
+			} else if s.userSkip[check.ID] {
+				check.State = SKIP
 			}
 
 			if cw.Result[check.State] == nil {
@@ -389,6 +440,13 @@ func (s *Summarizer) loadControls() error {
 				if !check.Scored {
 					continue
 				}
+				if msg, ok := s.notApplicable[check.ID]; ok {
+					check.State = NA
+					check.Remediation = msg
+				} else if msg, ok := s.defaultSkip[check.ID]; ok {
+					check.State = SKIP
+					check.Remediation = msg
+				}
 				if cw, ok := s.checkWrappersMaps[check.ID]; !ok {
 					s.fullReport.Total++
 					c := getCheckWrapper(check)
@@ -431,6 +489,8 @@ func getMappedState(state kb.State) State {
 		return Fail
 	case SKIP:
 		return Skip
+	case NA:
+		return NotApplicable
 	}
 	return Fail
 }
@@ -493,6 +553,11 @@ func (s *Summarizer) runFinalPassOnCheckWrapper(cw *CheckWrapper) {
 	nodeCount := len(nodesMap)
 	logrus.Debugf("id: %v nodeCount: %v", cw.ID, nodeCount)
 	if len(cw.Result) == 1 {
+		if _, ok := cw.Result[NA]; ok {
+			cw.State = NotApplicable
+			s.fullReport.NotApplicable++
+			return
+		}
 		if _, ok := cw.Result[kb.FAIL]; ok {
 			if len(cw.Result[kb.FAIL]) == nodeCount {
 				cw.State = Fail
@@ -609,12 +674,12 @@ func (s *Summarizer) Summarize() error {
 	}
 
 	logrus.Debugf("--- before final pass")
-	s.printReport()
+	_ = s.printReport()
 	if err := s.runFinalPass(); err != nil {
 		return fmt.Errorf("error running final pass on the report: %v", err)
 	}
 	logrus.Debugf("--- before final pass")
-	s.printReport()
+	_ = s.printReport()
 	return s.save()
 }
 
