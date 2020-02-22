@@ -1,6 +1,6 @@
 ---
 controls:
-version: 1.13
+version: 1.4
 id: 1
 text: "Master Node Security Configuration"
 type: "master"
@@ -512,7 +512,7 @@ groups:
 
       - id: 1.1.35
         text: "Ensure that the encryption provider is set to aescbc (Scored)"
-        audit: "check_encryption_provider_config.sh"
+        audit: "check_encryption_provider_config.sh aescbc"
         tests:
           test_items:
             - flag: "true"

@@ -10,16 +10,19 @@ import (
 )
 
 const (
-	K8SVersionFlag       = "k8s-version"
-	BenchmarkVersionFlag = "benchmark-version"
-	ControlsDirFlag      = "controls-dir"
-	EtcdControlsDirFlag  = "etcd-controls-dir"
-	InputDirFlag         = "input-dir"
-	OutputDirFlag        = "output-dir"
-	OutputFileNameFlag   = "output-filename"
-	FailuresOnlyFlag     = "failures-only"
-	SkipConfigFileFlag   = "skip-config-file"
-	SkipConfigFileEnvVar = "SKIP_CONFIG_FILE"
+	K8SVersionFlag                = "k8s-version"
+	BenchmarkVersionFlag          = "benchmark-version"
+	ControlsDirFlag               = "controls-dir"
+	InputDirFlag                  = "input-dir"
+	OutputDirFlag                 = "output-dir"
+	OutputFileNameFlag            = "output-filename"
+	FailuresOnlyFlag              = "failures-only"
+	UserSkipConfigFileFlag        = "user-skip-config-file"
+	UserSkipConfigFileEnvVar      = "USER_SKIP_CONFIG_FILE"
+	DefaultSkipConfigFileFlag     = "default-skip-config-file"
+	DefaultSkipConfigFileEnvVar   = "DEFAULT_SKIP_CONFIG_FILE"
+	NotApplicableConfigFileFlag   = "not-applicable-config-file"
+	NotApplicableConfigFileEnvVar = "NOT_APPLICABLE_CONFIG_FILE"
 )
 
 var (
@@ -46,10 +49,6 @@ func main() {
 			Value: summarizer.DefaultControlsDirectory,
 		},
 		cli.StringFlag{
-			Name:  EtcdControlsDirFlag,
-			Value: summarizer.EtcdDefaultControlsDirectory,
-		},
-		cli.StringFlag{
 			Name:  InputDirFlag,
 			Value: "",
 		},
@@ -62,8 +61,18 @@ func main() {
 			Value: summarizer.DefaultOutputFileName,
 		},
 		cli.StringFlag{
-			Name:   SkipConfigFileFlag,
-			EnvVar: SkipConfigFileEnvVar,
+			Name:   UserSkipConfigFileFlag,
+			EnvVar: UserSkipConfigFileEnvVar,
+			Value:  "",
+		},
+		cli.StringFlag{
+			Name:   DefaultSkipConfigFileFlag,
+			EnvVar: DefaultSkipConfigFileEnvVar,
+			Value:  "",
+		},
+		cli.StringFlag{
+			Name:   NotApplicableConfigFileFlag,
+			EnvVar: NotApplicableConfigFileEnvVar,
 			Value:  "",
 		},
 		cli.BoolFlag{
@@ -82,12 +91,13 @@ func run(c *cli.Context) error {
 	k8sversion := c.String(K8SVersionFlag)
 	benchmarkVersion := c.String(BenchmarkVersionFlag)
 	controlsDir := c.String(ControlsDirFlag)
-	etcdControlsDir := c.String(EtcdControlsDirFlag)
 	inputDir := c.String(InputDirFlag)
 	outputDir := c.String(OutputDirFlag)
 	outputFilename := c.String(OutputFileNameFlag)
 	failuresOnly := c.Bool(FailuresOnlyFlag)
-	skipConfigFile := c.String(SkipConfigFileFlag)
+	userSkipConfigFile := c.String(UserSkipConfigFileFlag)
+	defaultSkipConfigFile := c.String(DefaultSkipConfigFileFlag)
+	notApplicableConfigFile := c.String(NotApplicableConfigFileFlag)
 	if k8sversion == "" && benchmarkVersion == "" {
 		return fmt.Errorf("error: either of the flags %v, %v not specified", K8SVersionFlag, BenchmarkVersionFlag)
 	}
@@ -96,9 +106,6 @@ func run(c *cli.Context) error {
 	}
 	if controlsDir == "" {
 		return fmt.Errorf("error: %v not specified", ControlsDirFlag)
-	}
-	if etcdControlsDir == "" {
-		return fmt.Errorf("error: %v not specified", EtcdControlsDirFlag)
 	}
 	if inputDir == "" {
 		return fmt.Errorf("error: %v not specified", InputDirFlag)
@@ -110,11 +117,12 @@ func run(c *cli.Context) error {
 		k8sversion,
 		benchmarkVersion,
 		controlsDir,
-		etcdControlsDir,
 		inputDir,
 		outputDir,
 		outputFilename,
-		skipConfigFile,
+		userSkipConfigFile,
+		defaultSkipConfigFile,
+		notApplicableConfigFile,
 		failuresOnly,
 	)
 	if err != nil {

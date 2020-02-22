@@ -21,15 +21,23 @@ if [[ $(stat -c %U:%G ${INPUT_DIR}) != "root:root" ]]; then
     exit
 fi
 
-FILES_PERMISSIONS=$(stat -c %U:%G ${INPUT_DIR}/*)
+statInfoLines=$(stat -c "%n %U:%G" ${INPUT_DIR}/*)
+while read -r statInfoLine; do
+  f=$(echo ${statInfoLine} | cut -d' ' -f1)
+  p=$(echo ${statInfoLine} | cut -d' ' -f2)
 
-while read -r fileInfo; do
-  p=$(echo ${fileInfo} | cut -d' ' -f2)
-  if [[ "$p" != "root:root" ]]; then
-    echo "false"
-    exit
+  if [[ $(basename "$f" .pem) == "kube-etcd-"* ]]; then
+    if [[ "$p" != "root:root" && "$p" != "etcd:etcd" ]]; then
+      echo "false"
+      exit
+    fi
+  else
+    if [[ "$p" != "root:root" ]]; then
+      echo "false"
+      exit
+    fi
   fi
-done <<< "${FILES_PERMISSIONS}"
+done <<< "${statInfoLines}"
 
 
 echo "true"

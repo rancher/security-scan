@@ -1,0 +1,103 @@
+---
+controls:
+version: 1.5
+id: 5
+text: "Kubernetes Policies"
+type: "policies"
+groups:
+  - id: 5.1
+    text: "RBAC and Service Accounts"
+    checks:
+      - id: 5.1.5
+        text: "Ensure that default service accounts are not actively used. (Scored)"
+        type: "manual"
+        remediation: |
+          Create explicit service accounts wherever a Kubernetes workload requires specific access
+          to the Kubernetes API server.
+          Modify the configuration of each default service account to include this value
+          automountServiceAccountToken: false
+        scored: true
+
+  - id: 5.2
+    text: "Pod Security Policies"
+    checks:
+      - id: 5.2.2
+        text: "Minimize the admission of containers wishing to share the host process ID namespace (Scored)"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostPID == null) or (.spec.hostPID == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
+        remediation: |
+          Create a PSP as described in the Kubernetes documentation, ensuring that the
+          .spec.hostPID field is omitted or set to false.
+        scored: true
+
+      - id: 5.2.3
+        text: "Minimize the admission of containers wishing to share the host IPC namespace (Scored)"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostIPC == null) or (.spec.hostIPC == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
+        remediation: |
+          Create a PSP as described in the Kubernetes documentation, ensuring that the
+          .spec.hostIPC field is omitted or set to false.
+        scored: true
+
+      - id: 5.2.4
+        text: "Minimize the admission of containers wishing to share the host network namespace (Scored)"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostNetwork == null) or (.spec.hostNetwork == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
+        remediation: |
+          Create a PSP as described in the Kubernetes documentation, ensuring that the
+          .spec.hostNetwork field is omitted or set to false.
+        scored: true
+
+      - id: 5.2.5
+        text: "Minimize the admission of containers with allowPrivilegeEscalation (Scored)"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.allowPrivilegeEscalation == null) or (.spec.allowPrivilegeEscalation == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
+        remediation: |
+          Create a PSP as described in the Kubernetes documentation, ensuring that the
+          .spec.allowPrivilegeEscalation field is omitted or set to false.
+        scored: true
+
+  - id: 5.3
+    text: "Network Policies and CNI"
+    checks:
+      - id: 5.3.2
+        text: "Ensure that all Namespaces have Network Policies defined (Scored)"
+        type: "manual"
+        remediation: |
+          Follow the documentation and create NetworkPolicy objects as you need them.
+        scored: true
+
+  - id: 5.6
+    text: "General Policies"
+    checks:
+      - id: 5.6.4
+        text: "The default namespace should not be used (Scored)"
+        type: "manual"
+        remediation: |
+          Ensure that namespaces are created to allow for appropriate segregation of Kubernetes
+          resources and that all new resources are created in a specific namespace.
+        scored: true

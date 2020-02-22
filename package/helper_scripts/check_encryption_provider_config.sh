@@ -13,10 +13,13 @@ if [[ ! -f "${ENCRYPTION_CONFIG_FILE}" ]]; then
   exit
 fi
 
-if ! grep aescbc "${ENCRYPTION_CONFIG_FILE}"; then
-  echo "false"
-  exit
-fi
+for provider in "$@"
+do
+  if grep "$provider" "${ENCRYPTION_CONFIG_FILE}"; then
+    echo "true"
+    exit
+  fi
+done
 
-echo "true"
+echo "false"
 exit
