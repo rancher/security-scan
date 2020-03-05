@@ -88,6 +88,7 @@ node:
       - "/etc/kubernetes/pki/ca.crt"
       - "/etc/kubernetes/certs/ca.crt"
       - "/etc/kubernetes/cert/ca.pem"
+      - "/etc/kubernetes/ssl/kube-ca.pem"
     svc:
       # These paths must also be included
       #  in the 'confs' property below
@@ -102,7 +103,7 @@ node:
       - "/etc/kubernetes/kubelet.conf"
       - "/var/lib/kubelet/kubeconfig"
       - "/etc/kubernetes/kubelet-kubeconfig"
-      - "/node/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
+      - "/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
     confs:
       - "/var/lib/kubelet/config.yaml"
       - "/etc/kubernetes/kubelet/kubelet-config.json"
@@ -137,6 +138,7 @@ node:
       - /var/snap/kube-proxy/current/args
     kubeconfig:
       - /etc/kubernetes/kubelet-kubeconfig
+      - /etc/kubernetes/ssl/kubecfg-kube-proxy.yaml
     svc:
       - "/lib/systemd/system/kube-proxy.service"
     defaultconf: /etc/kubernetes/addons/kube-proxy-daemonset.yaml
@@ -157,7 +159,15 @@ etcd:
     defaultconf: /etc/kubernetes/manifests/etcd.yaml
 
 controlplane:
-  components: []
+  components:
+    - apiserver
+
+  apiserver:
+    bins:
+      - "kube-apiserver"
+      - "hyperkube apiserver"
+      - "hyperkube kube-apiserver"
+      - "apiserver"
 
 policies:
   components: []
