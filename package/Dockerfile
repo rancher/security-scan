@@ -22,6 +22,8 @@ COPY package/run.sh \
      package/helper_scripts/check_files_permissions.sh \
      package/helper_scripts/check_files_owner_in_dir.sh \
      package/helper_scripts/check_encryption_provider_config.sh \
+     package/helper_scripts/check_for_network_policies.sh \
+     package/helper_scripts/check_for_default_sa.sh \
      /usr/bin/
 
 CMD ["run.sh"]

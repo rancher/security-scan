@@ -10,7 +10,14 @@ groups:
     checks:
       - id: 5.1.5
         text: "Ensure that default service accounts are not actively used. (Scored)"
-        type: "manual"
+        audit: check_for_default_sa.sh
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Create explicit service accounts wherever a Kubernetes workload requires specific access
           to the Kubernetes API server.

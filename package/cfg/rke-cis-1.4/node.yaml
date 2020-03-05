@@ -277,7 +277,7 @@ groups:
     - id: 2.2.1
       text: "Ensure that the kubelet.conf file permissions are set to 644 or
       more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e $kubeletkubeconfig; then stat -c %a $kubeletkubeconfig; fi'"
+      audit: "/bin/sh -c 'if test -e /node$kubeletkubeconfig; then stat -c %a /node$kubeletkubeconfig; fi'"
       tests:
         bin_op: or
         test_items:
@@ -304,7 +304,7 @@ groups:
 
     - id: 2.2.2
       text: "Ensure that the kubelet.conf file ownership is set to root:root (Scored)"
-      audit: "/bin/sh -c 'if test -e $kubeletkubeconfig; then stat -c %U:%G $kubeletkubeconfig; fi'"
+      audit: "/bin/sh -c 'if test -e /node$kubeletkubeconfig; then stat -c %U:%G /node$kubeletkubeconfig; fi'"
       tests:
         test_items:
           - flag: "root:root"
@@ -360,9 +360,8 @@ groups:
       scored: true
 
     - id: 2.2.5
-      type: skip
       text: "Ensure that the proxy kubeconfig file permissions are set to 644 or more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e $proxykubeconfig; then stat -c %a $proxykubeconfig; fi'"
+      audit: "/bin/sh -c 'if test -e /node$proxykubeconfig; then stat -c %a /node$proxykubeconfig; fi'"
       tests:
         bin_op: or
         test_items:
@@ -382,27 +381,28 @@ groups:
             value: "600"
           set: true
       remediation: |
-        Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-proxy.
-        All configuration is passed in as arguments at container run time.
+        Run the below command (based on the file location on your system) on the each worker
+        node. For example,
+        chmod 644 $proxykubeconfig
       scored: true
 
     - id: 2.2.6
-      type: skip
       text: "Ensure that the proxy kubeconfig file ownership is set to root:root (Scored)"
-      audit: "/bin/sh -c 'if test -e $proxykubeconfig; then stat -c %U:%G $proxykubeconfig; fi'"
+      audit: "/bin/sh -c 'if test -e /node$proxykubeconfig; then stat -c %U:%G /node$proxykubeconfig; fi'"
       tests:
         test_items:
         - flag: "root:root"
           set: true
       remediation: |
-        Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-proxy.
-        All configuration is passed in as arguments at container run time.
+        Run the below command (based on the file location on your system) on the each worker
+        node. For example,
+        chmod 644 $proxykubeconfig
       scored: true
 
     - id: 2.2.7
       text: "Ensure that the certificate authorities file permissions are set to
       644 or more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e /node/etc/kubernetes/ssl/kube-ca.pem; then stat -c %a /node/etc/kubernetes/ssl/kube-ca.pem; fi'"
+      audit: '/bin/sh -c ''if test -e /node$kubeletcafile; then stat -c %a /node$kubeletcafile; fi'' '
       tests:
         bin_op: or
         test_items:
@@ -421,6 +421,26 @@ groups:
               op: eq
               value: "600"
             set: true
+          - flag: "444"
+            compare:
+              op: eq
+              value: "444"
+            set: true
+          - flag: "440"
+            compare:
+              op: eq
+              value: "440"
+            set: true
+          - flag: "400"
+            compare:
+              op: eq
+              value: "400"
+            set: true
+          - flag: "000"
+            compare:
+              op: eq
+              value: "000"
+            set: true
       remediation: |
         Run the following command to modify the file permissions of the --client-ca-file
         chmod 644 <filename>
@@ -428,7 +448,7 @@ groups:
 
     - id: 2.2.8
       text: "Ensure that the client certificate authorities file ownership is set to root:root (Scored)"
-      audit: "/bin/sh -c 'if test -e /node/etc/kubernetes/ssl/kube-ca.pem; then stat -c %U:%G /node/etc/kubernetes/ssl/kube-ca.pem; fi'"
+      audit: '/bin/sh -c ''if test -e /node$kubeletcafile; then stat -c %U:%G /node$kubeletcafile; fi'' '
       tests:
         test_items:
           - flag: "root:root"

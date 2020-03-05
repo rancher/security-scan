@@ -110,7 +110,10 @@ groups:
         text: "Ensure that the --client-cert-auth argument is set to true (Scored)"
         audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
         tests:
+          bin_op: or
           test_items:
+            - flag: "--client-cert-auth"
+              set: true
             - flag: "--client-cert-auth"
               compare:
                 op: eq
@@ -163,7 +166,10 @@ groups:
         text: "Ensure that the --peer-client-cert-auth argument is set to true (Scored)"
         audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
         tests:
+          bin_op: or
           test_items:
+            - flag: "--peer-client-cert-auth"
+              set: true
             - flag: "--peer-client-cert-auth"
               compare:
                 op: eq
