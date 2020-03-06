@@ -252,7 +252,6 @@ groups:
     # To check if the property is set as expected, we need to parse the kubelet command 
     # instead reading the Kubelet Configuration file.
     audit: "/bin/ps -fC $kubeletbin "
-    type: skip
     tests:
       test_items:
       - flag: --cadvisor-port

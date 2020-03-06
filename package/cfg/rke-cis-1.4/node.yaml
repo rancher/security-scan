@@ -242,7 +242,6 @@ groups:
     scored: true
 
   - id: 2.1.12
-    type: skip
     text: "Ensure that the --rotate-certificates argument is not set to false (Scored)"
     audit: "ps -fC $kubeletbin"
     tests:
@@ -257,7 +256,6 @@ groups:
     scored: true
 
   - id: 2.1.13
-    type: skip
     text: "Ensure that the RotateKubeletServerCertificate argument is set to true (Scored)"
     audit: "ps -fC $kubeletbin"
     tests:
@@ -319,7 +317,6 @@ groups:
       scored: true
 
     - id: 2.2.3
-      type: skip
       text: "Ensure that the kubelet service file permissions are set to 644 or
       more restrictive (Scored)"
       audit: "/bin/sh -c 'if test -e $kubeletsvc; then stat -c %a $kubeletsvc; fi'"
@@ -347,7 +344,6 @@ groups:
       scored: true
 
     - id: 2.2.4
-      type: skip
       text: "Ensure that the kubelet service file ownership is set to root:root (Scored)"
       audit: "/bin/sh -c 'if test -e $kubeletsvc; then stat -c %U:%G $kubeletsvc; fi'"
       tests:
@@ -459,7 +455,6 @@ groups:
       scored: true
 
     - id: 2.2.9
-      type: skip
       text: "Ensure that the kubelet configuration file ownership is set to root:root (Scored)"
       audit: "/bin/sh -c 'if test -e $kubeletconf; then stat -c %U:%G $kubeletconf; fi'"
       tests:
@@ -472,7 +467,6 @@ groups:
       scored: true
 
     - id: 2.2.10
-      type: skip
       text: "Ensure that the kubelet configuration file has permissions set to 644 or more restrictive (Scored)"
       audit: "/bin/sh -c 'if test -e $kubeletconf; then stat -c %a $kubeletconf; fi'"
       tests:
