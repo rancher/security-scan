@@ -775,7 +775,6 @@ groups:
     text: "Configuration Files"
     checks:
       - id: 1.4.1
-        type: skip
         text: "Ensure that the API server pod specification file permissions are
     set to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c %a $apiserverconf; fi'"
@@ -803,7 +802,6 @@ groups:
         scored: true
 
       - id: 1.4.2
-        type: skip
         text: "Ensure that the API server pod specification file ownership is set to
     root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c %U:%G $apiserverconf; fi'"
@@ -820,7 +818,6 @@ groups:
         scored: true
 
       - id: 1.4.3
-        type: skip
         text: "Ensure that the controller manager pod specification file
     permissions are set to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c %a $controllermanagerconf; fi'"
@@ -848,7 +845,6 @@ groups:
         scored: true
 
       - id: 1.4.4
-        type: skip
         text: "Ensure that the controller manager pod specification file
     ownership is set to root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c %U:%G $controllermanagerconf; fi'"
@@ -865,7 +861,6 @@ groups:
         scored: true
 
       - id: 1.4.5
-        type: skip
         text: "Ensure that the scheduler pod specification file permissions are set
     to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c %a $schedulerconf; fi'"
@@ -893,7 +888,6 @@ groups:
         scored: true
 
       - id: 1.4.6
-        type: skip
         text: "Ensure that the scheduler pod specification file ownership is set to
     root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c %U:%G $schedulerconf; fi'"
@@ -910,7 +904,6 @@ groups:
         scored: true
 
       - id: 1.4.7
-        type: skip
         text: "Ensure that the etcd pod specification file permissions are set to
     644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $etcdconf; then stat -c %a $etcdconf; fi'"
@@ -938,7 +931,6 @@ groups:
         scored: true
 
       - id: 1.4.8
-        type: skip
         text: "Ensure that the etcd pod specification file ownership is set to
     root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $etcdconf; then stat -c %U:%G $etcdconf; fi'"
@@ -955,7 +947,6 @@ groups:
         scored: true
 
       - id: 1.4.13
-        type: skip
         text: "Ensure that the admin.conf file permissions are set to 644 or
     more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c %a /etc/kubernetes/admin.conf; fi'"
@@ -982,7 +973,6 @@ groups:
         scored: true
 
       - id: 1.4.14
-        type: skip
         text: "Ensure that the admin.conf file ownership is set to root:root (Scored)"
         audit: "/bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c %U:%G /etc/kubernetes/admin.conf; fi'"
         tests:

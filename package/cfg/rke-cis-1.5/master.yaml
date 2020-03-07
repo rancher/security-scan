@@ -9,7 +9,6 @@ groups:
     text: "Master Node Configuration Files "
     checks:
       - id: 1.1.1
-        type: skip
         text: "Ensure that the API server pod specification file permissions are set to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c %a $apiserverconf; fi'"
         tests:
@@ -56,7 +55,6 @@ groups:
         scored: true
 
       - id: 1.1.2
-        type: skip
         text: "Ensure that the API server pod specification file ownership is set to root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c %U:%G $apiserverconf; fi'"
         tests:
@@ -72,7 +70,6 @@ groups:
         scored: true
 
       - id: 1.1.3
-        type: skip
         text: "Ensure that the controller manager pod specification file permissions are set to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c %a $controllermanagerconf; fi'"
         tests:
@@ -119,7 +116,6 @@ groups:
         scored: true
 
       - id: 1.1.4
-        type: skip
         text: "Ensure that the controller manager pod specification file ownership is set to root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c %U:%G $controllermanagerconf; fi'"
         tests:
@@ -135,7 +131,6 @@ groups:
         scored: true
 
       - id: 1.1.5
-        type: skip
         text: "Ensure that the scheduler pod specification file permissions are set to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c %a $schedulerconf; fi'"
         tests:
@@ -182,7 +177,6 @@ groups:
         scored: true
 
       - id: 1.1.6
-        type: skip
         text: "Ensure that the scheduler pod specification file ownership is set to root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c %U:%G $schedulerconf; fi'"
         tests:
@@ -198,7 +192,6 @@ groups:
         scored: true
 
       - id: 1.1.7
-        type: skip
         text: "Ensure that the etcd pod specification file permissions are set to 644 or more restrictive (Scored)"
         audit: "/bin/sh -c 'if test -e $etcdconf; then stat -c %a $etcdconf; fi'"
         tests:
@@ -245,7 +238,6 @@ groups:
         scored: true
 
       - id: 1.1.8
-        type: skip
         text: "Ensure that the etcd pod specification file ownership is set to root:root (Scored)"
         audit: "/bin/sh -c 'if test -e $etcdconf; then stat -c %U:%G $etcdconf; fi'"
         tests:
