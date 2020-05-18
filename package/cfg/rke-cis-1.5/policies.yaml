@@ -103,7 +103,14 @@ groups:
     checks:
       - id: 5.6.4
         text: "The default namespace should not be used (Scored)"
-        type: "manual"
+        audit: "kubectl get all -o json | jq .items[] | jq -r 'select((.metadata.name!=\"kubernetes\"))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Ensure that namespaces are created to allow for appropriate segregation of Kubernetes
           resources and that all new resources are created in a specific namespace.
