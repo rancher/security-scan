@@ -24,6 +24,7 @@ COPY package/run.sh \
      package/helper_scripts/check_encryption_provider_config.sh \
      package/helper_scripts/check_for_network_policies.sh \
      package/helper_scripts/check_for_default_sa.sh \
+     package/helper_scripts/check_for_default_ns.sh \
      /usr/bin/
 
 CMD ["run.sh"]
