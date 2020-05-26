@@ -103,13 +103,13 @@ groups:
     checks:
       - id: 5.6.4
         text: "The default namespace should not be used (Scored)"
-        audit: "kubectl get all -o json | jq .items[] | jq -r 'select((.metadata.name!=\"kubernetes\"))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        audit: check_for_default_ns.sh
         tests:
           test_items:
-            - flag: "count"
+            - flag: "true"
               compare:
-                op: gt
-                value: "0"
+                op: eq
+                value: "true"
               set: true
         remediation: |
           Ensure that namespaces are created to allow for appropriate segregation of Kubernetes
