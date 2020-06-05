@@ -93,7 +93,14 @@ groups:
     checks:
       - id: 5.3.2
         text: "Ensure that all Namespaces have Network Policies defined (Scored)"
-        type: "manual"
+        audit: check_for_network_policies.sh
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Follow the documentation and create NetworkPolicy objects as you need them.
         scored: true
