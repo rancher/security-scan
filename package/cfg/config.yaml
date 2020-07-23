@@ -185,6 +185,7 @@ target_mapping:
   "cis-1.4":
     - "master"
     - "node"
+    - "etcd"
   "cis-1.5":
     - "master"
     - "node"
