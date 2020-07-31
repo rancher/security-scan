@@ -2,13 +2,12 @@
 ## Version-specific settings that override the values in cfg/config.yaml
 
 master:
-    components:
+  components:
     - apiserver
     - scheduler
     - controllermanager
     - etcd
     - flanneld
-    - kubernetes
 
     apiserver:
       bins:
@@ -27,7 +26,7 @@ master:
         - "hyperkube kube-scheduler"
         - "scheduler"
       confs:
-        - "var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml"
+        - "/var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml"
       defaultconf: "/var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml"
 
     controllermanager:
@@ -40,10 +39,6 @@ master:
       confs:
         - "/var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml"
       defaultconf: "/var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml"
-
-    etcd:
-      components:
-        - etcd
     
     etcd:
       bins:
