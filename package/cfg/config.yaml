@@ -189,6 +189,7 @@ version_mapping:
   "rke-1.16": "rke-cis-1.5"
   "rke-1.17": "rke-cis-1.5"
   "rke-1.18": "rke-cis-1.5"
+  "rke-1.18": "rke2-cis-1.5"
 
 target_mapping:
   "cis-1.4":
@@ -217,4 +218,3 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
-
