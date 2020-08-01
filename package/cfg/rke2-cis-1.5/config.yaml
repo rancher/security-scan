@@ -11,44 +11,34 @@ master:
 
     apiserver:
       bins:
-        - "kube-apiserver"
-        - "hyperkube apiserver"
-        - "hyperkube kube-apiserver"
-        - "apiserver"
+        - kube-apiserver
       confs: 
-        - "/var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml"
-      defaultconf: "/var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml"
+        - /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml
+      defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml
 
     scheduler:
       bins:
-        - "kube-scheduler"
-        - "hyperkube scheduler"
-        - "hyperkube kube-scheduler"
-        - "scheduler"
+        - kube-scheduler
       confs:
-        - "/var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml"
-      defaultconf: "/var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml"
+        - /var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml
+      defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml
 
     controllermanager:
       bins:
-        - "kube-controller-manager"
-        - "kube-controller"
-        - "hyperkube controller-manager"
-        - "hyperkube kube-controller-manager"
-        - "controller-manager"
+        - kube-controller-manager
       confs:
-        - "/var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml"
-      defaultconf: "/var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml"
+        - /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
+      defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
     
     etcd:
       bins:
-        - "etcd"
+        - etcd
       confs:
-        - "/var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml"
-      defaultconf: "/var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml"
+        - /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
+      defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
 
     flanneld:
       optional: true
       bins:
         - flanneld
-      defaultconf: "/etc/sysconfig/flanneld"
+      defaultconf: /etc/sysconfig/flanneld

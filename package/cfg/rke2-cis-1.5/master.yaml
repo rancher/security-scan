@@ -23,6 +23,7 @@ groups:
           master node.
           For example, chmod 644 $apiserverconf
         scored: true
+        type: skip
 
       - id: 1.1.2
         text: "Ensure that the API server pod specification file ownership is set to root:root (Scored)"
@@ -173,6 +174,7 @@ groups:
           Run the below command (based on the etcd data directory found above). For example,
           chmod 700 /var/lib/etcd
         scored: true
+        type: skip
 
       - id: 1.1.12
         text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Scored)"
@@ -188,6 +190,7 @@ groups:
           Run the below command (based on the etcd data directory found above).
           For example, chown etcd:etcd /var/lib/etcd
         scored: true
+        type: skip
 
       - id: 1.1.13
         text: "Ensure that the admin.conf file permissions are set to 644 or more restrictive (Scored)"
@@ -811,6 +814,7 @@ groups:
           --etcd-certfile=<path/to/client-certificate-file>
           --etcd-keyfile=<path/to/client-key-file>
         scored: true
+        type: skip
 
       - id: 1.2.30
         text: "Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Scored)"
@@ -857,6 +861,7 @@ groups:
           on the master node and set the etcd certificate authority file parameter.
           --etcd-cafile=<path/to/ca-file>
         scored: true
+        type: skip
 
       - id: 1.2.33
         text: "Ensure that the --encryption-provider-config argument is set as appropriate (Scored)"
