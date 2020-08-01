@@ -9,36 +9,36 @@ master:
     - etcd
     - flanneld
 
-    apiserver:
-      bins:
-        - kube-apiserver
-      confs: 
-        - /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml
-      defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml
+  apiserver:
+    bins:
+      - kube-apiserver
+    confs: 
+      - /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml
+    defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml
 
-    scheduler:
-      bins:
-        - kube-scheduler
-      confs:
-        - /var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml
-      defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml
+  scheduler:
+    bins:
+      - kube-scheduler
+    confs:
+      - /var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml
+    defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml
 
-    controllermanager:
-      bins:
-        - kube-controller-manager
-      confs:
-        - /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
-      defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
-    
-    etcd:
-      bins:
-        - etcd
-      confs:
-        - /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
-      defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
+  controllermanager:
+    bins:
+      - kube-controller-manager
+    confs:
+      - /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
+    defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
+  
+  etcd:
+    bins:
+      - etcd
+    confs:
+      - /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
+    defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
 
-    flanneld:
-      optional: true
-      bins:
-        - flanneld
-      defaultconf: /etc/sysconfig/flanneld
+  flanneld:
+    optional: true
+    bins:
+      - flanneld
+    defaultconf: /etc/sysconfig/flanneld
