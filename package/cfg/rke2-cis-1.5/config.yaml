@@ -43,9 +43,6 @@ master:
       - flanneld
     defaultconf: /etc/sysconfig/flanneld
 
-version_mapping:
-  "1.18": "rke2-cis-1.5"
-
 target_mapping:
   "rke2-cis-1.5":
     - "master"
