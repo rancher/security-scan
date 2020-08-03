@@ -8,23 +8,6 @@ groups:
 - id: 1.1
   text: "Master Node Configuration Files "
   checks:
-    - id: 1.1.1
-      text: "Ensure that the API server pod specification file permissions are set to 644 or more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c permissions=%a $apiserverconf; fi'"
-      tests:
-        test_items:
-          - flag: "permissions"
-            compare:
-              op: bitmask
-              value: "644"
-            set: true
-      remediation: |
-        Run the below command (based on the file location on your system) on the
-        master node.
-        For example, chmod 644 $apiserverconf
-      scored: true
-  type: skip
-
     - id: 1.1.2
       text: "Ensure that the API server pod specification file ownership is set to root:root (Scored)"
       audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c %U:%G $apiserverconf; fi'"
@@ -188,108 +171,6 @@ groups:
         Run the below command (based on the etcd data directory found above).
         For example, chown etcd:etcd /var/lib/etcd
       scored: true
-
-    - id: 1.1.13
-      text: "Ensure that the admin.conf file permissions are set to 644 or more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c permissions=%a /etc/kubernetes/admin.conf; fi'"
-      tests:
-        test_items:
-          - flag: "permissions"
-            compare:
-              op: bitmask
-              value: "644"
-            set: true
-      remediation: |
-        Run the below command (based on the file location on your system) on the master node.
-        For example,
-        chmod 644 /etc/kubernetes/admin.conf
-      scored: true
-      type: skip
-
-    - id: 1.1.14
-      text: "Ensure that the admin.conf file ownership is set to root:root (Scored) "
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c %U:%G /etc/kubernetes/admin.conf; fi'"
-      tests:
-        test_items:
-          - flag: "root:root"
-            compare:
-              op: eq
-              value: "root:root"
-            set: true
-      remediation: |
-        Run the below command (based on the file location on your system) on the master node.
-        For example,
-        chown root:root /etc/kubernetes/admin.conf
-      scored: true
-      type: skip
-
-    - id: 1.1.15
-      text: "Ensure that the scheduler.conf file permissions are set to 644 or more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/scheduler.conf; then stat -c permissions=%a /etc/kubernetes/scheduler.conf; fi'"
-      tests:
-        test_items:
-          - flag: "permissions"
-            compare:
-              op: bitmask
-              value: "644"
-            set: true
-      remediation: |
-        Run the below command (based on the file location on your system) on the master node.
-        For example,
-        chmod 644 /etc/kubernetes/scheduler.conf
-      scored: true
-      type: skip
-
-    - id: 1.1.16
-      text: "Ensure that the scheduler.conf file ownership is set to root:root (Scored)"
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/scheduler.conf; then stat -c %U:%G /etc/kubernetes/scheduler.conf; fi'"
-      tests:
-        test_items:
-          - flag: "root:root"
-            compare:
-              op: eq
-              value: "root:root"
-            set: true
-      remediation: |
-        Run the below command (based on the file location on your system) on the master node.
-        For example,
-        chown root:root /etc/kubernetes/scheduler.conf
-      scored: true
-      type: skip
-
-    - id: 1.1.17
-      text: "Ensure that the controller-manager.conf file permissions are set to 644 or more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/controller-manager.conf; then stat -c permissions=%a /etc/kubernetes/controller-manager.conf; fi'"
-      tests:
-        test_items:
-          - flag: "permissions"
-            compare:
-              op: bitmask
-              value: "644"
-            set: true
-      remediation: |
-        Run the below command (based on the file location on your system) on the master node.
-        For example,
-        chmod 644 /etc/kubernetes/controller-manager.conf
-      scored: true
-      type: skip
-
-    - id: 1.1.18
-      text: "Ensure that the controller-manager.conf file ownership is set to root:root (Scored)"
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/controller-manager.conf; then stat -c %U:%G /etc/kubernetes/controller-manager.conf; fi'"
-      tests:
-        test_items:
-          - flag: "root:root"
-            compare:
-              op: eq
-              value: "root:root"
-            set: true
-      remediation: |
-        Run the below command (based on the file location on your system) on the master node.
-        For example,
-        chown root:root /etc/kubernetes/controller-manager.conf
-      scored: true
-      type: skip
 
     - id: 1.1.19
       text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Scored)"
@@ -870,16 +751,6 @@ groups:
         Then, edit the API server pod specification file $apiserverconf
         on the master node and set the --encryption-provider-config parameter to the path of that file: --encryption-provider-config=</path/to/EncryptionConfig/File>
       scored: true
-
-    - id: 1.2.34
-      text: "Ensure that encryption providers are appropriately configured (Scored)"
-      audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-      type: "manual"
-      remediation: |
-        Follow the Kubernetes documentation and configure a EncryptionConfig file.
-        In this file, choose aescbc, kms or secretbox as the encryption provider.
-      scored: true
-      type: skip
 
     - id: 1.2.35
       text: "Ensure that the API Server only makes use of Strong Cryptographic Ciphers (Not Scored)"
