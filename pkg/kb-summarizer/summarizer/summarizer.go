@@ -530,9 +530,7 @@ func (s *Summarizer) getMissingNodesMapOfCheckWrapper(check *CheckWrapper, nodes
 		}
 	}
 	for n := range nodes {
-		if _, ok := allNodes[n]; ok {
-			delete(allNodes, n)
-		}
+		delete(allNodes, n)
 	}
 	logrus.Debugf("ID: %v, missing nodes: %v", check.ID, allNodes)
 	var missingNodes []string
@@ -635,7 +633,7 @@ func (s *Summarizer) runFinalPass() error {
 
 func (s *Summarizer) Summarize() error {
 	logrus.Infof("summarize")
-	logrus.Debugf("inputDir: %v", s.InputDirectory)
+	logrus.Infof("inputDir: %s", s.InputDirectory)
 
 	// Walk through the host folders
 	hostsDir, err := ioutil.ReadDir(s.InputDirectory)
@@ -648,12 +646,11 @@ func (s *Summarizer) Summarize() error {
 			continue
 		}
 		hostname := hostDir.Name()
-		logrus.Debugf("hostDir: %v", hostname)
+		logrus.Debugf("hostDir: %s", hostname)
 
 		// Check for errors before proceeding
-		errorLogFile := fmt.Sprintf("%v/%v/%v", s.InputDirectory, hostname, DefaultErrorLogFileName)
-		_, err := os.Stat(errorLogFile)
-		if err == nil {
+		errorLogFile := fmt.Sprintf("%s/%s/%s", s.InputDirectory, hostname, DefaultErrorLogFileName)
+		if _, err := os.Stat(errorLogFile); err == nil {
 			data, err := ioutil.ReadFile(errorLogFile)
 			if err != nil {
 				return fmt.Errorf("error reading file %v: %v", errorLogFile, err)
@@ -692,27 +689,28 @@ func (s *Summarizer) printReport() error {
 		}
 	}
 
-	bytes, err := json.MarshalIndent(s.fullReport, "", " ")
+	b, err := json.MarshalIndent(s.fullReport, "", " ")
 	if err != nil {
 		return fmt.Errorf("error marshalling report: %v", err)
 	}
 
-	txt := string(bytes)
-	logrus.Debugf("json txt: %+v", txt)
+	txt := string(b)
+	logrus.Debugf("json txt: %s", txt)
 	return nil
 }
 
 func printCheck(check *kb.Check) {
 	logrus.Debugf("check: ")
-	logrus.Debugf("ID: %v", check.ID)
+	logrus.Debugf("ID: %s", check.ID)
 	logrus.Debugf("State: %v", check.State)
-	logrus.Debugf("Text: %v", check.Text)
-	logrus.Debugf("Audit: %v", check.Audit)
-	logrus.Debugf("ActualValue: %v", check.ActualValue)
+	logrus.Debugf("Text: %s", check.Text)
+	logrus.Debugf("Audit: %s", check.Audit)
+	logrus.Debugf("ActualValue: %s", check.ActualValue)
 }
+
 func printCheckWrapper(cw *CheckWrapper) {
 	logrus.Debugf("checkWrapper:")
-	logrus.Debugf("id: %v", cw.ID)
+	logrus.Debugf("id: %s", cw.ID)
 	logrus.Debugf("state: %v", cw.State)
 	logrus.Debugf("node_type: %+v", cw.NodeType)
 	logrus.Debugf("nodes: %+v", cw.Nodes)
