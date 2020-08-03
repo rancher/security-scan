@@ -1,0 +1,2 @@
+FROM security-scan:add-rke2
+COPY . /go/src/github.com/rancher/security-scan/

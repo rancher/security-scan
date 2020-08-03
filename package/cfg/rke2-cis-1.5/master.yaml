@@ -23,6 +23,7 @@ groups:
         master node.
         For example, chmod 644 $apiserverconf
       scored: true
+  type: skip
 
     - id: 1.1.2
       text: "Ensure that the API server pod specification file ownership is set to root:root (Scored)"
