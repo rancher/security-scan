@@ -332,6 +332,7 @@ groups:
         For example,
         chown -R root:root /etc/kubernetes/pki/
       scored: true
+      type: skip
 
     - id: 1.1.20
       text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Scored) "
@@ -342,6 +343,7 @@ groups:
         For example,
         chmod -R 644 /etc/kubernetes/pki/*.crt
       scored: true
+      type: skip
 
     - id: 1.1.21
       text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Scored)"
@@ -384,6 +386,7 @@ groups:
         edit the API server pod specification file $apiserverconf
         on the master node and remove the --basic-auth-file=<filename> parameter.
       scored: true
+      type: skip
 
     - id: 1.2.3
       text: "Ensure that the --token-auth-file parameter is not set (Scored)"
@@ -628,6 +631,7 @@ groups:
         --enable-admission-plugins=...,PodSecurityPolicy,...
         Then restart the API Server.
       scored: true
+      type: skip
 
     - id: 1.2.17
       text: "Ensure that the admission control plugin NodeRestriction is set (Scored)"
