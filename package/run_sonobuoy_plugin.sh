@@ -41,7 +41,7 @@ mkdir -p "${RESULTS_DIR}"
 
 # etcd
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep -f /usr/local/bin/etcd | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f /etcd | wc -l)" -gt 0 ]]; then
     echo "etcd: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets etcd \
@@ -56,7 +56,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
       --outputfile "${RESULTS_DIR}/etcd.json" 2> "${ERROR_LOG_FILE}"
   fi
 else
-  if [[ "$(pgrep -f /usr/local/bin/etcd | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f /etcd | wc -l)" -gt 0 ]]; then
     echo "etcd: Using RANCHER_K8S_VERSION=${RANCHER_K8S_VERSION}"
     kube-bench run \
       --targets etcd \
@@ -74,7 +74,7 @@ fi
 
 # master (no etcd)
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep kube-apiserver | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f /kube-apiserver | wc -l)" -gt 0 ]]; then
     echo "master: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets master \
@@ -89,7 +89,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
       --outputfile "${RESULTS_DIR}/master.json" 2> "${ERROR_LOG_FILE}"
   fi
 else
-  if [[ "$(pgrep kube-apiserver | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f /kube-apiserver | wc -l)" -gt 0 ]]; then
     echo "master: Using RANCHER_K8S_VERSION=${RANCHER_K8S_VERSION}"
     kube-bench run \
       --targets master \
@@ -106,7 +106,7 @@ else
 fi
 
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f /kubelet | wc -l)" -gt 0 ]]; then
     echo "node: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets node \
@@ -121,7 +121,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
       --outputfile "${RESULTS_DIR}/node.json" 2> "${ERROR_LOG_FILE}"
   fi
 else
-  if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f /kubelet | wc -l)" -gt 0 ]]; then
     echo "node: Using RANCHER_K8S_VERSION=${RANCHER_K8S_VERSION}"
     kube-bench run \
       --targets node \
@@ -144,7 +144,7 @@ fi
 #   there would be some controls which require running on
 #   master nodes only
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep kube-apiserver | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f /kube-apiserver | wc -l)" -gt 0 ]]; then
     for controlFile in $(find ${CONFIG_DIR}/${OVERRIDE_BENCHMARK_VERSION} -name '*.yaml' ! -name config.yaml ! -name master.yaml ! -name node.yaml ! -name etcd.yaml); do
         echo "controlFile: ${controlFile}"
         target=$(basename "${controlFile}" .yaml)
