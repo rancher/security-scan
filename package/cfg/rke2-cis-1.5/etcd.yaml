@@ -97,6 +97,7 @@ groups:
         node and set the below parameter.
         --peer-client-cert-auth=true
       scored: true
+      type: skip
 
     - id: 2.6
       text: "Ensure that the --peer-auto-tls argument is not set to true (Scored)"

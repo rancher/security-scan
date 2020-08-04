@@ -3,6 +3,8 @@
 set -x
 set -eE
 
+ls -ltra /var/lib/rancher/rke2
+
 defaultCMName=cis-$(date +"%Y-%m-%d-%H-%M-%S-%N")
 OUTPUT_CONFIGMAPNAME=${OUTPUT_CONFIGMAPNAME:-${defaultCMName}}
 

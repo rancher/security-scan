@@ -7,7 +7,6 @@ master:
     - scheduler
     - controllermanager
     - etcd
-    - flanneld
 
   apiserver:
     bins:

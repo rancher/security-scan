@@ -13,17 +13,16 @@ groups:
       audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c permissions=%a $apiserverconf; fi'"
       tests:
         test_items:
-          - flag: "permissions"
+          - flag: "permissions=644"
             compare:
-              op: bitmask
-              value: "644"
+              op: eq
+              value: "permissions=644"
             set: true
       remediation: |
         Run the below command (based on the file location on your system) on the
         master node.
         For example, chmod 644 $apiserverconf
       scored: true
-      type: skip
 
     - id: 1.1.2
       text: "Ensure that the API server pod specification file ownership is set to root:root (Scored)"
@@ -46,9 +45,9 @@ groups:
       audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c permissions=%a $controllermanagerconf; fi'"
       tests:
         test_items:
-          - flag: "permissions"
+          - flag: "644"
             compare:
-              op: bitmask
+              op: eq
               value: "644"
             set: true
       remediation: |
@@ -78,9 +77,9 @@ groups:
       audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c permissions=%a $schedulerconf; fi'"
       tests:
         test_items:
-          - flag: "permissions"
+          - flag: "644"
             compare:
-              op: bitmask
+              op: eq
               value: "644"
             set: true
       remediation: |
@@ -110,9 +109,9 @@ groups:
       audit: "/bin/sh -c 'if test -e $etcdconf; then stat -c permissions=%a $etcdconf; fi'"
       tests:
         test_items:
-          - flag: "permissions"
+          - flag: "644"
             compare:
-              op: bitmask
+              op: eq
               value: "644"
             set: true
       remediation: |
@@ -162,10 +161,10 @@ groups:
       audit: ps -ef | grep $etcdbin | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | xargs stat -c permissions=%a
       tests:
         test_items:
-          - flag: "permissions"
+          - flag: "permissions=700"
             compare:
-              op: bitmask
-              value: "700"
+              op: eq
+              value: "permissions=700"
             set: true
       remediation: |
         On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
@@ -173,6 +172,7 @@ groups:
         ps -ef | grep etcd Run the below command (based on the etcd data directory found above). For example,
         chmod 700 /var/lib/etcd
       scored: true
+      type: skip
 
     - id: 1.1.12
       text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Scored)"
@@ -188,6 +188,7 @@ groups:
         Run the below command (based on the etcd data directory found above).
         For example, chown etcd:etcd /var/lib/etcd
       scored: true
+      type: skip
 
     - id: 1.1.13
       text: "Ensure that the admin.conf file permissions are set to 644 or more restrictive (Scored)"

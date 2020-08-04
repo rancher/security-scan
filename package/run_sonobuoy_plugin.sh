@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eE
+set -eEx
 
 DEBUG_TIME_IN_SEC=${DEBUG_TIME_IN_SEC:-300}
 

@@ -192,7 +192,7 @@ func GetUserSkipInfo(benchmark, skipConfigFile string) (map[string]bool, error) 
 	}
 	skipArr, ok := sc.Skip[benchmark]
 	if !ok {
-		skipArr, ok = sc.Skip[CurrentBenchmarkKey]
+		skipArr = sc.Skip[CurrentBenchmarkKey]
 	}
 	if len(skipArr) == 0 {
 		return skipMap, nil
@@ -217,8 +217,7 @@ func GetChecksMapFromConfigFile(configFile string) (map[string]string, error) {
 	if len(data) == 0 {
 		return checksMap, nil
 	}
-	err = json.Unmarshal(data, &checksMap)
-	if err != nil {
+	if err := json.Unmarshal(data, &checksMap); err != nil {
 		return nil, fmt.Errorf("error unmarshalling config file %v: %v", configFile, err)
 	}
 	return checksMap, nil
@@ -241,12 +240,16 @@ func (s *Summarizer) processOneResultFileForHost(results *kb.Controls, hostname 
 			if !check.Scored {
 				continue
 			}
-			logrus.Infof("host:%v id: %v %v", hostname, check.ID, check.State)
+			logrus.Infof("host:%s id: %s %v", hostname, check.ID, check.State)
 			printCheck(check)
 			cw := s.checkWrappersMaps[check.ID]
 			if cw == nil {
-				logrus.Errorf("check %v found in results but not in spec", check.ID)
+				logrus.Errorf("check %s found in results but not in spec", check.ID)
 				continue
+			}
+
+			if check.Type == "skip" {
+				check.State = SKIP
 			}
 
 			if msg, ok := s.notApplicable[check.ID]; ok {
@@ -263,7 +266,6 @@ func (s *Summarizer) processOneResultFileForHost(results *kb.Controls, hostname 
 				cw.Result[check.State] = make(map[string]bool)
 			}
 			cw.Result[check.State][hostname] = true
-
 		}
 	}
 }
@@ -279,10 +281,11 @@ func (s *Summarizer) addNode(nodeType NodeType, hostname string) {
 }
 
 func (s *Summarizer) summarizeForHost(hostname string) error {
-	logrus.Debugf("summarizeForHost: %v", hostname)
+	logrus.Debugf("summarizeForHost: %s", hostname)
 
-	hostDir := fmt.Sprintf("%v/%v", s.InputDirectory, hostname)
-	resultFilesPaths, err := filepath.Glob(fmt.Sprintf("%v/*.json", hostDir))
+	hostDir := fmt.Sprintf("%s/%s", s.InputDirectory, hostname)
+
+	resultFilesPaths, err := filepath.Glob(fmt.Sprintf("%s/*.json", hostDir))
 	if err != nil {
 		return fmt.Errorf("error globing files: %v", err)
 	}
@@ -293,21 +296,20 @@ func (s *Summarizer) summarizeForHost(hostname string) error {
 		resultFile := filepath.Base(resultFilePath)
 		nodeType, ok := nodeTypeMapping[resultFile]
 		if !ok {
-			logrus.Errorf("unknown result file found: %v", resultFilePath)
+			logrus.Errorf("unknown result file found: %s", resultFilePath)
 			continue
 		}
 		s.addNode(nodeType, hostname)
-		logrus.Debugf("host: %v resultFile: %v", hostname, resultFile)
+		logrus.Debugf("host: %s resultFile: %s", hostname, resultFile)
 		// Load one result file
 		// Marshal it into the results
 		contents, err := ioutil.ReadFile(filepath.Clean(resultFilePath))
 		if err != nil {
-			return fmt.Errorf("error reading file %+v: %v", resultFilePath, err)
+			return fmt.Errorf("error reading file %+s: %v", resultFilePath, err)
 		}
 
 		results := &kb.Controls{}
-		err = json.Unmarshal(contents, results)
-		if err != nil {
+		if err := json.Unmarshal(contents, results); err != nil {
 			return fmt.Errorf("error unmarshalling: %v", err)
 		}
 		logrus.Debugf("results: %+v", results)
@@ -340,7 +342,7 @@ func (s *Summarizer) save() error {
 }
 
 func (s *Summarizer) loadVersionMapping() error {
-	configFileName := fmt.Sprintf("%v/%v", s.ControlsDirectory, ConfigFilename)
+	configFileName := fmt.Sprintf("%s/%s", s.ControlsDirectory, ConfigFilename)
 	v := viper.New()
 	v.SetConfigFile(configFileName)
 	if err := v.ReadInConfig(); err != nil {
@@ -353,7 +355,7 @@ func (s *Summarizer) loadVersionMapping() error {
 	}
 	logrus.Debugf("%v: %v", VersionMappingKey, kubeToBenchmarkMap)
 	s.kubeToBenchmarkMap = kubeToBenchmarkMap
-
+	logrus.Infof("CONFIG: %+v\n", kubeToBenchmarkMap)
 	return nil
 }
 
@@ -363,21 +365,20 @@ func (s *Summarizer) loadControlsFromFile(filePath string) (*kb.Controls, error)
 	if err != nil {
 		return nil, fmt.Errorf("error reading file %+v: %v", filePath, err)
 	}
-	err = yaml.Unmarshal(fileContents, controls)
-	if err != nil {
+	if err := yaml.Unmarshal(fileContents, controls); err != nil {
 		return nil, fmt.Errorf("error unmarshalling master controls file: %v", err)
 	}
 	logrus.Debugf("filePath: %v, controls: %+v", filePath, controls)
 	return controls, nil
 }
 
-func getNodeTypes() []NodeType {
-	return []NodeType{
-		NodeTypeMaster,
-		NodeTypeEtcd,
-		NodeTypeNode,
-	}
-}
+// func getNodeTypes() []NodeType {
+// 	return []NodeType{
+// 		NodeTypeMaster,
+// 		NodeTypeEtcd,
+// 		NodeTypeNode,
+// 	}
+// }
 
 func getResultsFileNodeTypeMapping() map[string]NodeType {
 	return map[string]NodeType{
@@ -390,7 +391,7 @@ func getResultsFileNodeTypeMapping() map[string]NodeType {
 }
 
 func (s *Summarizer) getControlsFilePath(filename string) string {
-	return fmt.Sprintf("%v/%v/%v", s.ControlsDirectory, s.BenchmarkVersion, filename)
+	return fmt.Sprintf("%s/%s/%s", s.ControlsDirectory, s.BenchmarkVersion, filename)
 }
 
 func (s *Summarizer) getNodeTypeControlsFileMapping() map[string]NodeType {
@@ -400,7 +401,7 @@ func (s *Summarizer) getNodeTypeControlsFileMapping() map[string]NodeType {
 		s.getControlsFilePath(EtcdControlsFilename):   NodeTypeEtcd,
 		s.getControlsFilePath(NodeControlsFilename):   NodeTypeNode,
 	}
-	allFiles, err := filepath.Glob(fmt.Sprintf("%v/%v/*.yaml", s.ControlsDirectory, s.BenchmarkVersion))
+	allFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.yaml", s.ControlsDirectory, s.BenchmarkVersion))
 	if err != nil {
 		logrus.Errorf("error globing files: %v", err)
 		return filepaths
@@ -426,7 +427,7 @@ func (s *Summarizer) loadControls() error {
 		s.nodeSeen[nodeType] = map[string]bool{}
 		controls, err := s.loadControlsFromFile(controlsFile)
 		if err != nil {
-			logrus.Errorf("error loading controls from file %v: %v", controlsFile, err)
+			logrus.Errorf("error loading controls from file %s: %v", controlsFile, err)
 			continue
 		}
 		for _, g := range controls.Groups {
@@ -477,23 +478,23 @@ func getGroupWrapper(group *kb.Group) *GroupWrapper {
 	}
 }
 
-func getMappedState(state kb.State) State {
-	switch state {
-	case kb.PASS:
-		return Pass
-	case kb.FAIL:
-		return Fail
-	case kb.WARN:
-		return Fail
-	case kb.INFO:
-		return Fail
-	case SKIP:
-		return Skip
-	case NA:
-		return NotApplicable
-	}
-	return Fail
-}
+// func getMappedState(state kb.State) State {
+// 	switch state {
+// 	case kb.PASS:
+// 		return Pass
+// 	case kb.FAIL:
+// 		return Fail
+// 	case kb.WARN:
+// 		return Fail
+// 	case kb.INFO:
+// 		return Fail
+// 	case SKIP:
+// 		return Skip
+// 	case NA:
+// 		return NotApplicable
+// 	}
+// 	return Fail
+// }
 
 func getCheckWrapper(check *kb.Check) *CheckWrapper {
 	return &CheckWrapper{
@@ -549,7 +550,7 @@ func (s *Summarizer) getMissingNodesMapOfCheckWrapper(check *CheckWrapper, nodes
 func (s *Summarizer) runFinalPassOnCheckWrapper(cw *CheckWrapper) {
 	nodesMap := s.getNodesMapOfCheckWrapper(cw)
 	nodeCount := len(nodesMap)
-	logrus.Debugf("id: %v nodeCount: %v", cw.ID, nodeCount)
+	logrus.Debugf("id: %s nodeCount: %d", cw.ID, nodeCount)
 	if len(cw.Result) == 1 {
 		if _, ok := cw.Result[NA]; ok {
 			cw.State = NotApplicable
