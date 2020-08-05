@@ -147,6 +147,7 @@ node:
     kubeconfig:
       - /etc/kubernetes/kubelet-kubeconfig
       - /etc/kubernetes/ssl/kubecfg-kube-proxy.yaml
+      - /var/lib/rancher/rke2/agent/kubeproxy.kubeconfig
     svc:
       - "/lib/systemd/system/kube-proxy.service"
     defaultconf: /etc/kubernetes/addons/kube-proxy-daemonset.yaml

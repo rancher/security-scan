@@ -354,6 +354,7 @@ groups:
         For example,
         chmod -R 600 /etc/kubernetes/pki/*.key
       scored: true
+      type: skip
 
 - id: 1.2
   text: "API Server"
