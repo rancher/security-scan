@@ -128,6 +128,7 @@ node:
       - "/lib/systemd/system/kubelet.service"
       - "/etc/systemd/system/snap.kubelet.daemon.service"
       - "/etc/rancher/rke2/rke2.yaml"
+      - /var/lib/rancher/rke2/agent/kubelet.kubeconfig
     defaultconf: "/var/lib/kubelet/config.yaml"
     defaultsvc: "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
     defaultkubeconfig: "/etc/kubernetes/kubelet.conf"

@@ -114,7 +114,6 @@ groups:
         Run the following command to modify the file permissions of the
         --client-ca-file chmod 644 <filename>
       scored: true
-      type: skip
 
     - id: 4.1.8
       text: "Ensure that the client certificate authorities file ownership is set to root:root (Scored)"
@@ -130,7 +129,6 @@ groups:
         Run the following command to modify the ownership of the --client-ca-file.
         chown root:root <filename>
       scored: true
-      type: skip
 
     - id: 4.1.9
       text: "Ensure that the kubelet configuration file has permissions set to 644 or more restrictive (Scored)"
