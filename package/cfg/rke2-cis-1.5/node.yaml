@@ -22,7 +22,7 @@ groups:
 
     - id: 4.1.5
       text: "Ensure that the kubelet.conf file permissions are set to 644 or more restrictive (Scored)"
-      audit: '/bin/sh -c ''if test -e $kubeletkubeconfig; then stat -c permissions=%a $kubeletkubeconfig; fi'' '
+      audit: '/bin/sh -c ''if test -e $kubeletkubeconfig; then stat -c %a $kubeletkubeconfig; fi'' '
       tests:
         test_items:
           - flag: "644"

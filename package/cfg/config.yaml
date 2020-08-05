@@ -110,7 +110,7 @@ node:
       - "/var/lib/kubelet/kubeconfig"
       - "/etc/kubernetes/kubelet-kubeconfig"
       - "/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
-      - "/etc/rancher/rke2/rke2.yaml"
+      - "/var/lib/rancher/rke2/agent/kubelet.kubeconfig"
     confs:
       - "/var/lib/kubelet/config.yaml"
       - "/etc/kubernetes/kubelet/kubelet-config.json"
