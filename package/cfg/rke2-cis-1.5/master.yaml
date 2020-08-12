@@ -387,7 +387,6 @@ groups:
         edit the API server pod specification file $apiserverconf
         on the master node and remove the --basic-auth-file=<filename> parameter.
       scored: true
-      #type: skip
 
     - id: 1.2.3
       text: "Ensure that the --token-auth-file parameter is not set (Scored)"
