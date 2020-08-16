@@ -437,6 +437,7 @@ groups:
 
       - id: 4.2.6
         text: "Ensure that the --protect-kernel-defaults argument is set to true (Scored)"
+        type: "skip"
         audit: "/bin/ps -fC $kubeletbin"
         audit_config: "/bin/cat $kubeletconf"
         tests:
@@ -487,6 +488,7 @@ groups:
 
       - id: 4.2.10
         text: "Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Scored)"
+        type: "skip"
         audit: "/bin/ps -fC $kubeletbin"
         audit_config: "/bin/cat $kubeletconf"
         tests:
