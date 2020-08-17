@@ -249,6 +249,9 @@ func (s *Summarizer) processOneResultFileForHost(results *kb.Controls, hostname 
 				continue
 			}
 
+			if check.Type == CheckTypeSkip {
+				check.State = NA
+			}
 			if msg, ok := s.notApplicable[check.ID]; ok {
 				check.State = NA
 				check.Remediation = msg
@@ -440,6 +443,9 @@ func (s *Summarizer) loadControls() error {
 				if !check.Scored {
 					continue
 				}
+				if check.Type == CheckTypeSkip {
+					check.State = NA
+				}
 				if msg, ok := s.notApplicable[check.ID]; ok {
 					check.State = NA
 					check.Remediation = msg
@@ -486,7 +492,7 @@ func getMappedState(state kb.State) State {
 	case kb.WARN:
 		return Fail
 	case kb.INFO:
-		return Fail
+		return NotApplicable
 	case SKIP:
 		return Skip
 	case NA:
