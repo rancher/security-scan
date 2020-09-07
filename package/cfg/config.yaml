@@ -180,10 +180,10 @@ managedservices:
 version_mapping:
   "rke-1.13": "rke-cis-1.4"
   "rke-1.14": "rke-cis-1.4"
-  "rke-1.15": "rke-cis-1.5"
-  "rke-1.16": "rke-cis-1.5"
-  "rke-1.17": "rke-cis-1.5"
-  "rke-1.18": "rke-cis-1.5"
+  "rke-1.15": "rke-cis-1.5-hardened"
+  "rke-1.16": "rke-cis-1.5-hardened"
+  "rke-1.17": "rke-cis-1.5-hardened"
+  "rke-1.18": "rke-cis-1.5-hardened"
   "rke-1.15": "rke-cis-1.5-permissive"
   "rke-1.16": "rke-cis-1.5-permissive"
   "rke-1.17": "rke-cis-1.5-permissive"
@@ -206,7 +206,7 @@ target_mapping:
     - "master"
     - "node"
     - "etcd"
-  "rke-cis-1.5":
+  "rke-cis-1.5-hardened":
     - "master"
     - "node"
     - "controlplane"
