@@ -7,7 +7,7 @@ RUN apt-get update \
     && apt-get install -y \
         git
 
-RUN git clone https://github.com/aquasecurity/kube-bench.git
+RUN git clone -b v0.3.1 --depth 1 https://github.com/aquasecurity/kube-bench.git
 
 FROM ubuntu:18.04
 ARG kube_bench_tag=0.2.3-rancher-1

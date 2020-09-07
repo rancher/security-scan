@@ -38,6 +38,9 @@ groups:
           ps -ef | grep etcd
           Run the below command (based on the etcd data directory found above).
           For example, chown etcd:etcd /var/lib/etcd
+
+          A system service account is required for etcd data directory ownership.
+          Refer to Rancher's hardening guide for more details on how to configure this ownership.
         scored: true
 
       - id: 1.1.19

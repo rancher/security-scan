@@ -54,6 +54,9 @@ groups:
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
           chmod 644 $kubeletsvc
+
+          Cluster provisioned by RKE doesn’t require or maintain a configuration file for the kubelet service.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 4.1.2
@@ -68,6 +71,9 @@ groups:
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
           chown root:root $kubeletsvc
+
+          Cluster provisioned by RKE doesn’t require or maintain a configuration file for the kubelet service.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 4.1.3
@@ -298,6 +304,9 @@ groups:
         remediation: |
           Run the following command (using the config file location identied in the Audit step)
           chmod 644 $kubeletconf
+
+          Clusters provisioned by RKE doesn’t require or maintain a configuration file for the kubelet.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 4.1.10
@@ -311,6 +320,9 @@ groups:
         remediation: |
           Run the following command (using the config file location identied in the Audit step)
           chown root:root $kubeletconf
+
+          Clusters provisioned by RKE doesn’t require or maintain a configuration file for the kubelet.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
   - id: 4.2
@@ -457,6 +469,7 @@ groups:
           Based on your system, restart the kubelet service. For example:
           systemctl daemon-reload
           systemctl restart kubelet.service
+          System level configurations are required prior to provisioning the cluster in order for this argument to be set to true.
         scored: true
 
       - id: 4.2.7
@@ -511,6 +524,8 @@ groups:
           Based on your system, restart the kubelet service. For example:
           systemctl daemon-reload
           systemctl restart kubelet.service
+
+          When generating serving certificates, functionality could break in conjunction with hostname overrides which are required for certain cloud providers.
         scored: true
 
       - id: 4.2.11
@@ -561,5 +576,7 @@ groups:
           Based on your system, restart the kubelet service. For example:
           systemctl daemon-reload
           systemctl restart kubelet.service
+
+          Clusters provisioned by RKE handles certificate rotation directly through RKE.
         scored: true
 
