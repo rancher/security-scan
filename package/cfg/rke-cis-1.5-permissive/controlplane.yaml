@@ -1,0 +1,20 @@
+---
+controls:
+version: 1.5
+id: 3
+text: "Control Plane Configuration"
+type: "controlplane"
+groups:
+  - id: 3.2
+    text: "Logging"
+    checks:
+      - id: 3.2.1
+        text: "Ensure that a minimal audit policy is created (Scored) "
+        audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        tests:
+          test_items:
+            - flag: "--audit-policy-file"
+              set: true
+        remediation: |
+          Create an audit policy file for your cluster.
+        scored: true
