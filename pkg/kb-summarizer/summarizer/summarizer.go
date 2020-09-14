@@ -480,25 +480,6 @@ func getGroupWrapper(group *kb.Group) *GroupWrapper {
 	}
 }
 
-
-func getMappedState(state kb.State) State {
-	switch state {
-	case kb.PASS:
-		return Pass
-	case kb.FAIL:
-		return Fail
-	case kb.WARN:
-		return Fail
-	case kb.INFO:
-		return NotApplicable
-	case SKIP:
-		return Skip
-	case NA:
-		return NotApplicable
-	}
-	return Fail
-}
-
 func getCheckWrapper(check *kb.Check) *CheckWrapper {
 	return &CheckWrapper{
 		ID:          check.ID,
