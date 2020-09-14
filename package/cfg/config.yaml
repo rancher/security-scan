@@ -183,15 +183,25 @@ controlplane:
 policies:
   components: []
 
+
+managedservices:
+  components: []
+
 # TODO: Clean up in the next refactor
 version_mapping:
   "rke-1.13": "rke-cis-1.4"
   "rke-1.14": "rke-cis-1.4"
-  "rke-1.15": "rke-cis-1.5"
-  "rke-1.16": "rke-cis-1.5"
-  "rke-1.17": "rke-cis-1.5"
-  "rke-1.18": "rke-cis-1.5"
+  "rke-1.15": "rke-cis-1.5-hardened"
+  "rke-1.16": "rke-cis-1.5-hardened"
+  "rke-1.17": "rke-cis-1.5-hardened"
+  "rke-1.18": "rke-cis-1.5-hardened"
+  "rke-1.15": "rke-cis-1.5-permissive"
+  "rke-1.16": "rke-cis-1.5-permissive"
+  "rke-1.17": "rke-cis-1.5-permissive"
+  "rke-1.18": "rke-cis-1.5-permissive"
   "rke-1.18+": "rke2-cis-1.5"
+  "eks-1.0": "eks-1.0"
+  "gke-1.0": "gke-1.0"
 
 target_mapping:
   "cis-1.4":
@@ -208,15 +218,21 @@ target_mapping:
     - "master"
     - "node"
     - "etcd"
-  "rke-cis-1.5":
+  "rke-cis-1.5-hardened":
     - "master"
     - "node"
     - "controlplane"
     - "etcd"
     - "policies"
-  "rke2-cis-1.5":
+  "rke-cis-1.5-permissive":
     - "master"
     - "node"
     - "controlplane"
     - "etcd"
+    - "policies"
+  "eks-1.0":
+    - "node"
+  "gke-1.0":
+    - "node"
+    - "managedservices"
     - "policies"
