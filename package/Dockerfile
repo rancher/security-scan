@@ -5,7 +5,7 @@ LABEL stage=intermediate
 
 RUN apt-get update \
     && apt-get install -y \
-        git
+    git
 
 RUN git clone -b v0.3.1 --depth 1 https://github.com/aquasecurity/kube-bench.git
 

@@ -618,7 +618,6 @@ func (s *Summarizer) runFinalPass() error {
 
 func (s *Summarizer) Summarize() error {
 	logrus.Infof("summarize")
-	logrus.Infof("inputDir: %s", s.InputDirectory)
 
 	// Walk through the host folders
 	hostsDir, err := ioutil.ReadDir(s.InputDirectory)
