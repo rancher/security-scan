@@ -325,36 +325,33 @@ groups:
 
     - id: 1.1.19
       text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Scored)"
-      audit: "ls -laR /etc/kubernetes/pki/"
+      audit: "ls -laR /var/lib/rancher/rke2/server/tls/"
       type: "manual"
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
-        chown -R root:root /etc/kubernetes/pki/
+        chown -R root:root /var/lib/rancher/rke2/server/tls/
       scored: true
-      type: skip
 
     - id: 1.1.20
       text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Scored) "
-      audit: "stat -c %n\ %a /etc/kubernetes/pki/*.crt"
+      audit: "stat -c %n\ %a /var/lib/rancher/rke2/server/tls/*.crt"
       type: "manual"
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
-        chmod -R 644 /etc/kubernetes/pki/*.crt
+        chmod -R 644 /var/lib/rancher/rke2/server/tls/*.crt chmod -R 600
       scored: true
-      type: skip
 
     - id: 1.1.21
       text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Scored)"
-      audit: "stat -c %n\ %a /etc/kubernetes/pki/*.key"
+      audit: "stat -c %n\ %a /var/lib/rancher/rke2/server/tls/*.key"
       type: "manual"
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
-        chmod -R 600 /etc/kubernetes/pki/*.key
+        chmod -R 600 /var/lib/rancher/rke2/server/tls/*.key
       scored: true
-      type: skip
 
 - id: 1.2
   text: "API Server"
