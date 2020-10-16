@@ -6,14 +6,14 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
-
-	"gopkg.in/yaml.v2"
 
 	kb "github.com/aquasecurity/kube-bench/check"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -76,16 +76,23 @@ const (
 )
 
 type CheckWrapper struct {
-	ID          string                       `yaml:"id" json:"id"`
-	Text        string                       `json:"d"`
-	Type        string                       `json:"-"`
-	Remediation string                       `json:"r"`
-	State       State                        `json:"s"`
-	Scored      bool                         `json:"-"`
-	Result      map[kb.State]map[string]bool `json:"-"`
-	NodeType    []NodeType                   `json:"t"`
-	NodesMap    map[string]bool              `json:"-"`
-	Nodes       []string                     `json:"n,omitempty"`
+	ID             string                       `yaml:"id" json:"id"`
+	Text           string                       `json:"d"`
+	Type           string                       `json:"-"`
+	Remediation    string                       `json:"r"`
+	State          State                        `json:"s"`
+	Scored         bool                         `json:"-"`
+	Result         map[kb.State]map[string]bool `json:"-"`
+	NodeType       []NodeType                   `json:"t"`
+	NodesMap       map[string]bool              `json:"-"`
+	Nodes          []string                     `json:"n,omitempty"`
+	Audit          string                       `json:"a"`
+	AuditConfig    string                       `json:"ac"`
+	TestInfo       []string                     `json:"ti"`
+	Commands       []*exec.Cmd                  `json:"c"`
+	ConfigCommands []*exec.Cmd                  `json:"cc"`
+	ActualValue    string                       `json:"av"`
+	ExpectedResult string                       `json:"er"`
 }
 
 type GroupWrapper struct {
@@ -500,12 +507,19 @@ func getMappedState(state kb.State) State {
 
 func getCheckWrapper(check *kb.Check) *CheckWrapper {
 	return &CheckWrapper{
-		ID:          check.ID,
-		Text:        check.Text,
-		Type:        check.Type,
-		Remediation: check.Remediation,
-		Scored:      check.Scored,
-		Result:      map[kb.State]map[string]bool{},
+		ID:             check.ID,
+		Text:           check.Text,
+		Type:           check.Type,
+		Remediation:    check.Remediation,
+		Scored:         check.Scored,
+		Result:         map[kb.State]map[string]bool{},
+		Audit:          check.Audit,
+		AuditConfig:    check.AuditConfig,
+		TestInfo:       check.TestInfo,
+		Commands:       check.Commands,
+		ConfigCommands: check.ConfigCommands,
+		ActualValue:    check.ActualValue,
+		ExpectedResult: check.ExpectedResult,
 	}
 }
 
@@ -708,6 +722,7 @@ func printCheck(check *kb.Check) {
 	logrus.Debugf("Text: %s", check.Text)
 	logrus.Debugf("Audit: %s", check.Audit)
 	logrus.Debugf("ActualValue: %s", check.ActualValue)
+	logrus.Debugf("KB check: %+v", check)
 }
 
 func printCheckWrapper(cw *CheckWrapper) {
@@ -717,4 +732,5 @@ func printCheckWrapper(cw *CheckWrapper) {
 	logrus.Debugf("node_type: %+v", cw.NodeType)
 	logrus.Debugf("nodes: %+v", cw.Nodes)
 	logrus.Debugf("result: %+v", cw.Result)
+	logrus.Debugf("checkWrapper: %+v", cw)
 }
