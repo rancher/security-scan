@@ -17,7 +17,7 @@ groups:
         Where possible, first bind users to a lower privileged role and then remove the
         clusterrolebinding to the cluster-admin role :
         kubectl delete clusterrolebinding [name]
-      scored: false
+      scored: true
 
     - id: 5.1.2
       text: "Minimize access to secrets (Not Scored)"
@@ -68,7 +68,7 @@ groups:
       remediation: |
         Create a PSP as described in the Kubernetes documentation, ensuring that
         the .spec.privileged field is omitted or set to false.
-      scored: false
+      scored: true
 
     - id: 5.2.2
       text: "Minimize the admission of containers wishing to share the host process ID namespace (Scored)"
@@ -109,7 +109,7 @@ groups:
         Create a PSP as described in the Kubernetes documentation, ensuring that the
         .spec.runAsUser.rule is set to either MustRunAsNonRoot or MustRunAs with the range of
         UIDs not including 0.
-      scored: false
+      scored: true
 
     - id: 5.2.7
       text: "Minimize the admission of containers with the NET_RAW capability (Not Scored)"
@@ -117,7 +117,7 @@ groups:
       remediation: |
         Create a PSP as described in the Kubernetes documentation, ensuring that the
         .spec.requiredDropCapabilities is set to include either NET_RAW or ALL.
-      scored: false
+      scored: true
 
     - id: 5.2.8
       text: "Minimize the admission of containers with added capabilities (Not Scored)"
@@ -146,7 +146,7 @@ groups:
         If the CNI plugin in use does not support network policies, consideration should be given to
         making use of a different plugin, or finding an alternate mechanism for restricting traffic
         in the Kubernetes cluster.
-      scored: false
+      scored: true
 
     - id: 5.3.2
       text: "Ensure that all Namespaces have Network Policies defined (Scored)"
@@ -185,9 +185,12 @@ groups:
       scored: false
 
 - id: 5.6
+  text: "The v1.5.1 guide skips 5.6 and goes from 5.5 to 5.7. We are including it here merely for explanation."
+
+- id: 5.7
   text: "General Policies"
   checks:
-    - id: 5.6.1
+    - id: 5.7.1
       text: "Create administrative boundaries between resources using namespaces (Not Scored)"
       type: "manual"
       remediation: |
@@ -195,7 +198,7 @@ groups:
         them.
       scored: false
 
-    - id: 5.6.2
+    - id: 5.7.2
       text: "Ensure that the seccomp profile is set to docker/default in your pod definitions (Not Scored)"
       type: "manual"
       remediation: |
@@ -221,7 +224,7 @@ groups:
               image: sotrustworthy:latest
       scored: false
 
-    - id: 5.6.3
+    - id: 5.7.3
       text: "Apply Security Context to Your Pods and Containers (Not Scored)"
       type: "manual"
       remediation: |
@@ -230,7 +233,7 @@ groups:
         Containers.
       scored: false
 
-    - id: 5.6.4
+    - id: 5.7.4
       text: "The default namespace should not be used (Scored)"
       type: "manual"
       remediation: |
