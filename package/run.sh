@@ -78,16 +78,19 @@ KBS_OUTPUT_FILENAME=output.json
 get_k8s_api_version() {
   set +x # don't print the token
   KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
+  # api_version=$(curl -sSk \
+  # -H "Authorization: Bearer $KUBE_TOKEN" \
+  # "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
   api_version=$(curl -sSk \
-  -H "Authorization: Bearer $KUBE_TOKEN" \
-  "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
+    -H "Authorization: Bearer $KUBE_TOKEN" \
+    "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.gitVersion')
   set -x
   echo "${api_version}"
 }
 
 if [[ "${RANCHER_K8S_VERSION}" == "" ]]; then
   K8S_API_VERSION=$(get_k8s_api_version)
-  RANCHER_K8S_VERSION="rke-${K8S_API_VERSION}"
+  RANCHER_K8S_VERSION="${K8S_API_VERSION}"
   echo "Calculated Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 else
   echo "Provided Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"

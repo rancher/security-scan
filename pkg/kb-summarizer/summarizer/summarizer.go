@@ -585,6 +585,7 @@ func (s *Summarizer) runFinalPassOnCheckWrapper(cw *CheckWrapper) {
 			return
 		}
 		if _, ok := cw.Result[kb.PASS]; ok {
+			logrus.Debug("IT PASSED!")
 			if len(cw.Result[kb.PASS]) == nodeCount {
 				cw.State = Pass
 				s.fullReport.Pass++

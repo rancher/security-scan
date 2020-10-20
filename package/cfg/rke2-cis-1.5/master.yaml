@@ -10,7 +10,7 @@ groups:
   checks:
     - id: 1.1.1
       text: "Ensure that the API server pod specification file permissions are set to 644 or more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c %a $apiserverconf; fi'"
+      audit: "stat -c %a /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml"
       tests:
         bin_op: or
         test_items:

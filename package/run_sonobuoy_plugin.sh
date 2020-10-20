@@ -24,9 +24,9 @@ trap 'handle_error' ERR
 KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
 K8S_API_VERSION=$(curl -sSk \
 -H "Authorization: Bearer $KUBE_TOKEN" \
-"https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
+"https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.gitVersion')
 
-RANCHER_K8S_VERSION="rke-${K8S_API_VERSION}"
+RANCHER_K8S_VERSION="${K8S_API_VERSION}"
 echo "Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 
 set -x
