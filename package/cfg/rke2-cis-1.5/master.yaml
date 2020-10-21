@@ -19,36 +19,6 @@ groups:
               op: eq
               value: "644"
             set: true
-          - flag: "640"
-            compare:
-              op: eq
-              value: "640"
-            set: true
-          - flag: "600"
-            compare:
-              op: eq
-              value: "600"
-            set: true
-          - flag: "444"
-            compare:
-              op: eq
-              value: "444"
-            set: true
-          - flag: "440"
-            compare:
-              op: eq
-              value: "440"
-            set: true
-          - flag: "400"
-            compare:
-              op: eq
-              value: "400"
-            set: true
-          - flag: "000"
-            compare:
-              op: eq
-              value: "000"
-            set: true
       remediation: |
         Run the below command (based on the file location on your system) on the
         master node.
@@ -189,7 +159,7 @@ groups:
 
     - id: 1.1.11
       text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Scored)"
-      audit: ps -ef | grep $etcdbin | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | xargs stat -c %a
+      audit: stat -c %a /var/lib/rancher/rke2/server/db/etcd 
       tests:
         test_items:
           - flag: "700"
@@ -203,11 +173,10 @@ groups:
         ps -ef | grep etcd Run the below command (based on the etcd data directory found above). For example,
         chmod 700 /var/lib/etcd
       scored: true
-      type: skip
 
     - id: 1.1.12
       text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Scored)"
-      audit: ps -ef | grep $etcdbin | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | xargs stat -c %U:%G
+      audit: stat -c %U:%G /var/lib/rancher/rke2/server/db/etcd
       tests:
         test_items:
           - flag: "etcd:etcd"
@@ -219,11 +188,10 @@ groups:
         Run the below command (based on the etcd data directory found above).
         For example, chown etcd:etcd /var/lib/etcd
       scored: true
-      type: skip
 
     - id: 1.1.13
       text: "Ensure that the admin.conf file permissions are set to 644 or more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c %a /etc/kubernetes/admin.conf; fi'"
+      audit: stat -c %a /var/lib/rancher/rke2/server/cred/admin.kubeconfig
       tests:
         test_items:
           - flag: "644"
@@ -234,13 +202,12 @@ groups:
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
-        chmod 644 /etc/kubernetes/admin.conf
+        chmod 644 /var/lib/rancher/rke2/server/cred/admin.kubeconfig
       scored: true
-      type: skip
 
     - id: 1.1.14
       text: "Ensure that the admin.conf file ownership is set to root:root (Scored) "
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c %U:%G /etc/kubernetes/admin.conf; fi'"
+      audit: "stat -c %U:%G /var/lib/rancher/rke2/server/cred/admin.kubeconfig"
       tests:
         test_items:
           - flag: "root:root"
@@ -251,13 +218,12 @@ groups:
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
-        chown root:root /etc/kubernetes/admin.conf
+        chown root:root /var/lib/rancher/rke2/server/cred/admin.kubeconfig
       scored: true
-      type: skip
 
     - id: 1.1.15
       text: "Ensure that the scheduler.conf file permissions are set to 644 or more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/scheduler.conf; then stat -c %a /etc/kubernetes/scheduler.conf; fi'"
+      audit: "stat -c %a /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig"
       tests:
         test_items:
           - flag: "644"
@@ -268,13 +234,12 @@ groups:
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
-        chmod 644 /etc/kubernetes/scheduler.conf
+        chmod 644 /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig
       scored: true
-      type: skip
 
     - id: 1.1.16
       text: "Ensure that the scheduler.conf file ownership is set to root:root (Scored)"
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/scheduler.conf; then stat -c %U:%G /etc/kubernetes/scheduler.conf; fi'"
+      audit: "stat -c %U:%G /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig"
       tests:
         test_items:
           - flag: "root:root"
@@ -285,13 +250,12 @@ groups:
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
-        chown root:root /etc/kubernetes/scheduler.conf
+        chown root:root /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig
       scored: true
-      type: skip
 
     - id: 1.1.17
       text: "Ensure that the controller-manager.conf file permissions are set to 644 or more restrictive (Scored)"
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/controller-manager.conf; then stat -c %a /etc/kubernetes/controller-manager.conf; fi'"
+      audit: "stat -c %a /var/lib/rancher/rke2/server/cred/controller.kubeconfig"
       tests:
         test_items:
           - flag: "644"
@@ -302,13 +266,12 @@ groups:
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
-        chmod 644 /etc/kubernetes/controller-manager.conf
+        chmod 644 /var/lib/rancher/rke2/server/cred/controller.kubeconfig
       scored: true
-      type: skip
 
     - id: 1.1.18
       text: "Ensure that the controller-manager.conf file ownership is set to root:root (Scored)"
-      audit: "/bin/sh -c 'if test -e /etc/kubernetes/controller-manager.conf; then stat -c %U:%G /etc/kubernetes/controller-manager.conf; fi'"
+      audit: "stat -c %U:%G /var/lib/rancher/rke2/server/cred/controller.kubeconfig"
       tests:
         test_items:
           - flag: "root:root"
@@ -319,14 +282,19 @@ groups:
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
-        chown root:root /etc/kubernetes/controller-manager.conf
+        chown root:root /var/lib/rancher/rke2/server/cred/controller.kubeconfig
       scored: true
-      type: skip
 
     - id: 1.1.19
       text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Scored)"
-      audit: "ls -laR /var/lib/rancher/rke2/server/tls/"
-      type: "manual"
+      audit: "stat -c %U:%G /var/lib/rancher/rke2/server/tls"
+      tests:
+        test_items:
+          - flag: "root:root"
+            compare:
+              op: eq
+              value: "root:root"
+            set: true
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
@@ -335,18 +303,30 @@ groups:
 
     - id: 1.1.20
       text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Scored) "
-      audit: "stat -c %n\ %a /var/lib/rancher/rke2/server/tls/*.crt"
-      type: "manual"
+      audit: "stat -c %a /var/lib/rancher/rke2/server/tls/*.crt wc -l"
+      tests:
+        test_items:
+          - flag: "12"
+            compare:
+              op: eq
+              value: "12"
+            set: true
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
-        chmod -R 644 /var/lib/rancher/rke2/server/tls/*.crt chmod -R 600
+        chmod -R 644 /var/lib/rancher/rke2/server/tls/*.crt
       scored: true
 
     - id: 1.1.21
       text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Scored)"
-      audit: "stat -c %n\ %a /var/lib/rancher/rke2/server/tls/*.key"
-      type: "manual"
+      audit: "/bin/sh -c 'stat -c %a /var/lib/rancher/rke2/server/tls/*.key | wc -l'"
+      tests:
+        test_items:
+          - flag: "15"
+            compare:
+              op: eq
+              value: "15"
+            set: true      
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
         For example,
@@ -905,8 +885,11 @@ groups:
 
     - id: 1.2.34
       text: "Ensure that encryption providers are appropriately configured (Scored)"
-      audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-      type: "manual"
+      audit: "/bin/sh -c 'if grep aescbc /var/lib/rancher/rke2/server/cred/encryption-config.json; then echo 0; fi'"
+      tests:
+        test_items:
+          - flag: "0"
+            set: true
       remediation: |
         Follow the Kubernetes documentation and configure a EncryptionConfig file.
         In this file, choose aescbc, kms or secretbox as the encryption provider.

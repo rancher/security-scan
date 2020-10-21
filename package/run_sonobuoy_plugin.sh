@@ -21,27 +21,21 @@ handle_error() {
 
 trap 'handle_error' ERR
 
-# Account for the differences in RKE and RKE2, etc on how the version is attained as well
-# as how the processes are named and discovered via `pgrep`. `pgrep` -> grep -E || egrep
-
 IS_RKE2=false
-if preg rke2; then
+if pgrep rke2 &>/dev/null; then
   IS_RKE2=true
 fi
 
 KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
 
-K8S_API_VERSION=""
+K8S_API_VERSION=$(curl -sSk \
+  -H "Authorization: Bearer $KUBE_TOKEN" \
+  "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
 if [ ${IS_RKE2} ]; then
   K8S_API_VERSION=$(curl -sSk \
     -H "Authorization: Bearer $KUBE_TOKEN" \
     "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.gitVersion')
-else
-  K8S_API_VERSION=$(curl -sSk \
-    -H "Authorization: Bearer $KUBE_TOKEN" \
-    "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
 fi
-
 
 RANCHER_K8S_VERSION="${K8S_API_VERSION}"
 echo "Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"

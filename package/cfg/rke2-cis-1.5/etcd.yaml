@@ -132,4 +132,4 @@ groups:
         Then, edit the etcd pod specification file $etcdconf on the
         master node and set the below parameter.
         --trusted-ca-file=</path/to/ca-file>
-      scored: true
+      scored: false

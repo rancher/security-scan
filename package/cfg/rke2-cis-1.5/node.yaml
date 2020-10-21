@@ -169,7 +169,14 @@ groups:
 
     - id: 4.1.7
       text: "Ensure that the certificate authorities file permissions are set to 600 or more restrictive (Scored)"
-      types: "manual"
+      audit: "stat -c %a /var/lib/rancher/rke2/server/tls/server-ca.crt"
+      tests:
+        test_items:
+          - flag: "644"
+            compare:
+              op: eq
+              value: "644"
+            set: true
       remediation: |
         Run the following command to modify the file permissions of the
         --client-ca-file chmod 600 <filename>
