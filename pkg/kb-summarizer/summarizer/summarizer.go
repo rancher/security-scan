@@ -585,7 +585,6 @@ func (s *Summarizer) runFinalPassOnCheckWrapper(cw *CheckWrapper) {
 			return
 		}
 		if _, ok := cw.Result[kb.PASS]; ok {
-			logrus.Debug("IT PASSED!")
 			if len(cw.Result[kb.PASS]) == nodeCount {
 				cw.State = Pass
 				s.fullReport.Pass++
@@ -692,7 +691,7 @@ func (s *Summarizer) Summarize() error {
 	if err := s.runFinalPass(); err != nil {
 		return fmt.Errorf("error running final pass on the report: %v", err)
 	}
-	logrus.Debugf("--- before final pass")
+	logrus.Debugf("--- after final pass")
 	_ = s.printReport()
 	return s.save()
 }
@@ -708,11 +707,10 @@ func (s *Summarizer) printReport() error {
 
 	b, err := json.MarshalIndent(s.fullReport, "", " ")
 	if err != nil {
-		return fmt.Errorf("error marshalling report: %v", err)
+		return fmt.Errorf("error marshalling report: %s", err.Error())
 	}
 
-	txt := string(b)
-	logrus.Debugf("json txt: %s", txt)
+	logrus.Debugf("json txt: %s", b)
 	return nil
 }
 
