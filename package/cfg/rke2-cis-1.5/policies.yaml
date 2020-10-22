@@ -86,7 +86,7 @@ groups:
       audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostPID == null) or (.spec.hostPID == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
       tests:
         test_items:
-          - flag: "count"
+          - flag: "--count"
             compare:
               op: gt
               value: "0"
