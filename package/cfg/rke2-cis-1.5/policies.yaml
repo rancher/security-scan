@@ -159,7 +159,7 @@ groups:
 
     - id: 5.2.7
       text: "Minimize the admission of containers with the NET_RAW capability (Not Scored)"
-      audit: "kubectl get psp global-restricted-psp -o json | jq .spec.requiredDropCapabilities[]"
+      audit: "kubectl get psp global-restricted-psp -o json | jq -r .spec.requiredDropCapabilities[] | wc -l"
       tests:
         test_items:
           - flag: "ALL"
@@ -295,7 +295,14 @@ groups:
 
     - id: 5.7.4
       text: "The default namespace should not be used (Scored)"
-      type: "manual"
+      audit: "kubectl get all -n default | grep -v service | grep -v NAME"
+      tests:
+        test_items:
+          - flag: ""
+            compare:
+              op: eq
+              value: ""
+            set: true
       remediation: |
         Ensure that namespaces are created to allow for appropriate segregation of Kubernetes
         resources and that all new resources are created in a specific namespace.
