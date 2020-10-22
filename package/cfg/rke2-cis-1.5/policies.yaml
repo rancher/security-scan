@@ -17,7 +17,7 @@ groups:
         Where possible, first bind users to a lower privileged role and then remove the
         clusterrolebinding to the cluster-admin role :
         kubectl delete clusterrolebinding [name]
-      scored: true
+      scored: false
 
     - id: 5.1.2
       text: "Minimize access to secrets (Not Scored)"
@@ -43,7 +43,14 @@ groups:
 
     - id: 5.1.5
       text: "Ensure that default service accounts are not actively used. (Scored)"
-      type: "manual"
+      audit: check_for_default_sa.sh
+      tests:
+        test_items:
+          - flag: "true"
+            compare:
+              op: eq
+              value: "true"
+            set: true
       remediation: |
         Create explicit service accounts wherever a Kubernetes workload requires specific access
         to the Kubernetes API server.
@@ -64,7 +71,11 @@ groups:
   checks:
     - id: 5.2.1
       text: "Minimize the admission of privileged containers (Not Scored)"
-      type: "manual"
+      audit: "kubectl get psp global-restricted-psp -o json | jq -r '.spec.runAsUser.rule'"
+      tests:
+        test_items:
+          - flag: "MustRunAsNonRoot"
+            set: true          
       remediation: |
         Create a PSP as described in the Kubernetes documentation, ensuring that
         the .spec.privileged field is omitted or set to false.
@@ -72,7 +83,14 @@ groups:
 
     - id: 5.2.2
       text: "Minimize the admission of containers wishing to share the host process ID namespace (Scored)"
-      type: "manual"
+      audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostPID == null) or (.spec.hostPID == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+      tests:
+        test_items:
+          - flag: "count"
+            compare:
+              op: gt
+              value: "0"
+            set: true
       remediation: |
         Create a PSP as described in the Kubernetes documentation, ensuring that the
         .spec.hostPID field is omitted or set to false.
@@ -80,7 +98,14 @@ groups:
 
     - id: 5.2.3
       text: "Minimize the admission of containers wishing to share the host IPC namespace (Scored)"
-      type: "manual"
+      audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostIPC == null) or (.spec.hostIPC == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+      tests:
+        test_items:
+          - flag: "count"
+            compare:
+              op: gt
+              value: "0"
+            set: true
       remediation: |
         Create a PSP as described in the Kubernetes documentation, ensuring that the
         .spec.hostIPC field is omitted or set to false.
@@ -88,7 +113,14 @@ groups:
 
     - id: 5.2.4
       text: "Minimize the admission of containers wishing to share the host network namespace (Scored)"
-      type: "manual"
+      audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostNetwork == null) or (.spec.hostNetwork == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+      tests:
+        test_items:
+          - flag: "count"
+            compare:
+              op: gt
+              value: "0"
+            set: true
       remediation: |
         Create a PSP as described in the Kubernetes documentation, ensuring that the
         .spec.hostNetwork field is omitted or set to false.
@@ -96,7 +128,14 @@ groups:
 
     - id: 5.2.5
       text: "Minimize the admission of containers with allowPrivilegeEscalation (Scored)"
-      type: "manual"
+      audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.allowPrivilegeEscalation == null) or (.spec.allowPrivilegeEscalation == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+      tests:
+        test_items:
+          - flag: "count"
+            compare:
+              op: gt
+              value: "0"
+            set: true
       remediation: |
         Create a PSP as described in the Kubernetes documentation, ensuring that the
         .spec.allowPrivilegeEscalation field is omitted or set to false.
@@ -104,7 +143,14 @@ groups:
 
     - id: 5.2.6
       text: "Minimize the admission of root containers (Not Scored)"
-      type: "manual"
+      audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.allowPrivilegeEscalation == null) or (.spec.allowPrivilegeEscalation == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+      tests:
+        test_items:
+          - flag: "count"
+            compare:
+              op: gt
+              value: "0"
+            set: true
       remediation: |
         Create a PSP as described in the Kubernetes documentation, ensuring that the
         .spec.runAsUser.rule is set to either MustRunAsNonRoot or MustRunAs with the range of
@@ -113,7 +159,14 @@ groups:
 
     - id: 5.2.7
       text: "Minimize the admission of containers with the NET_RAW capability (Not Scored)"
-      type: "manual"
+      audit: "kubectl get psp global-restricted-psp -o json | jq .spec.requiredDropCapabilities[]"
+      tests:
+        test_items:
+          - flag: "ALL"
+            compare:
+              op: eq
+              value: "ALL"
+            set: true
       remediation: |
         Create a PSP as described in the Kubernetes documentation, ensuring that the
         .spec.requiredDropCapabilities is set to include either NET_RAW or ALL.
@@ -150,7 +203,14 @@ groups:
 
     - id: 5.3.2
       text: "Ensure that all Namespaces have Network Policies defined (Scored)"
-      type: "manual"
+      audit: "check_for_rke2_network_policies.sh"
+      tests:
+        test_items:
+          - flag: "true"
+            compare:
+              op: eq
+              value: "true"
+            set: true
       remediation: |
         Follow the documentation and create NetworkPolicy objects as you need them.
       scored: true

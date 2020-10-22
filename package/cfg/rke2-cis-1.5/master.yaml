@@ -303,13 +303,13 @@ groups:
 
     - id: 1.1.20
       text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Scored) "
-      audit: "stat -c %a /var/lib/rancher/rke2/server/tls/*.crt wc -l"
+      audit: "check_files_permissions.sh /var/lib/rancher/rke2/server/tls/*.crt 644"
       tests:
         test_items:
-          - flag: "12"
+          - flag: "true"
             compare:
               op: eq
-              value: "12"
+              value: "true"
             set: true
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
@@ -319,13 +319,13 @@ groups:
 
     - id: 1.1.21
       text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Scored)"
-      audit: "/bin/sh -c 'stat -c %a /var/lib/rancher/rke2/server/tls/*.key | wc -l'"
+      audit: "check_files_permissions.sh /var/lib/rancher/rke2/server/tls/*.key 600"
       tests:
         test_items:
-          - flag: "15"
+          - flag: "true"
             compare:
               op: eq
-              value: "15"
+              value: "true"
             set: true      
       remediation: |
         Run the below command (based on the file location on your system) on the master node.
