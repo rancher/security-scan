@@ -37,6 +37,7 @@ COPY package/run.sh \
     package/helper_scripts/check_for_network_policies.sh \
     package/helper_scripts/check_for_default_sa.sh \
     package/helper_scripts/check_for_default_ns.sh \
+    package/helper_scripts/check_for_rke2_network_policies.sh \
     /usr/bin/
 
 CMD ["run.sh"]

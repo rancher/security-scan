@@ -2,12 +2,12 @@
 ## Version-specific settings that override the values in cfg/config.yaml
 
 master:
-  # components:
-  #   - apiserver
-  #   - scheduler
-  #   - controllermanager
-  #   - etcd
-  #   - policies
+  components:
+    - apiserver
+    - scheduler
+    - controllermanager
+    - etcd
+    - policies
 
   apiserver:
     bins:
@@ -49,6 +49,6 @@ master:
     proxy:
       defaultkubeconfig: /var/lib/rancher/rke2/agent/kubeproxy.kubeconfig
 
-  # policies:
-  #   components:
-  #     - policies
+  policies:
+    components:
+      - policies

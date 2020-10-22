@@ -159,7 +159,7 @@ then
 fi
 
 if [[ "${DEBUG}" == "true" ]]; then
-    sleep "${DEBUG_TIME_IN_SEC}"
+  sleep "${DEBUG_TIME_IN_SEC}"
 fi
 
 # Annotate self (pod) to signal "done"

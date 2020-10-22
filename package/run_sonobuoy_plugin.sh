@@ -165,7 +165,7 @@ fi
 #   there would be some controls which require running on
 #   master nodes only
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep -f kube-apiserver | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f ${KUBE_APISERVER_PROC} | wc -l)" -gt 0 ]]; then
     for controlFile in $(find ${CONFIG_DIR}/${OVERRIDE_BENCHMARK_VERSION} -name '*.yaml' ! -name config.yaml ! -name master.yaml ! -name node.yaml ! -name etcd.yaml); do
         echo "controlFile: ${controlFile}"
         target=$(basename "${controlFile}" .yaml)

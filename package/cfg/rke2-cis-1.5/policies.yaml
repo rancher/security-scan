@@ -75,7 +75,10 @@ groups:
       tests:
         test_items:
           - flag: "MustRunAsNonRoot"
-            set: true          
+            compare:
+              op: eq
+              value: "MustRunAsNonRoot"
+            set: true       
       remediation: |
         Create a PSP as described in the Kubernetes documentation, ensuring that
         the .spec.privileged field is omitted or set to false.
@@ -86,7 +89,7 @@ groups:
       audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostPID == null) or (.spec.hostPID == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
       tests:
         test_items:
-          - flag: "--count"
+          - flag: "count"
             compare:
               op: gt
               value: "0"
@@ -159,7 +162,7 @@ groups:
 
     - id: 5.2.7
       text: "Minimize the admission of containers with the NET_RAW capability (Not Scored)"
-      audit: "kubectl get psp global-restricted-psp -o json | jq -r .spec.requiredDropCapabilities[] | wc -l"
+      audit: "kubectl get psp global-restricted-psp -o json | jq -r .spec.requiredDropCapabilities[]"
       tests:
         test_items:
           - flag: "ALL"
@@ -295,7 +298,7 @@ groups:
 
     - id: 5.7.4
       text: "The default namespace should not be used (Scored)"
-      audit: "kubectl get all -n default | grep -v service | grep -v NAME"
+      audit: "kubectl get all --no-headers -n default | grep -v service"
       tests:
         test_items:
           - flag: ""
