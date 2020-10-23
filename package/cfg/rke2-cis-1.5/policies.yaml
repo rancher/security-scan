@@ -298,13 +298,13 @@ groups:
 
     - id: 5.7.4
       text: "The default namespace should not be used (Scored)"
-      audit: "kubectl get all --no-headers -n default | grep -v service"
+      audit: "kubectl get all --no-headers -n default | grep -v service | wc -l | xargs -I {} echo '--count={}'"
       tests:
         test_items:
-          - flag: ""
+          - flag: "count"
             compare:
               op: eq
-              value: ""
+              value: "0"
             set: true
       remediation: |
         Ensure that namespaces are created to allow for appropriate segregation of Kubernetes
