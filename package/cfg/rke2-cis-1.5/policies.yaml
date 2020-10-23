@@ -197,13 +197,13 @@ groups:
   checks:
     - id: 5.3.1
       text: "Ensure that the CNI in use supports Network Policies (Not Scored)"
-      audit: "ls /etc/cni/net.d | grep -E 'canal|cillium' | wc -l | xargs -I {} echo '--count={}'"
+      audit: "check_for_cni_net_policy_support.sh"
       tests:
         test_items:
-          - flag: "count"
+          - flag: "true"
             compare:
               op: eq
-              value: "0"
+              value: "true"
             set: true
       remediation: |
         If the CNI plugin in use does not support network policies, consideration should be given to
