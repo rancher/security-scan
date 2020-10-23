@@ -197,7 +197,7 @@ groups:
   checks:
     - id: 5.3.1
       text: "Ensure that the CNI in use supports Network Policies (Not Scored)"
-      audit: "check_for_cni_net_policy_support.sh"
+      audit: "check_for_rke2_cni_net_policy_support.sh"
       tests:
         test_items:
           - flag: "true"

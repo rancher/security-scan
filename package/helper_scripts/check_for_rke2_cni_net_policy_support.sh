@@ -3,7 +3,7 @@
 set -eE
 
 handle_error() {
-    echo "false"
+  echo "false"
 }
 
 trap 'handle_error' ERR
