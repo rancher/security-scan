@@ -197,13 +197,13 @@ groups:
   checks:
     - id: 5.3.1
       text: "Ensure that the CNI in use supports Network Policies (Not Scored)"
-      audit: "check_for_rke2_cni_net_policy_support.sh"
+      audit: "kubectl get pods -n kube-system -l k8s-app=canal -o json | jq .items[] | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
       tests:
         test_items:
-          - flag: "true"
+          - flag: "count"
             compare:
-              op: eq
-              value: "true"
+              op: gt
+              value: "0"
             set: true
       remediation: |
         If the CNI plugin in use does not support network policies, consideration should be given to
