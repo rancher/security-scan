@@ -305,8 +305,7 @@ groups:
 
     - id: 5.7.4
       text: "The default namespace should not be used (Scored)"
-      #audit: "kubectl get all --no-headers -n default | grep -v service | wc -l | xargs -I {} echo '--count={}'"
-      audit: "sleep 9999"
+      audit: "kubectl get all --no-headers -n default | grep -v service | wc -l | xargs -I {} echo '--count={}'"
       tests:
         test_items:
           - flag: "count"
