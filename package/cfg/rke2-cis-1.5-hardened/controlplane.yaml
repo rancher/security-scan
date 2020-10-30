@@ -21,13 +21,13 @@ groups:
   checks:
     - id: 3.2.1
       text: "Ensure that a minimal audit policy is created (Scored)"
-      audit: "/bin/ps -ef | grep kube-apiserver | grep -v grep | grep audit-policy-file"
+      audit: "/bin/ps -ef | grep kube-apiserver | grep -v grep | grep -o audit-policy-file"
       tests:
         test_items:
-          - flag: "--audit-policy-file"
+          - flag: "audit-policy-file"
             compare:
               op: eq
-              value: "--audit-policy-file"
+              value: "audit-policy-file"
             set: true
       remediation: |
         Create an audit policy file for your cluster.
