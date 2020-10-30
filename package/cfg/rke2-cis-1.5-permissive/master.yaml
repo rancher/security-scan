@@ -692,6 +692,7 @@ groups:
 
     - id: 1.2.22
       text: "Ensure that the --audit-log-path argument is set (Scored)"
+      type: "skip"
       audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
       tests:
         test_items:
@@ -706,6 +707,7 @@ groups:
 
     - id: 1.2.23
       text: "Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Scored)"
+      type: "skip"
       audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
       tests:
         test_items:
@@ -722,6 +724,7 @@ groups:
 
     - id: 1.2.24
       text: "Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Scored)"
+      type: "skip"
       audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
       tests:
         test_items:
@@ -739,6 +742,7 @@ groups:
 
     - id: 1.2.25
       text: "Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Scored)"
+      type: "skip"
       audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
       tests:
         test_items:
