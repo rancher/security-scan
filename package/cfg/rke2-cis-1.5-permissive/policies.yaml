@@ -214,6 +214,7 @@ groups:
 
     - id: 5.3.2
       text: "Ensure that all Namespaces have Network Policies defined (Scored)"
+      type: "skip"
       audit: "check_for_rke2_network_policies.sh"
       tests:
         test_items:
