@@ -39,6 +39,8 @@ COPY package/run.sh \
     package/helper_scripts/check_for_default_ns.sh \
     package/helper_scripts/check_for_rke2_network_policies.sh \
     package/helper_scripts/check_for_rke2_cni_net_policy_support.sh \
+    package/helper_scripts/check_cafile_permissions.sh \
+    package/helper_scripts/check_cafile_ownership.sh \
     /usr/bin/
 
 CMD ["run.sh"]
