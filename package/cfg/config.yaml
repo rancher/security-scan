@@ -237,6 +237,12 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
+  "rke-cis-1.6-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
   "rke-cis-1.5-permissive":
     - "master"
     - "node"

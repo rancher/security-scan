@@ -14,8 +14,10 @@ groups:
         tests:
           bin_op: and
           test_items:
-            - flag: "--cert-file"
-            - flag: "--key-file"
+              - flag: "--cert-file"
+                set: true
+              - flag: "--key-file"
+                set: true
         remediation: |
           Follow the etcd service documentation and configure TLS encryption.
           Then, edit the etcd pod specification file /etc/kubernetes/manifests/etcd.yaml
@@ -28,11 +30,15 @@ groups:
         text: "Ensure that the --client-cert-auth argument is set to true (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
         tests:
+          bin_op: or
           test_items:
+            - flag: "--client-cert-auth"
+              set: true
             - flag: "--client-cert-auth"
               compare:
                 op: eq
                 value: true
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and set the below parameter.
@@ -65,7 +71,9 @@ groups:
           bin_op: and
           test_items:
             - flag: "--peer-cert-file"
+              set: true
             - flag: "--peer-key-file"
+              set: true
         remediation: |
           Follow the etcd service documentation and configure peer TLS encryption as appropriate
           for your etcd cluster.
@@ -79,11 +87,15 @@ groups:
         text: "Ensure that the --peer-client-cert-auth argument is set to true (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
         tests:
+          bin_op: or
           test_items:
+            - flag: "--peer-client-cert-auth"
+              set: true
             - flag: "--peer-client-cert-auth"
               compare:
                 op: eq
                 value: true
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and set the below parameter.
@@ -102,6 +114,7 @@ groups:
               compare:
                 op: eq
                 value: false
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and either remove the --peer-auto-tls parameter or set it to false.
@@ -109,11 +122,12 @@ groups:
         scored: true
 
       - id: 2.7
-        text: "Ensure that a unique Certificate Authority is used for etcd (Manual)"
+        text: "Ensure that a unique Certificate Authority is used for etcd (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
         tests:
           test_items:
             - flag: "--trusted-ca-file"
+              set: true
         remediation: |
           [Manual test]
           Follow the etcd documentation and create a dedicated certificate authority setup for the
@@ -121,4 +135,4 @@ groups:
           Then, edit the etcd pod specification file $etcdconf on the
           master node and set the below parameter.
           --trusted-ca-file=</path/to/ca-file>
-        scored: false
+        scored: true
