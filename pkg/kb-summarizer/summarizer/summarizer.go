@@ -715,21 +715,9 @@ func (s *Summarizer) printReport() error {
 }
 
 func printCheck(check *kb.Check) {
-	logrus.Debugf("check: ")
-	logrus.Debugf("ID: %s", check.ID)
-	logrus.Debugf("State: %v", check.State)
-	logrus.Debugf("Text: %s", check.Text)
-	logrus.Debugf("Audit: %s", check.Audit)
-	logrus.Debugf("ActualValue: %s", check.ActualValue)
 	logrus.Debugf("KB check: %+v", check)
 }
 
 func printCheckWrapper(cw *CheckWrapper) {
-	logrus.Debugf("checkWrapper:")
-	logrus.Debugf("id: %s", cw.ID)
-	logrus.Debugf("state: %v", cw.State)
-	logrus.Debugf("node_type: %+v", cw.NodeType)
-	logrus.Debugf("nodes: %+v", cw.Nodes)
-	logrus.Debugf("result: %+v", cw.Result)
 	logrus.Debugf("checkWrapper: %+v", cw)
 }

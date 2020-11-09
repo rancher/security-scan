@@ -181,8 +181,7 @@ controlplane:
       - "apiserver"
 
 policies:
-  components:
-    - policies
+  components: []
 
 
 managedservices:
