@@ -27,7 +27,7 @@ handle_error() {
       sleep infinity
   fi
   # Annotate self (pod) to signal "error"
-  if [[ -f  "${ERROR_LOG_FILE}" ]]; then
+  if [[ -f "${ERROR_LOG_FILE}" ]]; then
       if ! kubectl -n "${SONOBUOY_NS}" \
         annotate pod "${SONOBUOY_POD_NAME}" \
         ${DONE_ANNOTATION_KEY}="$(cat ${ERROR_LOG_FILE})"
@@ -79,15 +79,20 @@ get_k8s_api_version() {
   set +x # don't print the token
   KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
   api_version=$(curl -sSk \
-  -H "Authorization: Bearer $KUBE_TOKEN" \
-  "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
+      -H "Authorization: Bearer $KUBE_TOKEN" \
+      "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
+  if pgrep rke2 &>/dev/null; then
+    api_version=$(curl -sSk \
+      -H "Authorization: Bearer $KUBE_TOKEN" \
+      "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.gitVersion')
+  fi
   set -x
   echo "${api_version}"
 }
 
 if [[ "${RANCHER_K8S_VERSION}" == "" ]]; then
   K8S_API_VERSION=$(get_k8s_api_version)
-  RANCHER_K8S_VERSION="rke-${K8S_API_VERSION}"
+  RANCHER_K8S_VERSION="${K8S_API_VERSION}"
   echo "Calculated Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 else
   echo "Provided Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
@@ -154,7 +159,7 @@ then
 fi
 
 if [[ "${DEBUG}" == "true" ]]; then
-    sleep "${DEBUG_TIME_IN_SEC}"
+  sleep "${DEBUG_TIME_IN_SEC}"
 fi
 
 # Annotate self (pod) to signal "done"
