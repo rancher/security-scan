@@ -29,6 +29,7 @@ master:
       - /etc/kubernetes/manifests/kube-apiserver.yaml
       - /etc/kubernetes/manifests/kube-apiserver.manifest
       - /var/snap/kube-apiserver/current/args
+      - /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml
     defaultconf: /etc/kubernetes/manifests/kube-apiserver.yaml
 
   scheduler:
@@ -41,6 +42,7 @@ master:
       - /etc/kubernetes/manifests/kube-scheduler.yaml
       - /etc/kubernetes/manifests/kube-scheduler.manifest
       - /var/snap/kube-scheduler/current/args
+      - /var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml
     defaultconf: /etc/kubernetes/manifests/kube-scheduler.yaml
 
   controllermanager:
@@ -54,6 +56,7 @@ master:
       - /etc/kubernetes/manifests/kube-controller-manager.yaml
       - /etc/kubernetes/manifests/kube-controller-manager.manifest
       - /var/snap/kube-controller-manager/current/args
+      - /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
     defaultconf: /etc/kubernetes/manifests/kube-controller-manager.yaml
 
   etcd:
@@ -65,6 +68,7 @@ master:
       - /etc/kubernetes/manifests/etcd.manifest
       - /etc/etcd/etcd.conf
       - /var/snap/etcd/common/etcd.conf.yml
+      - /var/lib/rancher/rke2/server/db/etcd/config
     defaultconf: /etc/kubernetes/manifests/etcd.yaml
 
   flanneld:
@@ -89,6 +93,8 @@ node:
       - "/etc/kubernetes/certs/ca.crt"
       - "/etc/kubernetes/cert/ca.pem"
       - "/etc/kubernetes/ssl/kube-ca.pem"
+      - "/var/lib/rancher/rke2/agent/server.crt"
+      - "/var/lib/rancher/rke2/agent/client-ca.crt"
     svc:
       # These paths must also be included
       #  in the 'confs' property below
@@ -104,6 +110,7 @@ node:
       - "/var/lib/kubelet/kubeconfig"
       - "/etc/kubernetes/kubelet-kubeconfig"
       - "/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
+      - "/var/lib/rancher/rke2/agent/kubelet.kubeconfig"
     confs:
       - "/var/lib/kubelet/config.yaml"
       - "/etc/kubernetes/kubelet/kubelet-config.json"
@@ -120,6 +127,8 @@ node:
       - "/etc/systemd/system/kubelet.service"
       - "/lib/systemd/system/kubelet.service"
       - "/etc/systemd/system/snap.kubelet.daemon.service"
+      - "/etc/rancher/rke2/rke2.yaml"
+      - /var/lib/rancher/rke2/agent/kubelet.kubeconfig
     defaultconf: "/var/lib/kubelet/config.yaml"
     defaultsvc: "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
     defaultkubeconfig: "/etc/kubernetes/kubelet.conf"
@@ -139,6 +148,7 @@ node:
     kubeconfig:
       - /etc/kubernetes/kubelet-kubeconfig
       - /etc/kubernetes/ssl/kubecfg-kube-proxy.yaml
+      - /var/lib/rancher/rke2/agent/kubeproxy.kubeconfig
     svc:
       - "/lib/systemd/system/kube-proxy.service"
     defaultconf: /etc/kubernetes/addons/kube-proxy-daemonset.yaml
@@ -156,6 +166,7 @@ etcd:
       - /etc/kubernetes/manifests/etcd.manifest
       - /etc/etcd/etcd.conf
       - /var/snap/etcd/common/etcd.conf.yml
+      - /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
     defaultconf: /etc/kubernetes/manifests/etcd.yaml
 
 controlplane:
@@ -188,6 +199,8 @@ version_mapping:
   "rke-1.16": "rke-cis-1.5-permissive"
   "rke-1.17": "rke-cis-1.5-permissive"
   "rke-1.18": "rke-cis-1.5-permissive"
+  "v1.18.10+rke2r1": "rke2-cis-1.5-hardened"
+  "v1.18.10+rke2r1": "rke2-cis-1.5-permissive"
   "eks-1.0": "eks-1.0"
   "gke-1.0": "gke-1.0"
 
@@ -212,7 +225,19 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
+  "rke2-cis-1.5-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
   "rke-cis-1.5-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.5-permissive":
     - "master"
     - "node"
     - "controlplane"
