@@ -497,6 +497,47 @@ groups:
           systemctl restart kubelet.service
         scored: true
 
+      - id: 4.2.8
+        text: "Ensure that the --hostname-override argument is not set (Not Scored)"
+        # This is one of those properties that can only be set as a command line argument.
+        # To check if the property is set as expected, we need to parse the kubelet command
+        # instead reading the Kubelet Configuration file.
+        audit: "/bin/ps -fC $kubeletbin "
+        tests:
+          test_items:
+            - flag: --hostname-override
+              set: false
+        remediation: |
+          Edit the kubelet service file $kubeletsvc
+          on each worker node and remove the --hostname-override argument from the
+          KUBELET_SYSTEM_PODS_ARGS variable.
+          Based on your system, restart the kubelet service. For example:
+          systemctl daemon-reload
+          systemctl restart kubelet.service
+        scored: false
+
+      - id: 4.2.9
+        text: "Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture (Not Scored)"
+        audit: "/bin/ps -fC $kubeletbin"
+        audit_config: "/bin/cat $kubeletconf"
+        tests:
+          test_items:
+            - flag: --event-qps
+              path: '{.eventRecordQPS}'
+              set: true
+              compare:
+                op: eq
+                value: 0
+        remediation: |
+          If using a Kubelet config file, edit the file to set eventRecordQPS: to an appropriate level.
+          If using command line arguments, edit the kubelet service file
+          $kubeletsvc on each worker node and
+          set the below parameter in KUBELET_SYSTEM_PODS_ARGS variable.
+          Based on your system, restart the kubelet service. For example:
+          systemctl daemon-reload
+          systemctl restart kubelet.service
+        scored: false
+
       - id: 4.2.10
         text: "Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Scored)"
         audit: "/bin/ps -fC $kubeletbin"
@@ -575,3 +616,27 @@ groups:
           Clusters provisioned by RKE handles certificate rotation directly through RKE.
         scored: true
 
+      - id: 4.2.13
+        text: "Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Not Scored)"
+        audit: "/bin/ps -fC $kubeletbin"
+        audit_config: "/bin/cat $kubeletconf"
+        tests:
+          test_items:
+            - flag: --tls-cipher-suites
+              path: '{range .tlsCipherSuites[:]}{}{'',''}{end}'
+              set: true
+              compare:
+                op: valid_elements
+                value: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
+        remediation: |
+          If using a Kubelet config file, edit the file to set TLSCipherSuites: to
+          TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
+          or to a subset of these values.
+          If using executable arguments, edit the kubelet service file
+          $kubeletsvc on each worker node and
+          set the --tls-cipher-suites parameter as follows, or to a subset of these values.
+          --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
+          Based on your system, restart the kubelet service. For example:
+          systemctl daemon-reload
+          systemctl restart kubelet.service
+        scored: false
