@@ -255,6 +255,12 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
+  "rke-cis-1.6-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
   "eks-1.0":
     - "node"
   "gke-1.0":
