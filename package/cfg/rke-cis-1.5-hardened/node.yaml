@@ -502,6 +502,7 @@ groups:
         # This is one of those properties that can only be set as a command line argument.
         # To check if the property is set as expected, we need to parse the kubelet command
         # instead reading the Kubelet Configuration file.
+        type: "skip"
         audit: "/bin/ps -fC $kubeletbin "
         tests:
           test_items:
@@ -514,6 +515,8 @@ groups:
           Based on your system, restart the kubelet service. For example:
           systemctl daemon-reload
           systemctl restart kubelet.service
+
+          Clusters provisioned by RKE set the --hostname-override to avoid any hostname configuration errors
         scored: false
 
       - id: 4.2.9

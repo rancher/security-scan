@@ -81,7 +81,7 @@ groups:
 
       - id: 5.2.2
         text: "Minimize the admission of containers wishing to share the host process ID namespace (Manual)"
-        type: "manual"
+        type: "skip"
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.hostPID field is omitted or set to false.
@@ -89,7 +89,7 @@ groups:
 
       - id: 5.2.3
         text: "Minimize the admission of containers wishing to share the host IPC namespace (Manual)"
-        type: "manual"
+        type: "skip"
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.hostIPC field is omitted or set to false.
@@ -97,7 +97,7 @@ groups:
 
       - id: 5.2.4
         text: "Minimize the admission of containers wishing to share the host network namespace (Manual)"
-        type: "manual"
+        type: "skip"
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.hostNetwork field is omitted or set to false.
@@ -105,7 +105,7 @@ groups:
 
       - id: 5.2.5
         text: "Minimize the admission of containers with allowPrivilegeEscalation (Manual)"
-        type: "manual"
+        type: "skip"
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.allowPrivilegeEscalation field is omitted or set to false.
@@ -159,7 +159,7 @@ groups:
 
       - id: 5.3.2
         text: "Ensure that all Namespaces have Network Policies defined (Manual)"
-        type: "manual"
+        type: "skip"
         remediation: |
           Follow the documentation and create NetworkPolicy objects as you need them.
         scored: false
@@ -241,7 +241,7 @@ groups:
 
       - id: 5.7.4
         text: "The default namespace should not be used (Manual)"
-        type: "manual"
+        type: "skip"
         remediation: |
           Ensure that namespaces are created to allow for appropriate segregation of Kubernetes
           resources and that all new resources are created in a specific namespace.
