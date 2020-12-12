@@ -9,7 +9,7 @@ groups:
     text: "Etcd Node Configuration Files"
     checks:
       - id: 1.1.11
-        text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Scored)"
+        text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Automated)"
         audit: stat -c %a /node/var/lib/etcd
         tests:
           test_items:
@@ -26,7 +26,7 @@ groups:
         scored: true
 
       - id: 1.1.12
-        text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Scored)"
+        text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Automated)"
         audit: stat -c %U:%G /node/var/lib/etcd
         tests:
           test_items:
@@ -44,7 +44,7 @@ groups:
         scored: true
 
       - id: 1.1.19
-        text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Scored)"
+        text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Automated)"
         audit: "check_files_owner_in_dir.sh /node/etc/kubernetes/ssl"
         tests:
           test_items:
@@ -60,7 +60,7 @@ groups:
         scored: true
 
       - id: 1.1.20
-        text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Scored) "
+        text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Automated) "
         audit: "check_files_permissions.sh /node/etc/kubernetes/ssl/!(*key).pem"
         tests:
           test_items:
@@ -76,7 +76,7 @@ groups:
         scored: true
 
       - id: 1.1.21
-        text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Scored)"
+        text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Automated)"
         audit: "check_files_permissions.sh /node/etc/kubernetes/ssl/*key.pem 600"
         tests:
           test_items:
