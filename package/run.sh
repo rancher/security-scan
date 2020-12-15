@@ -21,6 +21,7 @@ DS_SKIP_LOCATION="/etc/kbs/defaultskip/config.json"
 SONOBUOY_OUTPUT_DIR=${SONOBUOY_OUTPUT_DIR:-/tmp/sonobuoy}
 
 KB_SUMMARIZER_ROOT=${KB_SUMMARIZER_ROOT:-/tmp/kb-summarizer}
+CONFIG_DIR="${CONFIG_DIR:-/etc/kube-bench/cfg}"
 
 handle_error() {
   if [[ "${DEBUG}" == "true" ]]; then
@@ -130,6 +131,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   echo "using OVERRIDE_BENCHMARK_VERSION: ${OVERRIDE_BENCHMARK_VERSION}"
   if ! kb-summarizer \
         --benchmark-version "${OVERRIDE_BENCHMARK_VERSION}" \
+        --controls-dir "${CONFIG_DIR}" \
         --input-dir "${KBS_INPUT_DIR}" \
         --output-dir "${KBS_OUTPUT_DIR}" \
         --output-filename "${KBS_OUTPUT_FILENAME}" 2> "${ERROR_LOG_FILE}"
