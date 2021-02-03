@@ -264,3 +264,9 @@ target_mapping:
     - "node"
     - "managedservices"
     - "policies"
+   "rke2-cis-1.6-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
