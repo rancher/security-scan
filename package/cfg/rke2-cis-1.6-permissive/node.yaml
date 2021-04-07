@@ -26,9 +26,11 @@ groups:
       - id: 4.1.2
         text: "Ensure that the kubelet service file ownership is set to root:root (Automated)"
         audit: '/bin/sh -c ''if test -e $kubeletsvc; then stat -c %U:%G $kubeletsvc; fi'' '
+        type: "skip"
         tests:
           test_items:
-            - flag: root:root
+            - flag: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
@@ -73,10 +75,11 @@ groups:
         audit: '/bin/sh -c ''if test -e $kubeletkubeconfig; then stat -c permissions=%a $kubeletkubeconfig; fi'' '
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
@@ -100,7 +103,7 @@ groups:
         audit: "check_cafile_permissions.sh"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
                 op: bitmask
                 value: "644"
@@ -128,10 +131,11 @@ groups:
         audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c permissions=%a $kubeletconf; fi'' '
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true
         remediation: |
           Run the following command (using the config file location identified in the Audit step)
           chmod 644 $kubeletconf
@@ -143,6 +147,7 @@ groups:
         tests:
           test_items:
             - flag: root:root
+              set: true
         remediation: |
           Run the following command (using the config file location identified in the Audit step)
           chown root:root $kubeletconf

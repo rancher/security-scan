@@ -24,7 +24,7 @@ groups:
         audit: "/bin/ps -ef | grep kube-apiserver | grep -v grep | grep -o audit-policy-file"
         tests:
           test_items:
-            - flag: "--audit-policy-file"
+            - flag: "audit-policy-file"
               compare:
                 op: eq
                 value: "audit-policy-file"

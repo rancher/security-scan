@@ -15,7 +15,7 @@ groups:
           test_items:
             - flag: "permissions"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
         remediation: |
           Run the below command (based on the file location on your system) on the
@@ -44,9 +44,9 @@ groups:
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c %a $controllermanagerconf; fi'"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
               set: true
         remediation: |
@@ -76,10 +76,11 @@ groups:
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c permissions=%a $schedulerconf; fi'"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,
@@ -92,6 +93,7 @@ groups:
         tests:
           test_items:
             - flag: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,
@@ -103,10 +105,11 @@ groups:
         audit: "/bin/sh -c 'if test -e $etcdconf; then stat -c permissions=%a $etcdconf; fi'"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,
@@ -119,6 +122,10 @@ groups:
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,
@@ -228,7 +235,7 @@ groups:
 
       - id: 1.1.16
         text: "Ensure that the scheduler.conf file ownership is set to root:root (Automated)"
-        audit: "/bin/sh -c 'if test -e $schedulerkubeconfig; then stat -c %U:%G $schedulerkubeconfig; fi'"
+        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig"
         tests:
           test_items:
             - flag: "root:root"
@@ -394,7 +401,7 @@ groups:
           bin_op: and
           test_items:
             - flag: "--kubelet-client-certificate"
-              - set: true
+              set: true
             - flag: "--kubelet-client-key"
               set: true
         remediation: |
@@ -412,6 +419,7 @@ groups:
         tests:
           test_items:
             - flag: "--kubelet-certificate-authority"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and setup the TLS connection between
           the apiserver and kubelets. Then, edit the API server pod specification file
@@ -429,6 +437,7 @@ groups:
               compare:
                 op: nothave
                 value: "AlwaysAllow"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the --authorization-mode parameter to values other than AlwaysAllow.
@@ -445,7 +454,7 @@ groups:
               compare:
                 op: has
                 value: "Node"
-                set: true
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the --authorization-mode parameter to a value that includes Node.
@@ -461,6 +470,7 @@ groups:
               compare:
                 op: has
                 value: "RBAC"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the --authorization-mode parameter to a value that includes RBAC,
@@ -591,6 +601,7 @@ groups:
               compare:
                 op: has
                 value: "PodSecurityPolicy"
+              set: true
         remediation: |
           Follow the documentation and create Pod Security Policy objects as per your environment.
           Then, edit the API server pod specification file $apiserverconf
@@ -609,6 +620,7 @@ groups:
               compare:
                 op: has
                 value: "NodeRestriction"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and configure NodeRestriction plug-in on kubelets.
           Then, edit the API server pod specification file $apiserverconf
@@ -638,6 +650,7 @@ groups:
               compare:
                 op: eq
                 value: 0
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the below parameter.
@@ -654,6 +667,7 @@ groups:
               compare:
                 op: gt
                 value: 0
+              set: true
             - flag: "--secure-port"
               set: false
         remediation: |
@@ -671,6 +685,7 @@ groups:
               compare:
                 op: eq
                 value: false
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the below parameter.
@@ -680,9 +695,11 @@ groups:
       - id: 1.2.22
         text: "Ensure that the --audit-log-path argument is set (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-path"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the --audit-log-path parameter to a suitable path and
@@ -693,12 +710,14 @@ groups:
       - id: 1.2.23
         text: "Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxage"
               compare:
                 op: gte
                 value: 30
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the --audit-log-maxage parameter to 30 or as an appropriate number of days:
@@ -708,12 +727,14 @@ groups:
       - id: 1.2.24
         text: "Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxbackup"
               compare:
                 op: gte
                 value: 10
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the --audit-log-maxbackup parameter to 10 or to an appropriate
@@ -724,12 +745,14 @@ groups:
       - id: 1.2.25
         text: "Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxsize"
               compare:
                 op: gte
                 value: 100
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the --audit-log-maxsize parameter to an appropriate size in MB.
@@ -779,6 +802,7 @@ groups:
         tests:
           test_items:
             - flag: "--service-account-key-file"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the --service-account-key-file parameter
@@ -793,7 +817,9 @@ groups:
           bin_op: and
           test_items:
             - flag: "--etcd-certfile"
+              set: true
             - flag: "--etcd-keyfile"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set up the TLS connection between the apiserver and etcd.
           Then, edit the API server pod specification file $apiserverconf
@@ -809,7 +835,9 @@ groups:
           bin_op: and
           test_items:
             - flag: "--tls-cert-file"
+              set: true
             - flag: "--tls-private-key-file"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set up the TLS connection on the apiserver.
           Then, edit the API server pod specification file $apiserverconf
@@ -824,6 +852,7 @@ groups:
         tests:
           test_items:
             - flag: "--client-ca-file"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set up the TLS connection on the apiserver.
           Then, edit the API server pod specification file $apiserverconf
@@ -837,6 +866,7 @@ groups:
         tests:
           test_items:
             - flag: "--etcd-cafile"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set up the TLS connection between the apiserver and etcd.
           Then, edit the API server pod specification file $apiserverconf
@@ -908,6 +938,7 @@ groups:
               compare:
                 op: eq
                 value: false
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the master node and set the below parameter.
@@ -923,6 +954,7 @@ groups:
               compare:
                 op: noteq
                 value: false
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the master node to set the below parameter.
@@ -935,6 +967,7 @@ groups:
         tests:
           test_items:
             - flag: "--service-account-private-key-file"
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the master node and set the --service-account-private-key-file parameter
@@ -948,6 +981,7 @@ groups:
         tests:
           test_items:
             - flag: "--root-ca-file"
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the master node and set the --root-ca-file parameter to the certificate bundle file`.
@@ -979,6 +1013,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |
@@ -998,6 +1033,7 @@ groups:
               compare:
                 op: eq
                 value: false
+              set: true
         remediation: |
           Edit the Scheduler pod specification file $schedulerconf file
           on the master node and set the below parameter.
@@ -1014,6 +1050,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |

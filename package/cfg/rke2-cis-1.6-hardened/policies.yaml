@@ -120,8 +120,8 @@ groups:
         tests:
           test_items:
             - flag: "count"
-               compare:
-                 op: gt
+              compare:
+                op: gt
                 value: "0"
               set: true
         remediation: |
@@ -315,4 +315,4 @@ groups:
         remediation: |
           Ensure that namespaces are created to allow for appropriate segregation of Kubernetes
           resources and that all new resources are created in a specific namespace.
-        scored: true
+        scored: false
