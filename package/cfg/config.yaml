@@ -200,6 +200,8 @@ version_mapping:
   "v1.18.10+rke2r1": "rke2-cis-1.5-permissive"
   "eks-1.0": "eks-1.0"
   "gke-1.0": "gke-1.0"
+  "v1.20.4+rke2r1": "rke2-cis-1.6-hardened"
+  "v1.20.4+rke2r1": "rke2-cis-1.6-permissive"
 
 target_mapping:
   "cis-1.4":
@@ -263,4 +265,16 @@ target_mapping:
   "gke-1.0":
     - "node"
     - "managedservices"
+    - "policies"
+  "rke2-cis-1.6-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.6-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
     - "policies"
