@@ -303,10 +303,11 @@ groups:
               compare:
                 op: bitmask
                 value: "644"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,
-          chmod -R 644 /etc/kubernetes/pki/*.crt
+          chmod -R 644 /var/lib/rancher/rke2/server/tls/*.crt
         scored: false
 
       - id: 1.1.21
