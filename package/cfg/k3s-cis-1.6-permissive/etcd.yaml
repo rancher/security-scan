@@ -61,14 +61,13 @@ groups:
 
       - id: 2.4
         text: "Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Automated)"
-        audit: "grep -E 'peer-cert-file|peer-key-file' /var/lib/rancher/k3s/server/db/etcd/config"
-        type: "skip"
+        audit: "grep peer /var/lib/rancher/k3s/server/db/etcd/config | grep -v trusted | grep -v security | grep -v advertise | grep -v listen"
         tests:
           bin_op: and
           test_items:
-            - flag: "--peer-cert-file"
+            - flag: "cert-file"
               set: true
-            - flag: "--peer-key-file"
+            - flag: "key-file"
               set: true
         remediation: |
           Follow the etcd service documentation and configure peer TLS encryption as appropriate
@@ -97,7 +96,6 @@ groups:
       - id: 2.6
         text: "Ensure that the --peer-auto-tls argument is not set to true (Automated)"
         audit: "grep 'peer-auto-tls' /var/lib/rancher/k3s/server/db/etcd/config"
-        type: "skip"
         tests:
           bin_op: or
           test_items:

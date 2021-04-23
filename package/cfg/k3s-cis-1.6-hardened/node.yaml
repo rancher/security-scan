@@ -343,7 +343,7 @@ groups:
       - id: 4.2.9
         text: "Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture (Manual)"
         audit: "/bin/ps -fC $kubeletbin"
-        type: "skip"
+        type: "manual"
         tests:
           test_items:
             - flag: --event-qps
@@ -364,7 +364,6 @@ groups:
       - id: 4.2.10
         text: "Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Manual)"
         audit:  "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1"
-        type: "skip"
         tests:
           test_items:
             - flag: "--tls-cert-file"
@@ -435,7 +434,7 @@ groups:
       - id: 4.2.13
         text: "Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Manual)"
         audit: "/bin/ps -fC $kubeletbin"
-        type: "skip"
+        type: "manual"
         tests:
           test_items:
             - flag: --tls-cipher-suites
