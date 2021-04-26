@@ -64,7 +64,7 @@ groups:
     checks:
       - id: 5.2.1
         text: "Minimize the admission of privileged containers (Manual)"
-        audit: "kubectl get psp global-restricted-psp -o json | jq -r '.spec.runAsUser.rule'"
+        audit: "kubectl describe psp global-restricted-psp | grep MustRunAsNonRoot"
         tests:
           test_items:
             - flag: "MustRunAsNonRoot"
