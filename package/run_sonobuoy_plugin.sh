@@ -31,7 +31,6 @@ if pgrep k3s; then
 fi
 
 KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
-
 K8S_API_VERSION=$(curl -sSk \
   -H "Authorization: Bearer $KUBE_TOKEN" \
   "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
@@ -45,7 +44,7 @@ RANCHER_K8S_VERSION="${K8S_API_VERSION}"
 echo "Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 
 set -x
-
+JOURNAL_LOG="${JOURNAL_LOG:-/var/log/journal}"
 TAR_FILE_NAME="${TAR_FILE_NAME:-kb}"
 CONFIG_DIR="${CONFIG_DIR:-/etc/kube-bench/cfg}"
 RESULTS_DIR="${RESULTS_DIR:-/tmp/results}"
@@ -56,7 +55,7 @@ mkdir -p "${RESULTS_DIR}"
 
 # etcd
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep -f /etcd | wc -l)" -gt 0 ]]  || [[ "$(journalctl -D /var/log/journal -u k3s | grep 'Managed etcd' | grep -v grep | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f /etcd | wc -l)" -gt 0 ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep 'Managed etcd' | grep -v grep | wc -l)" -gt 0 ]]; then
     echo "etcd: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets etcd \
@@ -94,7 +93,7 @@ fi
 
 # master (no etcd)
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep -f ${KUBE_APISERVER_PROC} | wc -l)" -gt 0 ]]  || [[ "$(journalctl -D /var/log/journal -u k3s | grep 'Running kube-apiserver' | grep -v grep | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f ${KUBE_APISERVER_PROC} | wc -l)" -gt 0 ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep 'Running kube-apiserver' | grep -v grep | wc -l)" -gt 0 ]]; then
     echo "master: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets master \
@@ -131,7 +130,7 @@ if [ ! ${IS_RKE2} ]; then
 fi
 
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep -f ${KUBELET_PROC} | wc -l)" -gt 0 ]] || [[ "$(journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | grep -v grep | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f ${KUBELET_PROC} | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep 'Running kubelet' | grep -v grep | wc -l)" -gt 0 ]]; then
     echo "node: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets node \
@@ -169,7 +168,7 @@ fi
 #   there would be some controls which require running on
 #   master nodes only
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep -f ${KUBE_APISERVER_PROC} | wc -l)" -gt 0 ]] || [[ "$(journalctl -D /var/log/journal -u k3s | grep 'Running kube-apiserver' | grep -v grep | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f ${KUBE_APISERVER_PROC} | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep 'Running kube-apiserver' | grep -v grep | wc -l)" -gt 0 ]]; then
     for controlFile in $(find ${CONFIG_DIR}/${OVERRIDE_BENCHMARK_VERSION}/ -name '*.yaml' ! -name config.yaml ! -name master.yaml ! -name node.yaml ! -name etcd.yaml); do
         echo "controlFile: ${controlFile}"
         target=$(basename "${controlFile}" .yaml)
