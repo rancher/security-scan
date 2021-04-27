@@ -105,7 +105,7 @@ groups:
           test_items:
             - flag: "644"
               compare:
-                op: eq
+                op: bitmask
                 value: "644"
               set: true
         remediation: |
