@@ -44,13 +44,16 @@ RANCHER_K8S_VERSION="${K8S_API_VERSION}"
 echo "Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 
 set -x
-JOURNAL_LOG="${JOURNAL_LOG:-/var/log/journal}"
 TAR_FILE_NAME="${TAR_FILE_NAME:-kb}"
 CONFIG_DIR="${CONFIG_DIR:-/etc/kube-bench/cfg}"
 RESULTS_DIR="${RESULTS_DIR:-/tmp/results}"
 ERROR_LOG_FILE="${RESULTS_DIR}/error.log"
 LOG_DIR="${RESULTS_DIR}/logs"
-
+JOURNAL_LOG="${JOURNAL_LOG:-/var/log/journal}"
+if [[ "$(journalctl -D $JOURNAL_LOG --lines=0 2>&1 | grep -s 'No such file or directory' | wc -l)" -gt 0 ]]; then
+  JOURNAL_LOG=/run/log/journal
+  find $CONFIG_DIR -name '*.yaml' | xargs -n1 sed -i 's|/var/log/journal|/run/log/journal|'
+fi
 mkdir -p "${RESULTS_DIR}"
 
 # etcd
