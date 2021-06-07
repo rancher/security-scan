@@ -332,6 +332,72 @@ groups:
           chmod -R 600 /var/lib/rancher/rke2/server/tls/*.key
         scored: false
 
+      - id: 1.1.22
+        text: "Ensure that the RKE2 server SystemD unit file ownership is set to root:root (Not Scored)"
+        audit: "check_rke2_unit_file_ownership.sh server"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true  
+        remediation: |
+          Run the below command (based on the file location on your system) on a node.
+          For example,
+          chown root:root /usr/local/lib/systemd/system/rke2-server.service
+        scored: true
+
+      - id: 1.1.23
+        text: "Ensure that the RKE2 server SystemD unit files permissions are set to 644 (Not Scored)"
+        audit: "check_rke2_unit_file_permissions.sh server"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true  
+        remediation: |
+          Run the below command (based on the file location on your system) on a node.
+          For example,
+          chmod 644 /usr/local/lib/systemd/system/rke2-server.service
+        scored: true
+
+      - id: 1.1.24
+        text: "Ensure that the RKE2 kubeconfig file permissions are set to 600 (Not Scored)"
+        audit: "check_files_permissions.sh /etc/rancher/rke2/rke2.yaml 600"
+        type: "manual"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true      
+        remediation: |
+          Run the below command (based on the file location on your system) on a node.
+          For example,
+          chmod -R 600 /etc/rancher/rke2/rke2.yaml
+        scored: true
+
+      - id: 1.1.25
+        text: "Ensure that the RKE2 kubeconfig directory and file ownership is set to root:root (Not Scored)"
+        audit: "stat -c %U:%G /etc/rancher/rke2/rke2.yaml"
+        type: "manual"
+        tests:
+          test_items:
+            - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on a node.
+          For example,
+          chown -R root:root /etc/rancher/rke2/rke2.yaml
+        scored: true
+
   - id: 1.2
     text: "API Server"
     checks:
