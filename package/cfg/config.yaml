@@ -25,6 +25,7 @@ master:
       - "hyperkube apiserver"
       - "hyperkube kube-apiserver"
       - "apiserver"
+      - "containerd"
     confs:
       - /etc/kubernetes/manifests/kube-apiserver.yaml
       - /etc/kubernetes/manifests/kube-apiserver.manifest
@@ -38,6 +39,7 @@ master:
       - "hyperkube scheduler"
       - "hyperkube kube-scheduler"
       - "scheduler"
+      - "containerd"
     confs:
       - /etc/kubernetes/manifests/kube-scheduler.yaml
       - /etc/kubernetes/manifests/kube-scheduler.manifest
@@ -52,6 +54,7 @@ master:
       - "hyperkube controller-manager"
       - "hyperkube kube-controller-manager"
       - "controller-manager"
+      - "containerd"
     confs:
       - /etc/kubernetes/manifests/kube-controller-manager.yaml
       - /etc/kubernetes/manifests/kube-controller-manager.manifest
@@ -95,6 +98,7 @@ node:
       - "/etc/kubernetes/ssl/kube-ca.pem"
       - "/var/lib/rancher/rke2/agent/server.crt"
       - "/var/lib/rancher/rke2/agent/client-ca.crt"
+      - "/var/lib/rancher/k3s/agent/client-ca.crt"
     svc:
       # These paths must also be included
       #  in the 'confs' property below
@@ -105,12 +109,15 @@ node:
     bins:
       - "hyperkube kubelet"
       - "kubelet"
+      - "containerd"
     kubeconfig:
       - "/etc/kubernetes/kubelet.conf"
       - "/var/lib/kubelet/kubeconfig"
       - "/etc/kubernetes/kubelet-kubeconfig"
       - "/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
       - "/var/lib/rancher/rke2/agent/kubelet.kubeconfig"
+      - "/var/lib/rancher/k3s/server/cred/admin.kubeconfig"
+      - "/var/lib/rancher/k3s/agent/kubelet.kubeconfig"
     confs:
       - "/var/lib/kubelet/config.yaml"
       - "/etc/kubernetes/kubelet/kubelet-config.json"
@@ -141,6 +148,7 @@ node:
       - "hyperkube proxy"
       - "hyperkube kube-proxy"
       - "proxy"
+      - "containerd"
     confs:
       - /etc/kubernetes/proxy
       - /etc/kubernetes/addons/kube-proxy-daemonset.yaml
@@ -149,6 +157,7 @@ node:
       - /etc/kubernetes/kubelet-kubeconfig
       - /etc/kubernetes/ssl/kubecfg-kube-proxy.yaml
       - /var/lib/rancher/rke2/agent/kubeproxy.kubeconfig
+      - /var/lib/rancher/k3s/agent/kubeproxy.kubeconfig
     svc:
       - "/lib/systemd/system/kube-proxy.service"
     defaultconf: /etc/kubernetes/addons/kube-proxy-daemonset.yaml
@@ -161,12 +170,14 @@ etcd:
   etcd:
     bins:
       - "etcd"
+      - "containerd"
     confs:
       - /etc/kubernetes/manifests/etcd.yaml
       - /etc/kubernetes/manifests/etcd.manifest
       - /etc/etcd/etcd.conf
       - /var/snap/etcd/common/etcd.conf.yml
       - /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
+      - /var/lib/rancher/k3s/server/db/etcd/config
     defaultconf: /etc/kubernetes/manifests/etcd.yaml
 
 controlplane:
@@ -179,6 +190,7 @@ controlplane:
       - "hyperkube apiserver"
       - "hyperkube kube-apiserver"
       - "apiserver"
+      - "containerd"
 
 policies:
   components: []
@@ -191,18 +203,19 @@ managedservices:
 version_mapping:
   "rke-1.13": "rke-cis-1.4"
   "rke-1.14": "rke-cis-1.4"
-  "rke-1.15": "rke-cis-1.5-hardened"
-  "rke-1.16": "rke-cis-1.5-hardened"
-  "rke-1.17": "rke-cis-1.5-hardened"
-  "rke-1.18": "rke-cis-1.5-hardened"
   "rke-1.15": "rke-cis-1.5-permissive"
-  "rke-1.16": "rke-cis-1.5-permissive"
-  "rke-1.17": "rke-cis-1.5-permissive"
-  "rke-1.18": "rke-cis-1.5-permissive"
+  "rke-1.16": "rke-cis-1.6-permissive"
+  "rke-1.17": "rke-cis-1.6-permissive"
+  "rke-1.18": "rke-cis-1.6-permissive"
+  "rke-1.19": "rke-cis-1.6-permissive"
   "v1.18.10+rke2r1": "rke2-cis-1.5-hardened"
   "v1.18.10+rke2r1": "rke2-cis-1.5-permissive"
   "eks-1.0": "eks-1.0"
   "gke-1.0": "gke-1.0"
+  "v1.20.5+rke2r1": "rke2-cis-1.6-hardened"
+  "v1.20.5+rke2r1": "rke2-cis-1.6-permissive"
+  "v1.20.5+k3s1": "k3s-cis-1.6-hardened"
+  "v1.20.5+k3s1": "k3s-cis-1.6-permissive"
 
 target_mapping:
   "cis-1.4":
@@ -210,6 +223,12 @@ target_mapping:
     - "node"
     - "etcd"
   "cis-1.5":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "cis-1.6":
     - "master"
     - "node"
     - "controlplane"
@@ -231,6 +250,12 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
+  "rke-cis-1.6-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
   "rke-cis-1.5-permissive":
     - "master"
     - "node"
@@ -243,9 +268,39 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
+  "rke-cis-1.6-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
   "eks-1.0":
     - "node"
   "gke-1.0":
     - "node"
     - "managedservices"
+    - "policies"
+  "rke2-cis-1.6-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.6-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.6-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.6-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
     - "policies"

@@ -17,7 +17,10 @@ RUN apt-get update \
     && apt-get install -y \
     curl \
     jq \
-    vim
+    vim \
+    systemd \
+    grep \
+    bash
 RUN curl -sLf https://storage.googleapis.com/kubernetes-release/release/v1.13.5/bin/linux/amd64/kubectl > /usr/local/bin/kubectl-1.13 \
     && ln -sv /usr/local/bin/kubectl-1.13 /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl*
@@ -39,6 +42,8 @@ COPY package/run.sh \
     package/helper_scripts/check_for_default_ns.sh \
     package/helper_scripts/check_for_rke2_network_policies.sh \
     package/helper_scripts/check_for_rke2_cni_net_policy_support.sh \
+    package/helper_scripts/check_cafile_permissions.sh \
+    package/helper_scripts/check_cafile_ownership.sh \
     /usr/bin/
 
 CMD ["run.sh"]
