@@ -54,7 +54,7 @@ echo "Rancher: Running CIS Benchmarks"
 rm -rf "${SONOBUOY_OUTPUT_DIR}"/*.tar.gz
 
 # Run sonobuoy first
-if ! sonobuoy master -v 3
+if ! sonobuoy aggregator -v 3
 then
   echo "error running sonobuoy" | tee -a ${ERROR_LOG_FILE}
   exit 1
