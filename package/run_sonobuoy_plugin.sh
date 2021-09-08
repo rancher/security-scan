@@ -59,7 +59,7 @@ mkdir -p "${RESULTS_DIR}"
 
 # etcd
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep -f /etcd | wc -l)" -gt 0 ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep 'Managed etcd' | grep -v grep | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep -f /etcd | wc -l)" -gt 0 ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | wc -l)" -gt 0 ]]; then
     echo "etcd: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets etcd \

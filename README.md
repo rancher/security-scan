@@ -11,8 +11,25 @@ Multi-purpose repo:
 The corresponding docker image (rancher/security-scan) is used in the system charts.
 
 ## Building
-
 `make`
+
+Tag the image to personal docker hub repo
+
+`docker tag rancher/security-scan:<MAKE TAG OUTPUT> <DOCKER_HUB_USER>/security-scan:dev`
+
+Push docker tag
+
+`docker push <DOCKER_HUB_USER>/security-scan:dev`
+
+On Rancher install CIS Benchmark app, changing the Values YAML to point to your image
+```
+image:
+...
+    securityScan:
+        repository: <DOCKER_HUB_USER>/security-scan
+        tag: dev
+```
+
 
 ## License
 Copyright (c) 2019 [Rancher Labs, Inc.](http://rancher.com)
