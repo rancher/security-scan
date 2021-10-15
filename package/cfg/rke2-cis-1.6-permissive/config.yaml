@@ -24,8 +24,6 @@ master:
     defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-scheduler.yaml
 
   controllermanager:
-    bins:
-      - kube-controller-manager
     confs:
       - /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
     defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
