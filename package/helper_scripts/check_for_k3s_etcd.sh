@@ -18,15 +18,15 @@ if [[ "$(journalctl -D /var/log/journal -u k3s | grep 'Managed etcd' | grep -v g
         "1.2.29")
             echo $(journalctl -D /var/log/journal -u k3s | grep 'Running kube-apiserver' | tail -n1 | grep 'etcd-');;
         "2.1")
-            echo $(grep file /var/lib/rancher/k3s/server/db/etcd/config | grep -v trusted);;
+            echo $(grep -A 5 'client-transport-security' /var/lib/rancher/k3s/server/db/etcd/config | grep -E 'cert-file|key-file');;
         "2.2")
-            echo "$(grep 'client-cert-auth' /var/lib/rancher/k3s/server/db/etcd/config)";;
+            echo "$(grep -A 5 'client-transport-security' /var/lib/rancher/k3s/server/db/etcd/config | grep 'client-cert-auth')";;
         "2.3")
             echo $(grep 'auto-tls' /var/lib/rancher/k3s/server/db/etcd/config);;
         "2.4")
-            echo $(grep peer /var/lib/rancher/k3s/server/db/etcd/config | grep -v trusted | grep -v security | grep -v advertise | grep -v listen);;
+            echo $(grep -A 5 'peer-transport-security' /var/lib/rancher/k3s/server/db/etcd/config | grep -E 'cert-file|key-file');;
         "2.5")
-            echo "$(grep 'client-cert-auth' /var/lib/rancher/k3s/server/db/etcd/config)";;
+            echo "$(grep -A 5 'peer-transport-security' /var/lib/rancher/k3s/server/db/etcd/config | grep 'client-cert-auth')";;
         "2.6")
             echo $(grep 'peer-auto-tls' /var/lib/rancher/k3s/server/db/etcd/config);;
         "2.7")

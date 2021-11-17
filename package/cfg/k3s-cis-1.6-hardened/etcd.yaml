@@ -83,7 +83,7 @@ groups:
         audit: "check_for_k3s_etcd.sh 2.5"
         tests:
           test_items:
-            - flag: "client-cert-auth"
+            - flag: "--client-cert-auth"
               compare:
                 op: eq
                 value: true
@@ -117,7 +117,7 @@ groups:
         audit: "check_for_k3s_etcd.sh 2.7"
         tests:
           test_items:
-            - flag: "--trusted-ca-file"
+            - flag: "trusted-ca-file"
               set: true
         remediation: |
           [Manual test]
