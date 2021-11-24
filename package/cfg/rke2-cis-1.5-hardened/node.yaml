@@ -145,6 +145,11 @@ groups:
             compare:
               op: eq
               value: "644"
+          - flag: "600"
+            compare:
+              op: eq
+              value: "600"
+              set: true
       remediation: |
         Run the below command (based on the file location on your system) on the each worker node.
         For example,
@@ -172,10 +177,10 @@ groups:
       audit: "stat -c %a /var/lib/rancher/rke2/server/tls/server-ca.crt"
       tests:
         test_items:
-          - flag: "644"
+          - flag: "600"
             compare:
               op: eq
-              value: "644"
+              value: "600"
             set: true
       remediation: |
         Run the following command to modify the file permissions of the
