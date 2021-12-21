@@ -20,6 +20,7 @@ const (
 	DefaultOutputFileName       = "report.json"
 	DefaultControlsDirectory    = "/etc/kube-bench/cfg"
 	VersionMappingKey           = "version_mapping"
+	TargetMappingKey            = "target_mapping"
 	ConfigFilename              = "config.yaml"
 	MasterControlsFilename      = "master.yaml"
 	EtcdControlsFilename        = "etcd.yaml"
@@ -35,20 +36,21 @@ const (
 
 type Summarizer struct {
 	// mapping for k8s version to default benchmark version
-	kubeToBenchmarkMap map[string]string
-	BenchmarkVersion   string
-	ControlsDirectory  string
-	InputDirectory     string
-	OutputDirectory    string
-	OutputFilename     string
-	FailuresOnly       bool
-	fullReport         *SummarizedReport
-	groupWrappersMap   map[string]*GroupWrapper
-	checkWrappersMaps  map[string]*CheckWrapper
-	userSkip           map[string]bool
-	defaultSkip        map[string]string
-	notApplicable      map[string]string
-	nodeSeen           map[NodeType]map[string]bool
+	kubeToBenchmarkMap   map[string]string
+	BenchmarkVersion     string
+	ControlsDirectory    string
+	InputDirectory       string
+	OutputDirectory      string
+	OutputFilename       string
+	FailuresOnly         bool
+	fullReport           *SummarizedReport
+	groupWrappersMap     map[string]*GroupWrapper
+	checkWrappersMaps    map[string]*CheckWrapper
+	userSkip             map[string]bool
+	defaultSkip          map[string]string
+	notApplicable        map[string]string
+	nodeSeen             map[NodeType]map[string]bool
+	BenchmarkToConfigMap map[string][]string
 }
 
 type State string
@@ -74,6 +76,13 @@ const (
 	NodeTypeEtcd   NodeType = "e"
 	NodeTypeMaster NodeType = "m"
 	NodeTypeNode   NodeType = "n"
+)
+
+const (
+	FilePathNodeTypeNone   string = ""
+	FilePathNodeTypeEtcd   string = "etcd"
+	FilePathNodeTypeMaster string = "master"
+	FilePathNodeTypeNode   string = "node"
 )
 
 type CheckWrapper struct {
@@ -152,6 +161,11 @@ func NewSummarizer(
 	if err := s.loadVersionMapping(); err != nil {
 		return nil, fmt.Errorf("error loading version mapping: %v", err)
 	}
+
+	if err := s.loadTargetMapping(); err != nil {
+		return nil, fmt.Errorf("error loading target mapping: %v", err)
+	}
+
 	if benchmarkVersion != "" {
 		s.BenchmarkVersion = benchmarkVersion
 	} else {
@@ -372,6 +386,26 @@ func (s *Summarizer) loadVersionMapping() error {
 	return nil
 }
 
+func (s *Summarizer) loadTargetMapping() error {
+	//configTargetFileName := fmt.Sprintf("/home/dhruv/go/src/github.com/rancher/security-scan/package/cfg/%s", ConfigFilename)
+	configFileName := fmt.Sprintf("%s/%s", s.ControlsDirectory, ConfigFilename)
+	v := viper.New()
+	v.SetConfigFile(configFileName)
+	if err := v.ReadInConfig(); err != nil {
+		return fmt.Errorf("error reading in config file: %v", err)
+	}
+
+	BenchmarkToConfigMap := v.GetStringMapStringSlice(TargetMappingKey)
+	if BenchmarkToConfigMap == nil || (len(BenchmarkToConfigMap) == 0) {
+		return fmt.Errorf("config file is missing '%v' section", TargetMappingKey)
+	}
+
+	logrus.Debugf("%v: %v", TargetMappingKey, BenchmarkToConfigMap)
+	s.BenchmarkToConfigMap = BenchmarkToConfigMap
+	logrus.Infof("CONFIG: %+v\n", BenchmarkToConfigMap)
+	return nil
+}
+
 func (s *Summarizer) loadControlsFromFile(filePath string) (*kb.Controls, error) {
 	controls := &kb.Controls{}
 	fileContents, err := ioutil.ReadFile(filePath)
@@ -384,14 +418,6 @@ func (s *Summarizer) loadControlsFromFile(filePath string) (*kb.Controls, error)
 	logrus.Debugf("filePath: %v, controls: %+v", filePath, controls)
 	return controls, nil
 }
-
-// func getNodeTypes() []NodeType {
-// 	return []NodeType{
-// 		NodeTypeMaster,
-// 		NodeTypeEtcd,
-// 		NodeTypeNode,
-// 	}
-// }
 
 func getResultsFileNodeTypeMapping() map[string]NodeType {
 	return map[string]NodeType{
@@ -408,25 +434,27 @@ func (s *Summarizer) getControlsFilePath(filename string) string {
 }
 
 func (s *Summarizer) getNodeTypeControlsFileMapping() map[string]NodeType {
-	// load node type files first
-	filepaths := map[string]NodeType{
-		s.getControlsFilePath(MasterControlsFilename): NodeTypeMaster,
-		s.getControlsFilePath(EtcdControlsFilename):   NodeTypeEtcd,
-		s.getControlsFilePath(NodeControlsFilename):   NodeTypeNode,
-	}
-	allFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.yaml", s.ControlsDirectory, s.BenchmarkVersion))
-	if err != nil {
-		logrus.Errorf("error globing files: %v", err)
-		return filepaths
-	}
-	for _, f := range allFiles {
-		if controlFilesToIgnore[f] {
+	var filepaths = make(map[string]NodeType)
+	requiredFiles := s.BenchmarkToConfigMap[s.BenchmarkVersion]
+	for _, f := range requiredFiles {
+
+		if FilePathNodeTypeMaster == f {
+			FileName := s.getControlsFilePath(MasterControlsFilename)
+			filepaths[FileName] = NodeTypeMaster
+			continue
+		} else if FilePathNodeTypeEtcd == f {
+			FileName := s.getControlsFilePath(EtcdControlsFilename)
+			filepaths[FileName] = NodeTypeEtcd
+			continue
+		} else if FilePathNodeTypeNode == f {
+			FileName := s.getControlsFilePath(NodeControlsFilename)
+			filepaths[FileName] = NodeTypeNode
+			continue
+		} else {
+			FileName := s.getControlsFilePath(fmt.Sprintf("%s.yaml", f))
+			filepaths[FileName] = NodeTypeNone
 			continue
 		}
-		if _, ok := filepaths[f]; ok {
-			continue
-		}
-		filepaths[f] = NodeTypeNone
 	}
 	return filepaths
 }
