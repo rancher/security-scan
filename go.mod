@@ -1,4 +1,4 @@
-module github.com/rancher/security-scan
+module github.com/rancherfederal/security-scan
 
 go 1.12
 
