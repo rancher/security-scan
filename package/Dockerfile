@@ -7,7 +7,7 @@ RUN zypper --non-interactive update \
     && zypper --non-interactive install \
     git
 
-RUN git clone -b v0.3.1 --depth 1 https://github.com/aquasecurity/kube-bench.git
+RUN git clone -b v0.6.6 --depth 1 https://github.com/aquasecurity/kube-bench.git
 
 FROM registry.suse.com/suse/sle15:15.3
 ARG kube_bench_tag=0.2.3-rancher-1
