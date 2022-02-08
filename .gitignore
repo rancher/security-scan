@@ -1,4 +1,5 @@
 /.dapper
+.dapper.tmp
 /.cache
 /.trash-cache
 /bin
