@@ -129,7 +129,7 @@ groups:
               set: true
         remediation: |
           Run the following command to modify the ownership of the --client-ca-file.
-          chown root:roset: trueot <filename>
+          chown root:root $kubeletcafile
         scored: true
 
       - id: 4.1.9
