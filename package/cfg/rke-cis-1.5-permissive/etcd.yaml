@@ -97,7 +97,7 @@ groups:
     checks:
       - id: 2.1
         text: "Ensure that the --cert-file and --key-file arguments are set as appropriate (Scored)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: and
           test_items:
@@ -115,7 +115,7 @@ groups:
 
       - id: 2.2
         text: "Ensure that the --client-cert-auth argument is set to true (Scored)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: or
           test_items:
@@ -134,7 +134,7 @@ groups:
 
       - id: 2.3
         text: "Ensure that the --auto-tls argument is not set to true (Scored)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: or
           test_items:
@@ -153,7 +153,7 @@ groups:
       - id: 2.4
         text: "Ensure that the --peer-cert-file and --peer-key-file arguments are
         set as appropriate (Scored)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: and
           test_items:
@@ -171,7 +171,7 @@ groups:
 
       - id: 2.5
         text: "Ensure that the --peer-client-cert-auth argument is set to true (Scored)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: or
           test_items:
@@ -190,7 +190,7 @@ groups:
 
       - id: 2.6
         text: "Ensure that the --peer-auto-tls argument is not set to true (Scored)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: or
           test_items:
@@ -209,7 +209,7 @@ groups:
 
       - id: 2.7
         text: "Ensure that a unique Certificate Authority is used for etcd (Not Scored)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           test_items:
             - flag: "--trusted-ca-file"

@@ -91,7 +91,7 @@ groups:
     checks:
       - id: 1.5.1
         text: "Ensure that the --cert-file and --key-file arguments are set as appropriate (Scored)"
-        audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           test_items:
             - flag: "--cert-file"
@@ -108,7 +108,7 @@ groups:
 
       - id: 1.5.2
         text: "Ensure that the --client-cert-auth argument is set to true (Scored)"
-        audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: or
           test_items:
@@ -127,7 +127,7 @@ groups:
 
       - id: 1.5.3
         text: "Ensure that the --auto-tls argument is not set to true (Scored)"
-        audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: or
           test_items:
@@ -146,7 +146,7 @@ groups:
       - id: 1.5.4
         text: "Ensure that the --peer-cert-file and --peer-key-file arguments are
       set as appropriate (Scored)"
-        audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: and
           test_items:
@@ -164,7 +164,7 @@ groups:
 
       - id: 1.5.5
         text: "Ensure that the --peer-client-cert-auth argument is set to true (Scored)"
-        audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: or
           test_items:
@@ -183,7 +183,7 @@ groups:
 
       - id: 1.5.6
         text: "Ensure that the --peer-auto-tls argument is not set to true (Scored)"
-        audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
+        audit: "pgrep -a $etcdbin"
         tests:
           bin_op: or
           test_items:
