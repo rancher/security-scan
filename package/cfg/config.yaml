@@ -212,6 +212,7 @@ version_mapping:
   "v1.18.10+rke2r1": "rke2-cis-1.5-permissive"
   "eks-1.0": "eks-1.0"
   "gke-1.0": "gke-1.0"
+  "aks-1.0": "aks-1.0"	
   "v1.20.5+rke2r1": "rke2-cis-1.6-hardened"
   "v1.20.5+rke2r1": "rke2-cis-1.6-permissive"
   "v1.20.5+k3s1": "k3s-cis-1.6-hardened"
@@ -280,6 +281,8 @@ target_mapping:
     - "node"
     - "managedservices"
     - "policies"
+  "aks-1.0":	
+    - "node"
   "rke2-cis-1.6-hardened":
     - "master"
     - "node"
