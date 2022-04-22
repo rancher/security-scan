@@ -1,6 +1,6 @@
 ---
 controls:
-version: "1.20"
+version: 1.20
 id: 5
 text: "Kubernetes Policies"
 type: "policies"
@@ -42,14 +42,21 @@ groups:
         scored: false
 
       - id: 5.1.5
-        text: "Ensure that default service accounts are not actively used. (Manual)"
-        type: "manual"
+        text: "Ensure that default service accounts are not actively used. (Automated)"
+        audit: check_for_default_sa.sh
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Create explicit service accounts wherever a Kubernetes workload requires specific access
           to the Kubernetes API server.
           Modify the configuration of each default service account to include this value
           automountServiceAccountToken: false
-        scored: false
+        scored: true
 
       - id: 5.1.6
         text: "Ensure that Service Account Tokens are only mounted where necessary (Manual)"
@@ -77,7 +84,7 @@ groups:
     text: "Pod Security Policies"
     checks:
       - id: 5.2.1
-        text: "Minimize the admission of privileged containers (Automated)"
+        text: "Minimize the admission of privileged containers (Manual)"
         type: "manual"
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that
@@ -86,38 +93,66 @@ groups:
 
       - id: 5.2.2
         text: "Minimize the admission of containers wishing to share the host process ID namespace (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostPID == null) or (.spec.hostPID == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.hostPID field is omitted or set to false.
-        scored: false
+        scored: true
 
       - id: 5.2.3
         text: "Minimize the admission of containers wishing to share the host IPC namespace (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostIPC == null) or (.spec.hostIPC == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.hostIPC field is omitted or set to false.
-        scored: false
+        scored: true
 
       - id: 5.2.4
         text: "Minimize the admission of containers wishing to share the host network namespace (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostNetwork == null) or (.spec.hostNetwork == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.hostNetwork field is omitted or set to false.
-        scored: false
+        scored: true
 
       - id: 5.2.5
         text: "Minimize the admission of containers with allowPrivilegeEscalation (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.allowPrivilegeEscalation == null) or (.spec.allowPrivilegeEscalation == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.allowPrivilegeEscalation field is omitted or set to false.
-        scored: false
+        scored: true
 
       - id: 5.2.6
-        text: "Minimize the admission of root containers (Automated)"
+        text: "Minimize the admission of root containers (Manual)"
         type: "manual"
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
@@ -126,7 +161,7 @@ groups:
         scored: false
 
       - id: 5.2.7
-        text: "Minimize the admission of containers with the NET_RAW capability (Automated)"
+        text: "Minimize the admission of containers with the NET_RAW capability (Manual)"
         type: "manual"
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
@@ -134,7 +169,7 @@ groups:
         scored: false
 
       - id: 5.2.8
-        text: "Minimize the admission of containers with added capabilities (Automated)"
+        text: "Minimize the admission of containers with added capabilities (Manual)"
         type: "manual"
         remediation: |
           Ensure that allowedCapabilities is not present in PSPs for the cluster unless
@@ -163,11 +198,18 @@ groups:
         scored: false
 
       - id: 5.3.2
-        text: "Ensure that all Namespaces have Network Policies defined (Manual)"
-        type: "manual"
+        text: "Ensure that all Namespaces have Network Policies defined (Automated)"
+        audit: check_for_network_policies.sh
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Follow the documentation and create NetworkPolicy objects as you need them.
-        scored: false
+        scored: true
 
   - id: 5.4
     text: "Secrets Management"
@@ -230,9 +272,16 @@ groups:
         scored: false
 
       - id: 5.7.4
-        text: "The default namespace should not be used (Manual)"
-        type: "manual"
+        text: "The default namespace should not be used (Automated)"
+        audit: check_for_default_ns.sh
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Ensure that namespaces are created to allow for appropriate segregation of Kubernetes
           resources and that all new resources are created in a specific namespace.
-        scored: false
+        scored: true
