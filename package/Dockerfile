@@ -10,7 +10,7 @@ RUN zypper --non-interactive update \
 RUN git clone -b v0.6.6 --depth 1 https://github.com/aquasecurity/kube-bench.git
 
 FROM registry.suse.com/suse/sle15:15.3
-ARG kube_bench_tag=0.2.3-rancher-1
+ARG kube_bench_tag=0.2.3-rancher-3
 ARG sonobuoy_version=0.53.2
 
 RUN zypper --non-interactive update \
@@ -26,7 +26,10 @@ RUN curl -sLf https://storage.googleapis.com/kubernetes-release/release/v1.13.5/
     && chmod +x /usr/local/bin/kubectl*
 RUN curl -sLf https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_amd64.tar.gz | tar -xvzf - -C /usr/bin sonobuoy
 #RUN curl -sLf https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_tag}/kube-bench_${kube_bench_tag}_linux_amd64.tar.gz | tar -xvzf - -C /usr/bin
-RUN curl -sLf https://github.com/leodotcloud/kube-bench/releases/download/v${kube_bench_tag}/kube-bench.tar.gz | tar -xvzf - -C /usr/bin
+#RUN curl -sLf https://github.com/rayandas/kube-bench/releases/download/v${kube_bench_tag}/kube-bench.tar.gz | tar -xvzf - -C /usr/bin
+RUN curl -L https://github.com/rayandas/kube-bench/releases/download/v0.2.3-rancher-3/kube-bench --output kube-bench
+RUN chmod +x kube-bench
+RUN cp kube-bench /usr/bin/kube-bench
 
 COPY --from=intermediate /kube-bench/cfg /etc/kube-bench/cfg/
 
