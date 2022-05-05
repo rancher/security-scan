@@ -127,9 +127,9 @@ type skipConfig struct {
 	Skip map[string][]string `json:"skip"`
 }
 
-var controlFilesToIgnore = map[string]bool{
-	"config.yaml": true,
-}
+	var controlFilesToIgnore = map[string]bool{
+		"config.yaml": true,
+	}
 
 func NewSummarizer(
 	k8sVersion,
@@ -548,8 +548,8 @@ func getCheckWrapper(check *kb.Check) *CheckWrapper {
 		Audit:          check.Audit,
 		AuditConfig:    check.AuditConfig,
 		TestInfo:       check.TestInfo,
-		Commands:       check.Commands,
-		ConfigCommands: check.ConfigCommands,
+		//Commands:       check.Commands,
+		//ConfigCommands: check.ConfigCommands,
 		ExpectedResult: check.ExpectedResult,
 	}
 }
@@ -600,6 +600,7 @@ func (s *Summarizer) runFinalPassOnCheckWrapper(cw *CheckWrapper) {
 	nodesMap := s.getNodesMapOfCheckWrapper(cw)
 	nodeCount := len(nodesMap)
 	logrus.Debugf("id: %s nodeCount: %d", cw.ID, nodeCount)
+	fmt.Println(cw.Result)
 	if len(cw.Result) == 1 {
 		if _, ok := cw.Result[NA]; ok {
 			cw.State = NotApplicable

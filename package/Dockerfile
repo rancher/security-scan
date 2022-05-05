@@ -7,7 +7,7 @@ RUN zypper --non-interactive update \
     && zypper --non-interactive install \
     git
 
-RUN git clone -b v0.6.6 --depth 1 https://github.com/aquasecurity/kube-bench.git
+RUN git clone -b v0.6.8 --depth 1 https://github.com/aquasecurity/kube-bench.git
 
 FROM registry.suse.com/suse/sle15:15.3
 ARG kube_bench_tag=0.6.8
@@ -28,7 +28,7 @@ RUN curl -sLf https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sono
 RUN curl -sLf https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_tag}/kube-bench_${kube_bench_tag}_linux_amd64.tar.gz | tar -xvzf - -C /usr/bin
 #RUN curl -sLf https://github.com/leodotcloud/kube-bench/releases/download/v${kube_bench_tag}/kube-bench.tar.gz | tar -xvzf - -C /usr/bin
 
-COPY --from=intermediate /kube-bench/cfg /etc/kube-bench/cfg/
+#COPY --from=intermediate /kube-bench/cfg /etc/kube-bench/cfg/
 
 COPY package/cfg/ /etc/kube-bench/cfg/
 COPY package/run.sh \
