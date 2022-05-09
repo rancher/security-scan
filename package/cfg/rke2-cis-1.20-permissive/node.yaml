@@ -1,6 +1,6 @@
 ---
 controls:
-version: "1.20"
+version: 1.20
 id: 4
 text: "Worker Node Security Configuration"
 type: "node"
@@ -26,9 +26,11 @@ groups:
       - id: 4.1.2
         text: "Ensure that the kubelet service file ownership is set to root:root (Automated)"
         audit: '/bin/sh -c ''if test -e $kubeletsvc; then stat -c %U:%G $kubeletsvc; fi'' '
+        type: "skip"
         tests:
           test_items:
-            - flag: root:root
+            - flag: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
@@ -73,10 +75,11 @@ groups:
         audit: '/bin/sh -c ''if test -e $kubeletkubeconfig; then stat -c permissions=%a $kubeletkubeconfig; fi'' '
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
@@ -89,6 +92,10 @@ groups:
         tests:
           test_items:
             - flag: root:root
+              set: true
+              compare:
+                op: eq
+                value: root:root
         remediation: |
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
@@ -97,16 +104,14 @@ groups:
 
       - id: 4.1.7
         text: "Ensure that the certificate authorities file permissions are set to 644 or more restrictive (Manual)"
-        audit: |
-          CAFILE=$(ps -ef | grep kubelet | grep -v apiserver | grep -- --client-ca-file= | awk -F '--client-ca-file=' '{print $2}' | awk '{print $1}')
-          if test -z $CAFILE; then CAFILE=$kubeletcafile; fi
-          if test -e $CAFILE; then stat -c permissions=%a $CAFILE; fi
+        audit: "check_cafile_permissions.sh"
         tests:
           test_items:
             - flag: "permissions"
               compare:
                 op: bitmask
                 value: "644"
+              set: true
         remediation: |
           Run the following command to modify the file permissions of the
           --client-ca-file chmod 644 <filename>
@@ -114,10 +119,7 @@ groups:
 
       - id: 4.1.8
         text: "Ensure that the client certificate authorities file ownership is set to root:root (Manual)"
-        audit: |
-          CAFILE=$(ps -ef | grep kubelet | grep -v apiserver | grep -- --client-ca-file= | awk -F '--client-ca-file=' '{print $2}' | awk '{print $1}')
-          if test -z $CAFILE; then CAFILE=$kubeletcafile; fi
-          if test -e $CAFILE; then stat -c %U:%G $CAFILE; fi
+        audit: "check_cafile_ownership.sh"
         tests:
           test_items:
             - flag: root:root
@@ -134,10 +136,11 @@ groups:
         audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c permissions=%a $kubeletconf; fi'' '
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true
         remediation: |
           Run the following command (using the config file location identified in the Audit step)
           chmod 644 $kubeletconf
@@ -149,6 +152,7 @@ groups:
         tests:
           test_items:
             - flag: root:root
+              set: true
         remediation: |
           Run the following command (using the config file location identified in the Audit step)
           chown root:root $kubeletconf
