@@ -1,6 +1,6 @@
 ---
 controls:
-version: "1.20"
+version: 1.20
 id: 5
 text: "Kubernetes Policies"
 type: "policies"
@@ -42,14 +42,21 @@ groups:
         scored: false
 
       - id: 5.1.5
-        text: "Ensure that default service accounts are not actively used. (Manual)"
-        type: "manual"
+        text: "Ensure that default service accounts are not actively used. (Automated)"
+        audit: check_for_default_sa.sh
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Create explicit service accounts wherever a Kubernetes workload requires specific access
           to the Kubernetes API server.
           Modify the configuration of each default service account to include this value
           automountServiceAccountToken: false
-        scored: false
+        scored: true
 
       - id: 5.1.6
         text: "Ensure that Service Account Tokens are only mounted where necessary (Manual)"
@@ -78,31 +85,59 @@ groups:
     checks:
       - id: 5.2.1
         text: "Minimize the admission of privileged containers (Automated)"
-        type: "manual"
+        audit: "kubectl get psp global-restricted-psp -o json | jq -r '.spec.runAsUser.rule'"
+        tests:
+           test_items:
+             - flag: "MustRunAsNonRoot"
+               compare:
+                 op: eq
+                 value: "MustRunAsNonRoot"
+               set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that
           the .spec.privileged field is omitted or set to false.
-        scored: false
+        scored: true
 
       - id: 5.2.2
         text: "Minimize the admission of containers wishing to share the host process ID namespace (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostPID == null) or (.spec.hostPID == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.hostPID field is omitted or set to false.
-        scored: false
+        scored: true
 
       - id: 5.2.3
         text: "Minimize the admission of containers wishing to share the host IPC namespace (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostIPC == null) or (.spec.hostIPC == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.hostIPC field is omitted or set to false.
-        scored: false
+        scored: true
 
       - id: 5.2.4
         text: "Minimize the admission of containers wishing to share the host network namespace (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostNetwork == null) or (.spec.hostNetwork == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.hostNetwork field is omitted or set to false.
@@ -110,28 +145,49 @@ groups:
 
       - id: 5.2.5
         text: "Minimize the admission of containers with allowPrivilegeEscalation (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.allowPrivilegeEscalation == null) or (.spec.allowPrivilegeEscalation == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.allowPrivilegeEscalation field is omitted or set to false.
-        scored: false
+        scored: true
 
       - id: 5.2.6
         text: "Minimize the admission of root containers (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.allowPrivilegeEscalation == null) or (.spec.allowPrivilegeEscalation == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.runAsUser.rule is set to either MustRunAsNonRoot or MustRunAs with the range of
           UIDs not including 0.
-        scored: false
+        scored: true
 
       - id: 5.2.7
-        text: "Minimize the admission of containers with the NET_RAW capability (Automated)"
-        type: "manual"
+        text: "Minimize the admission of containers with the NET_RAW capability (Manual)"
+        audit: "kubectl get psp global-restricted-psp -o json | jq -r .spec.requiredDropCapabilities[]"
+        tests:
+          test_items:
+            - flag: "ALL"
+              compare:
+                op: eq
+                value: "ALL"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that the
           .spec.requiredDropCapabilities is set to include either NET_RAW or ALL.
-        scored: false
+        scored: true
 
       - id: 5.2.8
         text: "Minimize the admission of containers with added capabilities (Automated)"
@@ -154,20 +210,34 @@ groups:
     text: "Network Policies and CNI"
     checks:
       - id: 5.3.1
-        text: "Ensure that the CNI in use supports Network Policies (Manual)"
-        type: "manual"
+        text: "Ensure that the CNI in use supports Network Policies (Automated)"
+        audit: "kubectl get pods -n kube-system -l k8s-app=canal -o json | jq .items[] | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           If the CNI plugin in use does not support network policies, consideration should be given to
           making use of a different plugin, or finding an alternate mechanism for restricting traffic
           in the Kubernetes cluster.
-        scored: false
+        scored: True
 
       - id: 5.3.2
-        text: "Ensure that all Namespaces have Network Policies defined (Manual)"
-        type: "manual"
+        text: "Ensure that all Namespaces have Network Policies defined (Automated)"
+        audit: "check_for_rke2_network_policies.sh"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Follow the documentation and create NetworkPolicy objects as you need them.
-        scored: false
+        scored: true
 
   - id: 5.4
     text: "Secrets Management"
@@ -221,7 +291,7 @@ groups:
         scored: false
 
       - id: 5.7.3
-        text: "Apply Security Context to Your Pods and Containers (Manual)"
+        text: "Apply Security Context to Your Pods and Containers (Automated)"
         type: "manual"
         remediation: |
           Follow the Kubernetes documentation and apply security contexts to your pods. For a
