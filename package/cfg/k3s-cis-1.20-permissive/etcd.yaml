@@ -1,6 +1,6 @@
 ---
 controls:
-version: "1.20"
+version: 1.20
 id: 2
 text: "Etcd Node Configuration"
 type: "etcd"
@@ -10,14 +10,16 @@ groups:
     checks:
       - id: 2.1
         text: "Ensure that the --cert-file and --key-file arguments are set as appropriate (Automated)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "check_for_k3s_etcd.sh 2.1"
         tests:
           bin_op: and
           test_items:
-            - flag: "--cert-file"
+            - flag: "cert-file"
               env: "ETCD_CERT_FILE"
-            - flag: "--key-file"
+              set: true
+            - flag: "key-file"
               env: "ETCD_KEY_FILE"
+              set: true
         remediation: |
           Follow the etcd service documentation and configure TLS encryption.
           Then, edit the etcd pod specification file /etc/kubernetes/manifests/etcd.yaml
@@ -28,7 +30,7 @@ groups:
 
       - id: 2.2
         text: "Ensure that the --client-cert-auth argument is set to true (Automated)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "check_for_k3s_etcd.sh 2.2"
         tests:
           test_items:
             - flag: "--client-cert-auth"
@@ -44,7 +46,7 @@ groups:
 
       - id: 2.3
         text: "Ensure that the --auto-tls argument is not set to true (Automated)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "check_for_k3s_etcd.sh 2.3"
         tests:
           bin_op: or
           test_items:
@@ -63,16 +65,17 @@ groups:
         scored: true
 
       - id: 2.4
-        text: "Ensure that the --peer-cert-file and --peer-key-file arguments are
-        set as appropriate (Automated)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        text: "Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Automated)"
+        audit: "check_for_k3s_etcd.sh 2.4"
         tests:
           bin_op: and
           test_items:
-            - flag: "--peer-cert-file"
+            - flag: "cert-file"
               env: "ETCD_PEER_CERT_FILE"
-            - flag: "--peer-key-file"
+              set: true
+            - flag: "key-file"
               env: "ETCD_PEER_KEY_FILE"
+              set: true
         remediation: |
           Follow the etcd service documentation and configure peer TLS encryption as appropriate
           for your etcd cluster.
@@ -84,7 +87,7 @@ groups:
 
       - id: 2.5
         text: "Ensure that the --peer-client-cert-auth argument is set to true (Automated)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "check_for_k3s_etcd.sh 2.5"
         tests:
           test_items:
             - flag: "--peer-client-cert-auth"
@@ -100,7 +103,7 @@ groups:
 
       - id: 2.6
         text: "Ensure that the --peer-auto-tls argument is not set to true (Automated)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "check_for_k3s_etcd.sh 2.6"
         tests:
           bin_op: or
           test_items:
@@ -112,6 +115,7 @@ groups:
               compare:
                 op: eq
                 value: false
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and either remove the --peer-auto-tls parameter or set it to false.
@@ -120,11 +124,12 @@ groups:
 
       - id: 2.7
         text: "Ensure that a unique Certificate Authority is used for etcd (Manual)"
-        audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit: "check_for_k3s_etcd.sh 2.7"
         tests:
           test_items:
-            - flag: "--trusted-ca-file"
+            - flag: "trusted-ca-file"
               env: "ETCD_TRUSTED_CA_FILE"
+              set: true
         remediation: |
           [Manual test]
           Follow the etcd documentation and create a dedicated certificate authority setup for the
