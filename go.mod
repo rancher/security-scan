@@ -9,5 +9,5 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/urfave/cli v1.22.1
 	golang.org/x/sys v0.0.0-20190514135907-3a4b5fb9f71f // indirect
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/yaml.v2 v2.2.8
 )
