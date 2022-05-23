@@ -1,6 +1,6 @@
 ---
 controls:
-version: "cis-1.23"
+version: 1.23
 id: 1
 text: "Control Plane Security Configuration"
 type: "master"
@@ -10,12 +10,12 @@ groups:
     checks:
       - id: 1.1.1
         text: "Ensure that the API server pod specification file permissions are set to 644 or more restrictive (Automated)"
-        audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c permissions=%a $apiserverconf; fi'"
+        audit: "stat -c %a /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml"
         tests:
           test_items:
             - flag: "permissions"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
         remediation: |
           Run the below command (based on the file location on your system) on the
@@ -29,6 +29,10 @@ groups:
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chown root:root $apiserverconf
@@ -39,10 +43,11 @@ groups:
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c permissions=%a $controllermanagerconf; fi'"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chmod 644 $controllermanagerconf
@@ -54,6 +59,10 @@ groups:
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chown root:root $controllermanagerconf
@@ -64,10 +73,11 @@ groups:
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c permissions=%a $schedulerconf; fi'"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chmod 644 $schedulerconf
@@ -79,38 +89,10 @@ groups:
         tests:
           test_items:
             - flag: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chown root:root $schedulerconf
-        scored: true
-
-      - id: 1.1.7
-        text: "Ensure that the etcd pod specification file permissions are set to 644 or more restrictive (Automated)"
-        audit: "/bin/sh -c 'if test -e $etcdconf; then find $etcdconf -name '*etcd*' | xargs stat -c permissions=%a; fi'"
-        use_multiple_values: true
-        tests:
-          test_items:
-            - flag: "permissions"
-              compare:
-                op: bitmask
-                value: "644"
-        remediation: |
-          Run the below command (based on the file location on your system) on the control plane node.
-          For example,
-          chmod 644 $etcdconf
-        scored: true
-
-      - id: 1.1.8
-        text: "Ensure that the etcd pod specification file ownership is set to root:root (Automated)"
-        audit: "/bin/sh -c 'if test -e $etcdconf; then find $etcdconf -name '*etcd*' | xargs stat -c %U:%G; fi'"
-        use_multiple_values: true
-        tests:
-          test_items:
-            - flag: "root:root"
-        remediation: |
-          Run the below command (based on the file location on your system) on the control plane node.
-          For example,
-          chown root:root $etcdconf
         scored: true
 
       - id: 1.1.9
@@ -132,6 +114,7 @@ groups:
 
       - id: 1.1.10
         text: "Ensure that the Container Network Interface file ownership is set to root:root (Manual)"
+        type: "manual"
         audit: |
           ps -ef | grep $kubeletbin | grep -- --cni-conf-dir | sed 's%.*cni-conf-dir[= ]\([^ ]*\).*%\1%' | xargs -I{} find {} -mindepth 1 | xargs --no-run-if-empty stat -c %U:%G
           find /var/lib/cni/networks -type f 2> /dev/null | xargs --no-run-if-empty stat -c %U:%G
@@ -145,38 +128,9 @@ groups:
           chown root:root <path/to/cni/files>
         scored: false
 
-      - id: 1.1.11
-        text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Automated)"
-        audit: ps -ef | grep $etcdbin | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | xargs stat -c permissions=%a
-        tests:
-          test_items:
-            - flag: "permissions"
-              compare:
-                op: bitmask
-                value: "700"
-        remediation: |
-          On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
-          from the command 'ps -ef | grep etcd'.
-          Run the below command (based on the etcd data directory found above). For example,
-          chmod 700 /var/lib/etcd
-        scored: true
-
-      - id: 1.1.12
-        text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Automated)"
-        audit: ps -ef | grep $etcdbin | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | xargs stat -c %U:%G
-        tests:
-          test_items:
-            - flag: "etcd:etcd"
-        remediation: |
-          On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
-          from the command 'ps -ef | grep etcd'.
-          Run the below command (based on the etcd data directory found above).
-          For example, chown etcd:etcd /var/lib/etcd
-        scored: true
-
       - id: 1.1.13
         text: "Ensure that the admin.conf file permissions are set to 600 or more restrictive (Automated)"
-        audit: "/bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c permissions=%a /etc/kubernetes/admin.conf; fi'"
+        audit: stat -c %a /var/lib/rancher/rke2/server/cred/admin.kubeconfig
         tests:
           test_items:
             - flag: "permissions"
@@ -190,10 +144,14 @@ groups:
 
       - id: 1.1.14
         text: "Ensure that the admin.conf file ownership is set to root:root (Automated)"
-        audit: "/bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c %U:%G /etc/kubernetes/admin.conf; fi'"
+        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/cred/admin.kubeconfig"
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chown root:root /etc/kubernetes/admin.conf
@@ -201,13 +159,14 @@ groups:
 
       - id: 1.1.15
         text: "Ensure that the scheduler.conf file permissions are set to 644 or more restrictive (Automated)"
-        audit: "/bin/sh -c 'if test -e $schedulerkubeconfig; then stat -c permissions=%a $schedulerkubeconfig; fi'"
+        audit: "stat -c %a /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
@@ -216,10 +175,14 @@ groups:
 
       - id: 1.1.16
         text: "Ensure that the scheduler.conf file ownership is set to root:root (Automated)"
-        audit: "/bin/sh -c 'if test -e $schedulerkubeconfig; then stat -c %U:%G $schedulerkubeconfig; fi'"
+        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig"
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
@@ -228,13 +191,14 @@ groups:
 
       - id: 1.1.17
         text: "Ensure that the controller-manager.conf file permissions are set to 644 or more restrictive (Automated)"
-        audit: "/bin/sh -c 'if test -e $controllermanagerkubeconfig; then stat -c permissions=%a $controllermanagerkubeconfig; fi'"
+        audit: "stat -c %a /var/lib/rancher/rke2/server/cred/controller.kubeconfig"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
@@ -243,23 +207,31 @@ groups:
 
       - id: 1.1.18
         text: "Ensure that the controller-manager.conf file ownership is set to root:root (Automated)"
-        audit: "/bin/sh -c 'if test -e $controllermanagerkubeconfig; then stat -c %U:%G $controllermanagerkubeconfig; fi'"
+        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/cred/controller.kubeconfig"
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
-          chown root:root $controllermanagerkubeconfig
+          chown root:root /var/lib/rancher/rke2/server/cred/controller.kubeconfig
         scored: true
 
       - id: 1.1.19
         text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Automated)"
-        audit: "find /etc/kubernetes/pki/ | xargs stat -c %U:%G"
+        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/tls"
         use_multiple_values: true
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
@@ -268,7 +240,7 @@ groups:
 
       - id: 1.1.20
         text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Manual)"
-        audit: "find /etc/kubernetes/pki/ -name '*.crt' | xargs stat -c permissions=%a"
+        audit: "check_files_permissions.sh /var/lib/rancher/rke2/server/tls/*.crt 644"
         use_multiple_values: true
         tests:
           test_items:
@@ -276,10 +248,11 @@ groups:
               compare:
                 op: bitmask
                 value: "644"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
-          chmod -R 644 /etc/kubernetes/pki/*.crt
+          chmod -R 644 /var/lib/rancher/rke2/server/tls/*.crt
         scored: false
 
       - id: 1.1.21
@@ -288,14 +261,15 @@ groups:
         use_multiple_values: true
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "true"
               compare:
-                op: bitmask
-                value: "600"
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
-          chmod -R 600 /etc/kubernetes/pki/*.key
+          chmod -R 600 /var/lib/rancher/rke2/server/tls/*.key
         scored: false
 
   - id: 1.2
@@ -304,6 +278,7 @@ groups:
       - id: 1.2.1
         text: "Ensure that the --anonymous-auth argument is set to false (Manual)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: manual
         tests:
           test_items:
             - flag: "--anonymous-auth"
@@ -339,6 +314,7 @@ groups:
               compare:
                 op: nothave
                 value: "DenyServiceExternalIPs"
+              set: true  
             - flag: "--enable-admission-plugins"
               set: false
         remediation: |
@@ -371,7 +347,9 @@ groups:
           bin_op: and
           test_items:
             - flag: "--kubelet-client-certificate"
+              set: true
             - flag: "--kubelet-client-key"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set up the TLS connection between the
           apiserver and kubelets. Then, edit API server pod specification file
@@ -387,6 +365,7 @@ groups:
         tests:
           test_items:
             - flag: "--kubelet-certificate-authority"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and setup the TLS connection between
           the apiserver and kubelets. Then, edit the API server pod specification file
@@ -404,6 +383,7 @@ groups:
               compare:
                 op: nothave
                 value: "AlwaysAllow"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --authorization-mode parameter to values other than AlwaysAllow.
@@ -420,6 +400,7 @@ groups:
               compare:
                 op: has
                 value: "Node"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --authorization-mode parameter to a value that includes Node.
@@ -435,6 +416,7 @@ groups:
               compare:
                 op: has
                 value: "RBAC"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --authorization-mode parameter to a value that includes RBAC,
@@ -450,6 +432,7 @@ groups:
               compare:
                 op: has
                 value: "EventRateLimit"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set the desired limits in a configuration file.
           Then, edit the API server pod specification file $apiserverconf
@@ -468,6 +451,7 @@ groups:
               compare:
                 op: nothave
                 value: AlwaysAdmit
+              set: true
             - flag: "--enable-admission-plugins"
               set: false
         remediation: |
@@ -485,6 +469,7 @@ groups:
               compare:
                 op: has
                 value: "AlwaysPullImages"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --enable-admission-plugins parameter to include
@@ -502,10 +487,12 @@ groups:
               compare:
                 op: has
                 value: "SecurityContextDeny"
+              set: true
             - flag: "--enable-admission-plugins"
               compare:
                 op: has
                 value: "PodSecurityPolicy"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --enable-admission-plugins parameter to include
@@ -559,6 +546,7 @@ groups:
               compare:
                 op: has
                 value: "NodeRestriction"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and configure NodeRestriction plug-in on kubelets.
           Then, edit the API server pod specification file $apiserverconf
@@ -577,6 +565,7 @@ groups:
               compare:
                 op: gt
                 value: 0
+              set: true
             - flag: "--secure-port"
               set: false
         remediation: |
@@ -594,6 +583,7 @@ groups:
               compare:
                 op: eq
                 value: false
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the below parameter.
@@ -603,9 +593,11 @@ groups:
       - id: 1.2.19
         text: "Ensure that the --audit-log-path argument is set (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-path"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-path parameter to a suitable path and
@@ -616,12 +608,14 @@ groups:
       - id: 1.2.20
         text: "Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxage"
               compare:
                 op: gte
                 value: 30
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxage parameter to 30
@@ -632,12 +626,14 @@ groups:
       - id: 1.2.21
         text: "Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxbackup"
               compare:
                 op: gte
                 value: 10
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxbackup parameter to 10 or to an appropriate
@@ -648,12 +644,14 @@ groups:
       - id: 1.2.22
         text: "Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxsize"
               compare:
                 op: gte
                 value: 100
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxsize parameter to an appropriate size in MB.
@@ -661,14 +659,19 @@ groups:
         scored: true
 
       - id: 1.2.23
-        text: "Ensure that the --request-timeout argument is set as appropriate (Manual)"
+        text: "Ensure that the --request-timeout argument is set as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        type: manual
+        tests:
+          bin_op: or
+          test_items:
+            - flag: "--request-timeout"
+              set: false
+            - flag: "--request-timeout"
         remediation: |
           Edit the API server pod specification file $apiserverconf
           and set the below parameter as appropriate and if needed.
           For example, --request-timeout=300s
-        scored: false
+        scored: true
 
       - id: 1.2.24
         text: "Ensure that the --service-account-lookup argument is set to true (Automated)"
@@ -696,6 +699,7 @@ groups:
         tests:
           test_items:
             - flag: "--service-account-key-file"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --service-account-key-file parameter
@@ -710,7 +714,9 @@ groups:
           bin_op: and
           test_items:
             - flag: "--etcd-certfile"
+              set: true
             - flag: "--etcd-keyfile"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set up the TLS connection between the apiserver and etcd.
           Then, edit the API server pod specification file $apiserverconf
@@ -726,7 +732,9 @@ groups:
           bin_op: and
           test_items:
             - flag: "--tls-cert-file"
+              set: true
             - flag: "--tls-private-key-file"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set up the TLS connection on the apiserver.
           Then, edit the API server pod specification file $apiserverconf
@@ -741,6 +749,7 @@ groups:
         tests:
           test_items:
             - flag: "--client-ca-file"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set up the TLS connection on the apiserver.
           Then, edit the API server pod specification file $apiserverconf
@@ -754,6 +763,7 @@ groups:
         tests:
           test_items:
             - flag: "--etcd-cafile"
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set up the TLS connection between the apiserver and etcd.
           Then, edit the API server pod specification file $apiserverconf
@@ -776,6 +786,7 @@ groups:
 
       - id: 1.2.31
         text: "Ensure that encryption providers are appropriately configured (Manual)"
+        type: "skip"        
         audit: |
           ENCRYPTION_PROVIDER_CONFIG=$(ps -ef | grep $apiserverbin | grep -- --encryption-provider-config | sed 's%.*encryption-provider-config[= ]\([^ ]*\).*%\1%')
           if test -e $ENCRYPTION_PROVIDER_CONFIG; then grep -A1 'providers:' $ENCRYPTION_PROVIDER_CONFIG | tail -n1 | grep -o "[A-Za-z]*" | sed 's/^/provider=/'; fi
@@ -836,6 +847,7 @@ groups:
               compare:
                 op: eq
                 value: false
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node and set the below parameter.
@@ -851,6 +863,7 @@ groups:
               compare:
                 op: noteq
                 value: false
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node to set the below parameter.
@@ -863,6 +876,7 @@ groups:
         tests:
           test_items:
             - flag: "--service-account-private-key-file"
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node and set the --service-account-private-key-file parameter
@@ -876,6 +890,7 @@ groups:
         tests:
           test_items:
             - flag: "--root-ca-file"
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node and set the --root-ca-file parameter to the certificate bundle file`.
@@ -900,6 +915,7 @@ groups:
           on the control plane node and set the --feature-gates parameter to include RotateKubeletServerCertificate=true.
           --feature-gates=RotateKubeletServerCertificate=true
         scored: true
+        type: skip
 
       - id: 1.3.7
         text: "Ensure that the --bind-address argument is set to 127.0.0.1 (Automated)"
@@ -911,6 +927,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |
@@ -930,6 +947,7 @@ groups:
               compare:
                 op: eq
                 value: false
+              set: true
         remediation: |
           Edit the Scheduler pod specification file $schedulerconf file
           on the control plane node and set the below parameter.
@@ -946,6 +964,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |
