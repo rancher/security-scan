@@ -211,7 +211,7 @@ version_mapping:
   "rke-1.20": "rke-cis-1.20-permissive"
   "v1.18.10+rke2r1": "rke2-cis-1.5-hardened"
   "v1.18.10+rke2r1": "rke2-cis-1.5-permissive"
-  "eks-1.0": "eks-1.0"
+  "eks-1.0.1": "eks-1.0.1"
   "gke-1.0": "gke-1.0"
   "aks-1.0": "aks-1.0"	
   "v1.20.5+rke2r1": "rke2-cis-1.6-hardened"
@@ -312,7 +312,7 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"  
-  "eks-1.0":
+  "eks-1.0.1":
     - "node"
   "gke-1.0":
     - "node"
