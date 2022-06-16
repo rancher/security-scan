@@ -57,14 +57,9 @@ if [[ "$(journalctl -D $JOURNAL_LOG --lines=0 2>&1 | grep -s 'No such file or di
 fi
 mkdir -p "${RESULTS_DIR}"
 
-ETCD_PROC="etcd"
-if [ ! ${IS_RKE2} ]; then
-  ETCD_PROC="/etcd"
-fi
-
 # etcd
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep -f $ETCD_PROC | wc -l)" -gt 1  ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s -u k3s-agent | grep -wv 'No entries' | grep -wv 'Logs begin' | wc -l)" -gt 0 ]]; then
+  if [[ "$(ps -e | grep etcd | wc -l)" -gt 0  ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s -u k3s-agent | grep -wv 'No entries' | grep -wv 'Logs begin' | wc -l)" -gt 0 ]]; then
     echo "etcd: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets etcd \
@@ -79,7 +74,7 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
       --outputfile "${RESULTS_DIR}/etcd.json" 2> "${ERROR_LOG_FILE}"
   fi
 else
-  if [[ "$(pgrep -f $ETCD_PROC | wc -l)" -gt 1 ]]; then
+  if [[ "$(ps -e | grep etcd | wc -l)" -gt 0 ]]; then
     echo "etcd: Using RANCHER_K8S_VERSION=${RANCHER_K8S_VERSION}"
     kube-bench run \
       --targets etcd \
