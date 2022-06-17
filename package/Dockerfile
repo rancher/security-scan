@@ -11,7 +11,7 @@ RUN git clone -b v0.6.8 --depth 1 https://github.com/aquasecurity/kube-bench.git
 
 FROM registry.suse.com/suse/sle15:15.3
 ARG kube_bench_tag=0.6.8
-ARG sonobuoy_version=0.53.2
+ARG sonobuoy_version=0.56.7
 
 RUN zypper --non-interactive update \
     && zypper --non-interactive install \
