@@ -129,9 +129,13 @@ else
 fi
 
 KUBELET_PROC="kubelet"
+kubeletbin=$KUBELET_PROC
 if [ ! ${IS_RKE2} ]; then
   KUBE_APISERVER_PROC="/kubelet"
+  kubeletbin=$KUBE_APISERVER_PROC
 fi
+
+kubeletconf="/node/var/lib/kubelet/config"
 
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
   if [[ "$(pgrep -f ${KUBELET_PROC} | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep 'Running kubelet' | grep -v grep | wc -l)" -gt 0 ]]; then
