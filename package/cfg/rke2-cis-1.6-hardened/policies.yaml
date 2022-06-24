@@ -209,7 +209,7 @@ groups:
           If the CNI plugin in use does not support network policies, consideration should be given to
           making use of a different plugin, or finding an alternate mechanism for restricting traffic
           in the Kubernetes cluster.
-        scored: True
+        scored: true
 
       - id: 5.3.2
         text: "Ensure that all Namespaces have Network Policies defined (Automated)"
