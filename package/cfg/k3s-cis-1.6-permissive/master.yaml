@@ -548,6 +548,7 @@ groups:
       - id: 1.2.16
         text: "Ensure that the admission control plugin PodSecurityPolicy is set (Automated)"
         audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-apiserver' | tail -n1 | grep 'enable-admission-plugins'"
+        type: "skip"
         tests:
           test_items:
             - flag: "--enable-admission-plugins"
@@ -643,6 +644,7 @@ groups:
       - id: 1.2.22
         text: "Ensure that the --audit-log-path argument is set (Automated)"
         audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-apiserver' | tail -n1 | grep 'audit-log-path'"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-path"
@@ -656,6 +658,7 @@ groups:
       - id: 1.2.23
         text: "Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Automated)"
         audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-apiserver' | tail -n1 | grep 'audit-log-maxage'"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxage"
@@ -671,6 +674,7 @@ groups:
       - id: 1.2.24
         text: "Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Automated)"
         audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-apiserver' | tail -n1 | grep 'audit-log-maxbackup'"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxbackup"
@@ -687,6 +691,7 @@ groups:
       - id: 1.2.25
         text: "Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Automated)"
         audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-apiserver' | tail -n1 | grep 'audit-log-maxsize'"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxsize"
