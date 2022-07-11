@@ -28,7 +28,7 @@ handle_error() {
       sleep infinity
   fi
   # Annotate self (pod) to signal "error"
-  if [[ -f "${ERROR_LOG_FILE}" ]]; then
+  if [[ -s "${ERROR_LOG_FILE}" ]]; then
       if ! kubectl -n "${SONOBUOY_NS}" \
         annotate pod "${SONOBUOY_POD_NAME}" \
         ${DONE_ANNOTATION_KEY}="$(cat ${ERROR_LOG_FILE})"
@@ -46,7 +46,7 @@ handle_error() {
   sleep infinity
 }
 
-trap 'handle_error' EXIT
+trap 'handle_error' ERR
 
 echo "Rancher: Running CIS Benchmarks"
 
