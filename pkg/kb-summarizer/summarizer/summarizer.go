@@ -335,13 +335,13 @@ func (s *Summarizer) summarizeForHost(hostname string) error {
 			return fmt.Errorf("error reading file %+s: %v", resultFilePath, err)
 		}
 
-		results := &kb.Controls{}
+		results := &kb.OverallControls{}
 		if err := json.Unmarshal(contents, results); err != nil {
 			return fmt.Errorf("error unmarshalling: %v", err)
 		}
-		logrus.Debugf("results: %+v", results)
+		logrus.Debugf("results: %+v", results.Controls[0])
 
-		s.processOneResultFileForHost(results, hostname)
+		s.processOneResultFileForHost(results.Controls[0], hostname)
 	}
 	return nil
 }
@@ -539,17 +539,17 @@ func getMappedState(state kb.State) State {
 
 func getCheckWrapper(check *kb.Check) *CheckWrapper {
 	return &CheckWrapper{
-		ID:             check.ID,
-		Text:           check.Text,
-		Type:           check.Type,
-		Remediation:    check.Remediation,
-		Scored:         check.Scored,
-		Result:         map[kb.State]map[string]bool{},
-		Audit:          check.Audit,
-		AuditConfig:    check.AuditConfig,
-		TestInfo:       check.TestInfo,
-		Commands:       check.Commands,
-		ConfigCommands: check.ConfigCommands,
+		ID:          check.ID,
+		Text:        check.Text,
+		Type:        check.Type,
+		Remediation: check.Remediation,
+		Scored:      check.Scored,
+		Result:      map[kb.State]map[string]bool{},
+		Audit:       check.Audit,
+		AuditConfig: check.AuditConfig,
+		TestInfo:    check.TestInfo,
+		//Commands:       check.Commands,
+		//ConfigCommands: check.ConfigCommands,
 		ExpectedResult: check.ExpectedResult,
 	}
 }
