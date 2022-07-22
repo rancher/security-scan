@@ -614,13 +614,16 @@ groups:
 
       - id: 1.2.18
         text: "Ensure that the --insecure-port argument is set to 0 (Automated)"
-        audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-apiserver' | tail -n1 | grep 'insecure-port'"
+        audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-apiserver' | tail -n1"
         tests:
+          bin_op: or
           test_items:
             - flag: "--insecure-port"
               compare:
                 op: eq
                 value: 0
+            - flag: "--insecure-port"
+              set: false
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the master node and set the below parameter.
