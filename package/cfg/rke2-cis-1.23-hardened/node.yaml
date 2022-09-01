@@ -473,4 +473,3 @@ groups:
           systemctl daemon-reload
           systemctl restart kubelet.service
         scored: false
-        type: skip
