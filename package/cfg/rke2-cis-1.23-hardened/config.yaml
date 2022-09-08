@@ -52,3 +52,6 @@ master:
   policies:
     components:
       - policies
+    policies:
+      confs:
+        - /etc/rancher/rke2/rke2-pss.yaml
