@@ -45,6 +45,7 @@ COPY package/run.sh \
     package/helper_scripts/check_for_rke2_cni_net_policy_support.sh \
     package/helper_scripts/check_cafile_permissions.sh \
     package/helper_scripts/check_cafile_ownership.sh \
+    package/helper_scripts/check_for_rke2_cluster_psa.sh \
     /usr/bin/
 
 CMD ["run.sh"]
