@@ -134,18 +134,18 @@ groups:
         scored: true
 
       - id: 4.1.9
-        text: "Ensure that the kubelet --config configuration file has permissions set to 600 or more restrictive (Automated)"
+        text: "Ensure that the kubelet --config configuration file has permissions set to 644 or more restrictive (Automated)"
         audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c permissions=%a $kubeletconf; fi'' '
         tests:
           test_items:
-            - flag: "600"
+            - flag: "644"
               set: true
               compare:
                 op: eq
-                value: "600"
+                value: "644"
         remediation: |
           Run the following command (using the config file location identified in the Audit step)
-          chmod 600 $kubeletconf
+          chmod 644 $kubeletconf
         scored: true
 
       - id: 4.1.10
