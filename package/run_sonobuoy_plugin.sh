@@ -47,6 +47,11 @@ echo "Rancher Kubernetes Version: ${RANCHER_K8S_VERSION}"
 
 TAR_FILE_NAME="${TAR_FILE_NAME:-kb}"
 CONFIG_DIR="${CONFIG_DIR:-/etc/kube-bench/cfg}"
+# Handle read-only issue in custom benchmark mounts
+if [[ "$CONFIG_DIR" != "/etc/kube-bench/cfg" ]]; then
+  cp -r "$CONFIG_DIR" /tmp/cfg
+  CONFIG_DIR=/tmp/cfg
+fi
 RESULTS_DIR="${RESULTS_DIR:-/tmp/results}"
 ERROR_LOG_FILE="${RESULTS_DIR}/error.log"
 LOG_DIR="${RESULTS_DIR}/logs"
