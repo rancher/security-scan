@@ -138,14 +138,14 @@ groups:
         audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c permissions=%a $kubeletconf; fi'' '
         tests:
           test_items:
-            - flag: "644"
+            - flag: "600"
               set: true
               compare:
                 op: eq
-                value: "644"
+                value: "600"
         remediation: |
           Run the following command (using the config file location identified in the Audit step)
-          chmod 644 $kubeletconf
+          chmod 600 $kubeletconf
         scored: true
 
       - id: 4.1.10
