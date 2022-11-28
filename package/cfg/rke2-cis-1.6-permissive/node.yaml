@@ -92,7 +92,11 @@ groups:
         audit: '/bin/sh -c ''if test -e $kubeletkubeconfig; then stat -c %U:%G $kubeletkubeconfig; fi'' '
         tests:
           test_items:
-            - flag: root:root
+            - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
