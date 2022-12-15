@@ -193,12 +193,18 @@ groups:
         scored: true
 
       - id: 2.7
-        text: "Ensure that a unique Certificate Authority is used for etcd (Manual)"
+        text: "Ensure that a unique Certificate Authority is used for etcd (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit_config: "cat /var/lib/rancher/rke2/server/db/etcd/config"
         tests:
+          bin_op: or
           test_items:
             - flag: "--trusted-ca-file"
               env: "ETCD_TRUSTED_CA_FILE"
+            - path: "{.peer-transport-security.trusted-ca-file}"
+              compare:
+                op: eq
+                value: "/var/lib/rancher/rke2/server/tls/etcd/peer-ca.crt"
               set: true
         remediation: |
           [Manual test]

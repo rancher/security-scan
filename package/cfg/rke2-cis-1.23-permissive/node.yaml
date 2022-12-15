@@ -350,6 +350,7 @@ groups:
           systemctl daemon-reload
           systemctl restart kubelet.service
         scored: false
+        type: skip
 
       - id: 4.2.9
         text: "Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture (Manual)"
