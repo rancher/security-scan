@@ -14,5 +14,10 @@ ENV DAPPER_DOCKER_SOCKET true
 ENV HOME ${DAPPER_SOURCE}
 WORKDIR ${DAPPER_SOURCE}
 
+# Cache go modules
+COPY go.mod go.mod
+COPY go.sum go.sum
+RUN go mod download
+
 ENTRYPOINT ["./scripts/entry"]
 CMD ["ci"]
