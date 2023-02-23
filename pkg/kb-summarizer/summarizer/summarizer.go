@@ -377,7 +377,7 @@ func (s *Summarizer) loadVersionMapping() error {
 	}
 
 	kubeToBenchmarkMap := v.GetStringMapString(VersionMappingKey)
-	if kubeToBenchmarkMap == nil || (len(kubeToBenchmarkMap) == 0) {
+	if len(kubeToBenchmarkMap) == 0 {
 		return fmt.Errorf("config file is missing '%v' section", VersionMappingKey)
 	}
 	logrus.Debugf("%v: %v", VersionMappingKey, kubeToBenchmarkMap)
