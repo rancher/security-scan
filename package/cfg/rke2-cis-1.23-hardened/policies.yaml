@@ -93,7 +93,7 @@ groups:
 
       - id: 5.2.2
         text: "Minimize the admission of privileged containers (Manual)"
-        audit: kubectl get psp global-restricted-psp && kubectl get psp global-restricted-psp -o json | jq -r ".spec.runAsUser.rule" || kubectl get psp restricted-noroot-psp -o json | jq -r ".spec.runAsUser.rule"
+        audit: kubectl get psp global-restricted-psp && kubectl get psp global-restricted-psp -o json | jq -r ".spec.runAsUser.rule" || kubectl get psp restricted-noroot-psp && kubectl get psp restricted-noroot-psp -o json | jq -r ".spec.runAsUser.rule"
         tests:
            test_items:
              - flag: "MustRunAsNonRoot"
@@ -183,7 +183,7 @@ groups:
 
       - id: 5.2.8
         text: "Minimize the admission of containers with the NET_RAW capability (Automated)"
-        audit: "kubectl get psp global-restricted-psp -o json | jq -r .spec.requiredDropCapabilities[]"
+        audit: "kubectl get psp global-restricted-psp && kubectl get psp global-restricted-psp -o json | jq -r .spec.requiredDropCapabilities[] || kubectl get psp restricted-noroot-psp && kubectl get psp restricted-noroot-psp -o json | jq -r .spec.requiredDropCapabilities[]"
         tests:
           test_items:
             - flag: "ALL"
