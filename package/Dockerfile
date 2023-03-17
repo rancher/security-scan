@@ -1,4 +1,4 @@
-FROM registry.suse.com/suse/sle15:15.3 as intermediate
+FROM registry.suse.com/bci/bci-base:15.4 as intermediate
 
 #Label the image for cleaning after build process
 LABEL stage=intermediate
@@ -9,9 +9,11 @@ RUN zypper --non-interactive update \
 
 RUN git clone -b v0.6.8 --depth 1 https://github.com/aquasecurity/kube-bench.git
 
-FROM registry.suse.com/suse/sle15:15.3
+FROM registry.suse.com/bci/bci-base:15.4
+ARG kubectl_version=1.24.10
 ARG kube_bench_tag=0.6.8
 ARG sonobuoy_version=0.56.7
+ARG ARCH=amd64
 
 RUN zypper --non-interactive update \
     && zypper --non-interactive install \
@@ -20,12 +22,14 @@ RUN zypper --non-interactive update \
     vim \
     systemd \
     tar \
-    awk
-RUN curl -sLf https://storage.googleapis.com/kubernetes-release/release/v1.13.5/bin/linux/amd64/kubectl > /usr/local/bin/kubectl-1.13 \
-    && ln -sv /usr/local/bin/kubectl-1.13 /usr/local/bin/kubectl \
+    awk \
+    gzip
+
+RUN curl -sLf https://storage.googleapis.com/kubernetes-release/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl > /usr/local/bin/kubectl-1.24 \
+    && ln -sv /usr/local/bin/kubectl-1.24 /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl*
-RUN curl -sLf https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_amd64.tar.gz | tar -xvzf - -C /usr/bin sonobuoy
-RUN curl -sLf https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_tag}/kube-bench_${kube_bench_tag}_linux_amd64.tar.gz | tar -xvzf - -C /usr/bin
+RUN curl -sLf https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_${ARCH}.tar.gz | tar -xvzf - -C /usr/bin sonobuoy
+RUN curl -sLf https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_tag}/kube-bench_${kube_bench_tag}_linux_${ARCH}.tar.gz | tar -xvzf - -C /usr/bin
 #RUN curl -sLf https://github.com/leodotcloud/kube-bench/releases/download/v${kube_bench_tag}/kube-bench.tar.gz | tar -xvzf - -C /usr/bin
 
 COPY --from=intermediate /kube-bench/cfg /etc/kube-bench/cfg/
