@@ -12,22 +12,20 @@ steps:
   commands:
   - export REPO=${DRONE_REPO_NAMESPACE}
   - dapper ci
+  - cp bin/kb-summarizer dist/kb-summarizer-${DRONE_STAGE_ARCH}
   volumes:
   - name: docker
     path: /var/run/docker.sock
 
 - name: github_binary_release
-  image: ibuildthecloud/github-release:v0.0.1
+  image: plugins/github-release
   settings:
     api_key:
       from_secret: github_token
-    prerelease: true
     checksum:
     - sha256
-    checksum_file: CHECKSUMsum-amd64.txt
-    checksum_flatten: true
     files:
-    - "dist/artifacts/*"
+    - "dist/kb-summarizer*"
   when:
     instance:
     - drone-publish.rancher.io
@@ -75,22 +73,20 @@ steps:
   commands:
   - export REPO=${DRONE_REPO_NAMESPACE}
   - dapper ci
+  - cp bin/kb-summarizer dist/kb-summarizer-${DRONE_STAGE_ARCH}
   volumes:
   - name: docker
     path: /var/run/docker.sock
 
 - name: github_binary_release
-  image: ibuildthecloud/github-release:v0.0.1
+  image: plugins/github-release
   settings:
     api_key:
       from_secret: github_token
-    prerelease: true
     checksum:
     - sha256
-    checksum_file: CHECKSUMsum-arm64.txt
-    checksum_flatten: true
     files:
-    - "dist/artifacts/*"
+    - "dist/kb-summarizer*"
   when:
     instance:
     - drone-publish.rancher.io
