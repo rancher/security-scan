@@ -39,8 +39,8 @@ dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/aquasecurity/kube-bench v0.6.11 h1:utMonriP6NPudi5IR47UXXoj+035ytSL0ANN01fL5iE=
-github.com/aquasecurity/kube-bench v0.6.11/go.mod h1:ZtqJNhiir54cVmVo8+XXW2IibnwCDPxcL+/BiQ2Rta0=
+github.com/aquasecurity/kube-bench v0.6.12 h1:N8VA4JUAdBQJ9X+zkj+4TuMs/JCVxguQRila2yaBuH8=
+github.com/aquasecurity/kube-bench v0.6.12/go.mod h1:ZtqJNhiir54cVmVo8+XXW2IibnwCDPxcL+/BiQ2Rta0=
 github.com/aws/aws-sdk-go-v2 v1.17.5 h1:TzCUW1Nq4H8Xscph5M/skINUitxM5UBAyvm2s7XBzL4=
 github.com/aws/aws-sdk-go-v2 v1.17.5/go.mod h1:uzbQtefpm44goOPmdKyAlXSNcwlRgF3ePWVW6EtJvvw=
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.29/go.mod h1:Dip3sIGv485+xerzVv24emnjX5Sg88utCL8fwGmCeWg=

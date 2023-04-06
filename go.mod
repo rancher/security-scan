@@ -3,7 +3,7 @@ module github.com/rancher/security-scan
 go 1.19
 
 require (
-	github.com/aquasecurity/kube-bench v0.6.11
+	github.com/aquasecurity/kube-bench v0.6.12
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.15.0
 	github.com/urfave/cli v1.22.12

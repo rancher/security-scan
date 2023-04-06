@@ -1,4 +1,4 @@
-# github.com/aquasecurity/kube-bench v0.6.11
+# github.com/aquasecurity/kube-bench v0.6.12
 ## explicit; go 1.19
 github.com/aquasecurity/kube-bench/check
 # github.com/aws/aws-sdk-go-v2 v1.17.5
