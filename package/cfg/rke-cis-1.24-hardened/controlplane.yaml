@@ -1,6 +1,6 @@
 ---
 controls:
-version: "cis-1.24"
+version: "1.24"
 id: 3
 text: "Control Plane Configuration"
 type: "controlplane"
@@ -20,7 +20,7 @@ groups:
     text: "Logging"
     checks:
       - id: 3.2.1
-        text: "Ensure that a minimal audit policy is created (Manual)"
+        text: "Ensure that a minimal audit policy is created (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           test_items:
@@ -28,7 +28,7 @@ groups:
               set: true
         remediation: |
           Create an audit policy file for your cluster.
-        scored: false
+        scored: true
 
       - id: 3.2.2
         text: "Ensure that the audit policy covers key security concerns (Manual)"
