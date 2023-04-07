@@ -1,6 +1,6 @@
 ---
 controls:
-version: "cis-1.25"
+version: 1.24
 id: 5
 text: "Kubernetes Policies"
 type: "policies"
@@ -42,14 +42,21 @@ groups:
         scored: false
 
       - id: 5.1.5
-        text: "Ensure that default service accounts are not actively used. (Manual)"
-        type: "manual"
+        text: "Ensure that default service accounts are not actively used. (Automated)"
+        audit: check_for_default_sa.sh
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Create explicit service accounts wherever a Kubernetes workload requires specific access
           to the Kubernetes API server.
           Modify the configuration of each default service account to include this value
           automountServiceAccountToken: false
-        scored: false
+        scored: true
 
       - id: 5.1.6
         text: "Ensure that Service Account Tokens are only mounted where necessary (Manual)"
@@ -85,24 +92,45 @@ groups:
         scored: false
 
       - id: 5.2.2
-        text: "Minimize the admission of privileged containers (Manual)"
-        type: "manual"
+        text: "Minimize the admission of privileged containers (Automated)"
+        audit: kubectl get psp global-restricted-psp && kubectl get psp global-restricted-psp -o json | jq -r ".spec.runAsUser.rule" || kubectl get psp restricted-noroot-psp && kubectl get psp restricted-noroot-psp -o json | jq -r ".spec.runAsUser.rule"
+        tests:
+           test_items:
+             - flag: "MustRunAsNonRoot"
+               compare:
+                 op: eq
+                 value: "MustRunAsNonRoot"
+               set: true
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of privileged containers.
-        scored: false
+        scored: true
 
       - id: 5.2.3
         text: "Minimize the admission of containers wishing to share the host process ID namespace (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostPID == null) or (.spec.hostPID == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostPID` containers.
-        scored: false
+        scored: true
 
       - id: 5.2.4
         text: "Minimize the admission of containers wishing to share the host IPC namespace (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostIPC == null) or (.spec.hostIPC == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostIPC` containers.
@@ -110,35 +138,63 @@ groups:
 
       - id: 5.2.5
         text: "Minimize the admission of containers wishing to share the host network namespace (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.hostNetwork == null) or (.spec.hostNetwork == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostNetwork` containers.
-        scored: false
+        scored: true
 
       - id: 5.2.6
         text: "Minimize the admission of containers with allowPrivilegeEscalation (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.allowPrivilegeEscalation == null) or (.spec.allowPrivilegeEscalation == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of containers with `.spec.allowPrivilegeEscalation` set to `true`.
-        scored: false
+        scored: true
 
       - id: 5.2.7
         text: "Minimize the admission of root containers (Automated)"
-        type: "manual"
+        audit: "kubectl get psp -o json | jq .items[] | jq -r 'select((.spec.allowPrivilegeEscalation == null) or (.spec.allowPrivilegeEscalation == false))' | jq .metadata.name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           Create a policy for each namespace in the cluster, ensuring that either `MustRunAsNonRoot`
           or `MustRunAs` with the range of UIDs not including 0, is set.
-        scored: false
+        scored: true
 
       - id: 5.2.8
         text: "Minimize the admission of containers with the NET_RAW capability (Automated)"
-        type: "manual"
+        audit: "kubectl get psp global-restricted-psp && kubectl get psp global-restricted-psp -o json | jq -r .spec.requiredDropCapabilities[] || kubectl get psp restricted-noroot-psp && kubectl get psp restricted-noroot-psp -o json | jq -r .spec.requiredDropCapabilities[]"
+        tests:
+          test_items:
+            - flag: "ALL"
+              compare:
+                op: eq
+                value: "ALL"
+              set: true
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of containers with the `NET_RAW` capability.
-        scored: false
+        scored: true
 
       - id: 5.2.9
         text: "Minimize the admission of containers with added capabilities (Automated)"
@@ -185,17 +241,31 @@ groups:
     text: "Network Policies and CNI"
     checks:
       - id: 5.3.1
-        text: "Ensure that the CNI in use supports NetworkPolicies (Manual)"
-        type: "manual"
+        text: "Ensure that the CNI in use supports Network Policies (Automated)"
+        audit: "kubectl get pods --all-namespaces --selector='k8s-app in (calico-node, canal, cilium)' -o name | wc -l | xargs -I {} echo '--count={}'"
+        tests:
+          test_items:
+            - flag: "count"
+              compare:
+                op: gt
+                value: "0"
+              set: true
         remediation: |
           If the CNI plugin in use does not support network policies, consideration should be given to
           making use of a different plugin, or finding an alternate mechanism for restricting traffic
           in the Kubernetes cluster.
-        scored: false
+        scored: True
 
       - id: 5.3.2
-        text: "Ensure that all Namespaces have NetworkPolicies defined (Manual)"
-        type: "manual"
+        text: "Ensure that all Namespaces have Network Policies defined (Automated)"
+        audit: "check_for_rke2_network_policies.sh"
+        tests:
+          test_items:
+            - flag: "true"
+              compare:
+                op: eq
+                value: "true"
+              set: true
         remediation: |
           Follow the documentation and create NetworkPolicy objects as you need them.
         scored: false

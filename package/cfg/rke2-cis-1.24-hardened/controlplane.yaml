@@ -1,6 +1,6 @@
 ---
 controls:
-version: "cis-1.24"
+version: 1.24
 id: 3
 text: "Control Plane Configuration"
 type: "controlplane"
@@ -20,15 +20,18 @@ groups:
     text: "Logging"
     checks:
       - id: 3.2.1
-        text: "Ensure that a minimal audit policy is created (Manual)"
-        audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        text: "Ensure that a minimal audit policy is created (Automated)"
+        audit: "/bin/ps -ef | grep kube-apiserver | grep -v grep | grep -o audit-policy-file"
         tests:
           test_items:
-            - flag: "--audit-policy-file"
+            - flag: "audit-policy-file"
+              compare:
+                op: eq
+                value: "audit-policy-file"
               set: true
         remediation: |
           Create an audit policy file for your cluster.
-        scored: false
+        scored: true
 
       - id: 3.2.2
         text: "Ensure that the audit policy covers key security concerns (Manual)"
