@@ -1,10 +1,76 @@
 ---
 controls:
-version: "cis-1.24"
+version: 1.24
 id: 2
 text: "Etcd Node Configuration"
 type: "etcd"
 groups:
+  - id: 1.1
+    text: "Master Node Configuration Files"
+    checks:
+      - id: 1.1.7
+        text: "Ensure that the etcd pod specification file permissions are set to 644 or more restrictive (Automated)"
+        audit: "/bin/sh -c 'if test -e $etcdconf; then find $etcdconf -name '*etcd*' | xargs stat -c permissions=%a; fi'"
+        use_multiple_values: true
+        tests:
+          test_items:
+            - flag: "permissions"
+              compare:
+                op: bitmask
+                value: "644"
+        remediation: |
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example,
+          chmod 644 $etcdconf
+        scored: true
+
+      - id: 1.1.8
+        text: "Ensure that the etcd pod specification file ownership is set to root:root (Automated)"
+        audit: "/bin/sh -c 'if test -e $etcdconf; then stat -c %U:%G $etcdconf; fi'"
+        tests:
+          test_items:
+            - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example,
+          chown root:root $etcdconf
+        scored: true
+
+      - id: 1.1.11
+        text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Automated)"
+        audit: "stat -c permissions=%a /var/lib/rancher/rke2/server/db/etcd"
+        tests:
+          test_items:
+            - flag: "permissions"
+              compare:
+                op: bitmask
+                value: "700"
+              set: true
+        remediation: |
+          On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
+          from the command 'ps -ef | grep etcd'.
+          Run the below command (based on the etcd data directory found above). For example,
+          chmod 700 /var/lib/etcd
+        scored: true
+      
+      - id: 1.1.12
+        text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Automated)"
+        type: "skip"
+        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/db/etcd"
+        tests:
+          test_items:
+            - flag: "etcd:etcd"
+        remediation: |
+          On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
+          from the command 'ps -ef | grep etcd'.
+          Run the below command (based on the etcd data directory found above).
+          For example, chown etcd:etcd /var/lib/etcd
+        scored: true        
+  
   - id: 2
     text: "Etcd Node Configuration"
     checks:
@@ -25,6 +91,7 @@ groups:
           --cert-file=</path/to/ca-file>
           --key-file=</path/to/key-file>
         scored: true
+        type: "skip"
 
       - id: 2.2
         text: "Ensure that the --client-cert-auth argument is set to true (Automated)"
@@ -36,6 +103,7 @@ groups:
               compare:
                 op: eq
                 value: true
+        type: "skip"
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and set the below parameter.
@@ -71,8 +139,10 @@ groups:
           test_items:
             - flag: "--peer-cert-file"
               env: "ETCD_PEER_CERT_FILE"
+              set: true
             - flag: "--peer-key-file"
               env: "ETCD_PEER_KEY_FILE"
+              set: true
         remediation: |
           Follow the etcd service documentation and configure peer TLS encryption as appropriate
           for your etcd cluster.
@@ -81,6 +151,7 @@ groups:
           --peer-client-file=</path/to/peer-cert-file>
           --peer-key-file=</path/to/peer-key-file>
         scored: true
+        type: "skip"
 
       - id: 2.5
         text: "Ensure that the --peer-client-cert-auth argument is set to true (Automated)"
@@ -92,11 +163,13 @@ groups:
               compare:
                 op: eq
                 value: true
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and set the below parameter.
           --peer-client-cert-auth=true
         scored: true
+        type: "skip"
 
       - id: 2.6
         text: "Ensure that the --peer-auto-tls argument is not set to true (Automated)"
@@ -112,6 +185,7 @@ groups:
               compare:
                 op: eq
                 value: false
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and either remove the --peer-auto-tls parameter or set it to false.
@@ -119,12 +193,19 @@ groups:
         scored: true
 
       - id: 2.7
-        text: "Ensure that a unique Certificate Authority is used for etcd (Manual)"
+        text: "Ensure that a unique Certificate Authority is used for etcd (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
+        audit_config: "cat /var/lib/rancher/rke2/server/db/etcd/config"
         tests:
+          bin_op: or
           test_items:
             - flag: "--trusted-ca-file"
               env: "ETCD_TRUSTED_CA_FILE"
+            - path: "{.peer-transport-security.trusted-ca-file}"
+              compare:
+                op: eq
+                value: "/var/lib/rancher/rke2/server/tls/etcd/peer-ca.crt"
+              set: true
         remediation: |
           [Manual test]
           Follow the etcd documentation and create a dedicated certificate authority setup for the

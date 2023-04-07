@@ -1,6 +1,6 @@
 ---
 controls:
-version: "cis-1.25"
+version: 1.24
 id: 5
 text: "Kubernetes Policies"
 type: "policies"
@@ -93,7 +93,7 @@ groups:
         scored: false
 
       - id: 5.2.3
-        text: "Minimize the admission of containers wishing to share the host process ID namespace (Automated)"
+        text: "Minimize the admission of containers wishing to share the host process ID namespace (Manual)"
         type: "manual"
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
@@ -101,7 +101,7 @@ groups:
         scored: false
 
       - id: 5.2.4
-        text: "Minimize the admission of containers wishing to share the host IPC namespace (Automated)"
+        text: "Minimize the admission of containers wishing to share the host IPC namespace (Manual)"
         type: "manual"
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
@@ -109,7 +109,7 @@ groups:
         scored: false
 
       - id: 5.2.5
-        text: "Minimize the admission of containers wishing to share the host network namespace (Automated)"
+        text: "Minimize the admission of containers wishing to share the host network namespace (Manual)"
         type: "manual"
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
@@ -117,7 +117,7 @@ groups:
         scored: false
 
       - id: 5.2.6
-        text: "Minimize the admission of containers with allowPrivilegeEscalation (Automated)"
+        text: "Minimize the admission of containers with allowPrivilegeEscalation (Manual)"
         type: "manual"
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
@@ -125,7 +125,7 @@ groups:
         scored: false
 
       - id: 5.2.7
-        text: "Minimize the admission of root containers (Automated)"
+        text: "Minimize the admission of root containers (Manual)"
         type: "manual"
         remediation: |
           Create a policy for each namespace in the cluster, ensuring that either `MustRunAsNonRoot`
@@ -133,7 +133,7 @@ groups:
         scored: false
 
       - id: 5.2.8
-        text: "Minimize the admission of containers with the NET_RAW capability (Automated)"
+        text: "Minimize the admission of containers with the NET_RAW capability (Manual)"
         type: "manual"
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
