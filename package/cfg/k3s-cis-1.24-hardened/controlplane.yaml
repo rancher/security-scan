@@ -1,6 +1,6 @@
 ---
 controls:
-version: "cis-1.24"
+version: 1.24
 id: 3
 text: "Control Plane Configuration"
 type: "controlplane"
@@ -21,7 +21,8 @@ groups:
     checks:
       - id: 3.2.1
         text: "Ensure that a minimal audit policy is created (Manual)"
-        audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-apiserver' | tail -n1 | grep 'audit-policy-file'"
+        type: "manual"
         tests:
           test_items:
             - flag: "--audit-policy-file"
