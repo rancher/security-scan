@@ -3,6 +3,7 @@ FROM registry.suse.com/bci/bci-base:15.5
 ARG kube_bench_version=0.6.12
 ARG sonobuoy_version=0.56.16
 ARG kubectl_version=1.26.3
+ARG ARCH
 
 RUN zypper --non-interactive update \
     && zypper --non-interactive install \
@@ -13,11 +14,11 @@ RUN zypper --non-interactive update \
     tar \
     awk \
     gzip
-RUN curl -sLf "https://storage.googleapis.com/kubernetes-release/release/v${kubectl_version}/bin/linux/amd64/kubectl" > "/usr/local/bin/kubectl-${kubectl_version}" \
-    && ln -sv "/usr/local/bin/kubectl-${kubectl_version}" /usr/local/bin/kubectl \
-    && chmod +x /usr/local/bin/kubectl*
-RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_amd64.tar.gz" | tar -xvzf - -C /usr/bin sonobuoy
-RUN curl -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_version}/kube-bench_${kube_bench_version}_linux_amd64.tar.gz" | tar -xvzf - -C /usr/bin
+RUN curl -Lo ./kubectl "https://storage.googleapis.com/kubernetes-release/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl" && \
+    chmod +x ./kubectl && \
+    mv ./kubectl /usr/local/bin/
+RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /usr/bin sonobuoy
+RUN curl -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_version}/kube-bench_${kube_bench_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /usr/bin
 
 # Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/.
 RUN curl -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/v${kube_bench_version}.tar.gz" | \

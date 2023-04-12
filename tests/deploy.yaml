@@ -1,0 +1,365 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cis-operator-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cis-serviceaccount
+  namespace: cis-operator-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: rancher-cis-benchmark
+  name: cis-scan-ns
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - nodes
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+# Permissions from here onwards are not part of the original cis-scan-ns
+# and were given to ensure the test can work.
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  - configmaps
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+  - patch
+  - delete
+  - create
+- apiGroups:
+  - "apps"
+  resources:
+  - daemonsets
+  verbs:
+  - get
+  - list
+  - watch
+  - patch
+  - delete
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cis-scan-ns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cis-scan-ns
+subjects:
+- kind: ServiceAccount
+  name: cis-serviceaccount
+  namespace: cis-operator-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cis-s-config-cm-scan-vk6d4
+  namespace: cis-operator-system
+data:
+  config.json: |
+    {
+        "Description": "kube-bench plugin for CIS benchmarks",
+        "Filters": {
+            "LabelSelector": "",
+            "Namespaces": "[^\\w-.]+"
+        },
+        "PluginNamespace": "cis-operator-system",
+        "Plugins": [
+            {
+                "name": "rancher-kube-bench"
+            }
+        ],
+        "PluginSearchPath": [
+          "/plugins.d"
+        ],
+        "Resources": [],
+        "ResultsDir": "/tmp/sonobuoy",
+        "Server": {
+            "advertiseaddress": "service-rancher-cis-benchmark",
+            "bindaddress": "0.0.0.0",
+            "bindport": 443,
+            "timeoutseconds": 5400
+        },
+        "Namespace": "cis-operator-system",
+        "WorkerImage": "${SONOBUOY_IMAGE}",
+        "Version": "v0.56.7"
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-rancher-cis-benchmark
+  namespace: cis-operator-system
+spec:
+  ports:
+  - name: http
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:    
+    run: sonobuoy-master
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cis-s-plugins-cm-scan-vk6d4
+  namespace: cis-operator-system
+data:
+  rancher-kube-bench.yaml: |
+    podSpec:
+      containers: []
+      dnsPolicy: ClusterFirstWithHostNet
+      hostIPC: true
+      hostNetwork: true
+      hostPID: true
+      serviceAccountName: cis-serviceaccount
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/controlplane
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      - effect: NoExecute
+        key: node-role.kubernetes.io/etcd
+        operator: Exists
+      - effect: NoExecute
+        key: CriticalAddonsOnly
+        operator: Exists
+      volumes:
+      - hostPath:
+          path: /
+        name: root
+      - hostPath:
+          path: /etc/passwd
+        name: etc-passwd
+      - hostPath:
+          path: /etc/group
+        name: etc-group
+      - hostPath:
+          path: /var/lib/rancher
+        name: rke2-root
+      - hostPath:
+          path: /etc/rancher
+        name: rke2-root-config
+      - hostPath:
+          path: /etc/cni/net.d
+        name: rke2-cni
+      - hostPath:
+          path: /var/log
+        name: var-log
+      - hostPath:
+          path: /run/log
+        name: run-log
+    sonobuoy-config:
+      driver: DaemonSet
+      plugin-name: rancher-kube-bench
+      result-type: rancher-kube-bench
+      result-format: raw
+    spec:
+      name: rancher-kube-bench
+      image: $IMAGE
+      command: ["/bin/bash", "-c", "run_sonobuoy_plugin.sh && sleep 3600"]
+      env:
+      - name: SONOBUOY_NS
+        value: cis-operator-system
+      - name: NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
+      - name: RESULTS_DIR
+        value: /tmp/results
+      - name: CHROOT_DIR
+        value: /node
+      - name: OVERRIDE_BENCHMARK_VERSION
+        value: cis-1.23
+      imagePullPolicy: Always
+      securityContext:
+        privileged: true
+      volumeMounts:
+      - mountPath: /tmp/results
+        name: results
+        readOnly: false
+      - mountPath: /node
+        name: root
+        readOnly: true
+      - mountPath: /etc/passwd
+        name: etc-passwd
+        readOnly: true
+      - mountPath: /etc/group
+        name: etc-group
+        readOnly: true
+      - mountPath: /var/lib/rancher
+        name: rke2-root
+        readOnly: true
+      - mountPath: /etc/rancher
+        name: rke2-root-config
+        readOnly: true
+      - mountPath: /etc/cni/net.d
+        name: rke2-cni
+        readOnly: true
+      - mountPath: /var/log/
+        name: var-log
+        readOnly: true
+      - mountPath: /run/log/
+        name: run-log
+        readOnly: true
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app.kubernetes.io/instance: security-scan-runner-scan-6fjs5
+    app.kubernetes.io/name: rancher-cis-benchmark
+    cis.cattle.io/clusterscanprofile: cis-1.23-profile
+    cis.cattle.io/controller: cis-operator
+    cis.cattle.io/scan: scan-6fjs5
+    controller-uid: d1c0f186-f321-481f-8cdb-8c052e5cd738
+    job-name: security-scan-runner-scan-6fjs5
+    run: sonobuoy-master
+  annotations:
+    sonobuoy.hept.io/status: "{}"
+  name: security-scan-runner-scan-test
+  namespace: cis-operator-system
+spec:
+  containers:
+    - env:
+        - name: OVERRIDE_BENCHMARK_VERSION
+          value: rke2-cis-1.23-hardened
+        - name: SONOBUOY_NS
+          value: cis-operator-system
+        - name: SONOBUOY_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: SONOBUOY_ADVERTISE_IP
+          value: cisscan-rancher-cis-benchmark
+        - name: OUTPUT_CONFIGMAPNAME
+          value: cisscan-output-for-scan-vk6d4
+      image: $IMAGE
+      imagePullPolicy: Never
+      command: ["bash"]
+      args: ["-c", "while true; do echo hello; sleep 10;done"]
+      name: rancher-cis-benchmark
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+        - mountPath: /etc/sonobuoy
+          name: s-config-volume
+        - mountPath: /plugins.d
+          name: s-plugins-volume
+        - mountPath: /tmp/sonobuoy
+          name: output-volume
+        - mountPath: /var/lib/rancher
+          name: rke2-root
+        - mountPath: /etc/rancher
+          name: rke2-root-config
+        - mountPath: /etc/cni/net.d
+          name: rke2-cni
+        - mountPath: /etc/passwd
+          name: etc-passwd
+        - mountPath: /etc/group
+          name: etc-group
+        - mountPath: /var/log/
+          name: var-log
+        - mountPath: /run/log/
+          name: run-log
+        - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          name: kube-api-access-6k6bd
+          readOnly: true
+  dnsPolicy: ClusterFirst
+  hostIPC: true
+  hostPID: true
+  nodeSelector:
+    kubernetes.io/os: linux
+  serviceAccount: cis-serviceaccount
+  serviceAccountName: cis-serviceaccount
+  volumes:
+    - configMap:
+        defaultMode: 420
+        name: cis-s-config-cm-scan-vk6d4
+      name: s-config-volume
+    - configMap:
+        defaultMode: 420
+        name: cis-s-plugins-cm-scan-vk6d4
+      name: s-plugins-volume
+    - emptyDir: {}
+      name: output-volume
+    - hostPath:
+        path: /var/lib/rancher
+        type: ''
+      name: rke2-root
+    - hostPath:
+        path: /etc/rancher
+        type: ''
+      name: rke2-root-config
+    - hostPath:
+        path: /etc/cni/net.d
+        type: ''
+      name: rke2-cni
+    - hostPath:
+        path: /etc/passwd
+        type: ''
+      name: etc-passwd
+    - hostPath:
+        path: /etc/group
+        type: ''
+      name: etc-group
+    - hostPath:
+        path: /var/log
+        type: ''
+      name: var-log
+    - hostPath:
+        path: /run/log
+        type: ''
+      name: run-log
+    - name: kube-api-access-6k6bd
+      projected:
+        defaultMode: 420
+        sources:
+          - serviceAccountToken:
+              expirationSeconds: 3607
+              path: token
+          - configMap:
+              items:
+                - key: ca.crt
+                  path: ca.crt
+              name: kube-root-ca.crt
+          - downwardAPI:
+              items:
+                - fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.namespace
+                  path: namespace
+---

@@ -1,11 +1,21 @@
 FROM registry.suse.com/bci/golang:1.19
 
+ARG KIND_VERSION=0.17.0
+ARG KUBERNETES_VERSION=1.26.0
 ARG DAPPER_HOST_ARCH
 ENV ARCH $DAPPER_HOST_ARCH
 
-RUN zypper --non-interactive install git docker vim less curl wget
+RUN zypper --non-interactive install git docker vim less curl wget gettext awk
 RUN go install golang.org/x/lint/golint@latest
 RUN go install golang.org/x/tools/cmd/goimports@latest
+
+RUN curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-${ARCH}" && \
+    chmod +x ./kind && \
+    mv ./kind /usr/local/bin/
+
+RUN curl -Lo ./kubectl "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/${ARCH}/kubectl" && \
+    chmod +x ./kubectl && \
+    mv ./kubectl /usr/local/bin/
 
 ENV DAPPER_ENV REPO TAG DRONE_TAG
 ENV DAPPER_SOURCE /go/src/github.com/rancher/security-scan/
