@@ -589,11 +589,11 @@ func (s *Summarizer) getMissingNodesMapOfCheckWrapper(check *CheckWrapper, nodes
 }
 
 // Logic:
-// - If a check has a non-PASS state on any host, the check is considered mixed.
-//   Nodes will list the ones where the check has failed.
-// - If a check has all pass, then nodes is empty. All nodes in that host type have passed.
-// - If a check has all fail, then nodes is empty. All nodes in that host type have failed.
-// - If a check is skipped, then nodes is empty.
+//   - If a check has a non-PASS state on any host, the check is considered mixed.
+//     Nodes will list the ones where the check has failed.
+//   - If a check has all pass, then nodes is empty. All nodes in that host type have passed.
+//   - If a check has all fail, then nodes is empty. All nodes in that host type have failed.
+//   - If a check is skipped, then nodes is empty.
 func (s *Summarizer) runFinalPassOnCheckWrapper(cw *CheckWrapper) {
 	//copy over the actual result info of the test after running the scan
 	s.copyDataFromResults(cw)

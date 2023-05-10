@@ -1,10 +1,10 @@
-FROM golang:1.17-alpine
+FROM registry.suse.com/bci/golang:1.19
 
 ARG DAPPER_HOST_ARCH
 ENV ARCH $DAPPER_HOST_ARCH
 
-RUN apk -U add bash git gcc musl-dev docker vim less file curl wget ca-certificates
-RUN go get -u golang.org/x/lint/golint
+RUN zypper --non-interactive install git docker vim less curl wget
+RUN go install golang.org/x/lint/golint@latest
 RUN go install golang.org/x/tools/cmd/goimports@latest
 
 ENV DAPPER_ENV REPO TAG DRONE_TAG
@@ -13,6 +13,11 @@ ENV DAPPER_OUTPUT ./bin ./dist
 ENV DAPPER_DOCKER_SOCKET true
 ENV HOME ${DAPPER_SOURCE}
 WORKDIR ${DAPPER_SOURCE}
+
+# Cache go modules
+COPY go.mod go.mod
+COPY go.sum go.sum
+RUN go mod download
 
 ENTRYPOINT ["./scripts/entry"]
 CMD ["ci"]
