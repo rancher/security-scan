@@ -1,18 +1,8 @@
-FROM registry.suse.com/bci/bci-base:15.4 as intermediate
-
-#Label the image for cleaning after build process
-LABEL stage=intermediate
-
-RUN zypper --non-interactive update \
-    && zypper --non-interactive install \
-    git
-
-RUN git clone -b v0.6.8 --depth 1 https://github.com/aquasecurity/kube-bench.git
-
 FROM registry.suse.com/bci/bci-base:15.4
-ARG kubectl_version=1.24.10
-ARG kube_bench_tag=0.6.8
-ARG sonobuoy_version=0.56.7
+
+ARG kube_bench_version=0.6.12
+ARG sonobuoy_version=0.56.16
+ARG kubectl_version=1.26.3
 ARG ARCH=amd64
 
 RUN zypper --non-interactive update \
@@ -24,15 +14,15 @@ RUN zypper --non-interactive update \
     tar \
     awk \
     gzip
-
-RUN curl -sLf https://storage.googleapis.com/kubernetes-release/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl > /usr/local/bin/kubectl-1.24 \
-    && ln -sv /usr/local/bin/kubectl-1.24 /usr/local/bin/kubectl \
+RUN curl -sLf "https://storage.googleapis.com/kubernetes-release/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl" > "/usr/local/bin/kubectl-${kubectl_version}" \
+    && ln -sv "/usr/local/bin/kubectl-${kubectl_version}" /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl*
-RUN curl -sLf https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_${ARCH}.tar.gz | tar -xvzf - -C /usr/bin sonobuoy
-RUN curl -sLf https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_tag}/kube-bench_${kube_bench_tag}_linux_${ARCH}.tar.gz | tar -xvzf - -C /usr/bin
-#RUN curl -sLf https://github.com/leodotcloud/kube-bench/releases/download/v${kube_bench_tag}/kube-bench.tar.gz | tar -xvzf - -C /usr/bin
+RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /usr/bin sonobuoy
+RUN curl -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_version}/kube-bench_${kube_bench_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /usr/bin
 
-COPY --from=intermediate /kube-bench/cfg /etc/kube-bench/cfg/
+# Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/.
+RUN curl -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/v${kube_bench_version}.tar.gz" | \
+    tar xvz -C . --strip-components=1 "kube-bench-${kube_bench_version}/cfg"
 
 COPY package/cfg/ /etc/kube-bench/cfg/
 COPY package/run.sh \
