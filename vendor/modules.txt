@@ -1,13 +1,13 @@
-# github.com/aquasecurity/kube-bench v0.6.12
+# github.com/aquasecurity/kube-bench v0.6.14
 ## explicit; go 1.19
 github.com/aquasecurity/kube-bench/check
-# github.com/aws/aws-sdk-go-v2 v1.17.5
+# github.com/aws/aws-sdk-go-v2 v1.17.6
 ## explicit; go 1.15
 github.com/aws/aws-sdk-go-v2/aws
 github.com/aws/aws-sdk-go-v2/internal/rand
 github.com/aws/aws-sdk-go-v2/internal/sdk
 github.com/aws/aws-sdk-go-v2/internal/sync/singleflight
-# github.com/aws/aws-sdk-go-v2/service/securityhub v1.28.4
+# github.com/aws/aws-sdk-go-v2/service/securityhub v1.29.1
 ## explicit; go 1.15
 github.com/aws/aws-sdk-go-v2/service/securityhub/types
 # github.com/aws/smithy-go v1.13.5
