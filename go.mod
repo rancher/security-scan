@@ -6,7 +6,8 @@ require (
 	github.com/aquasecurity/kube-bench v0.6.12
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.15.0
-	github.com/urfave/cli v1.22.12
+	github.com/urfave/cli v1.22.13
+	github.com/urfave/cli/v2 v2.25.5
 	gopkg.in/yaml.v2 v2.4.0
 )
 
