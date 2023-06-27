@@ -222,8 +222,8 @@ version_mapping:
     - "rke2-cis-1.5-permissive"
   "eks-1.0.1": 
     - "eks-1.0.1"
-  "gke-1.0": 
-    - "gke-1.0"
+  "gke-1.2.0": 
+    - "gke-1.2.0"
   "aks-1.0": 
     - "aks-1.0"	
   "v1.20.5+rke2r1": 
@@ -328,7 +328,7 @@ target_mapping:
     - "policies"  
   "eks-1.0.1":
     - "node"
-  "gke-1.0":
+  "gke-1.2.0":
     - "node"
     - "managedservices"
     - "policies"
