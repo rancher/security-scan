@@ -19,7 +19,7 @@ groups:
                 op: bitmask
                 value: "644"
         remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          Clusters provisioned by RKE do not require or maintain a configuration file for kube-apiserver.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -161,7 +161,7 @@ groups:
                 op: bitmask
                 value: "600"
         remediation: |
-          Cluster provisioned by RKE does not store the kubernetes default kubeconfig credentials file on the nodes.
+          A cluster provisioned by RKE does not store the kubernetes default kubeconfig credentials file on the nodes.
         scored: true
 
       - id: 1.1.14

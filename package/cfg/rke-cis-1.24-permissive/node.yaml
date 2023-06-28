@@ -135,7 +135,7 @@ groups:
                 op: bitmask
                 value: "600"
         remediation: |
-          Clusters provisioned by RKE does not require or maintain a configuration file for the kubelet.
+          Cluster provisioned by RKE doesn't require or maintain a configuration file for the kubelet.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -147,7 +147,7 @@ groups:
           test_items:
             - flag: root:root
         remediation: |
-          Clusters provisioned by RKE doesn’t require or maintain a configuration file for the kubelet.
+          Cluster provisioned by RKE doesn’t require or maintain a configuration file for the kubelet.
           All configuration is passed in as arguments at container run time.
         scored: true
 
