@@ -261,7 +261,13 @@ target_mapping:
     - "node"
     - "controlplane"
     - "etcd"
-    - "policies"     
+    - "policies"    
+  "cis-1.24":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies" 
   "rke-cis-1.4":
     - "master"
     - "node"
@@ -295,7 +301,13 @@ target_mapping:
     - "node"
     - "controlplane"
     - "etcd"
-    - "policies"    
+    - "policies"
+  "rke-cis-1.24-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
   "rke-cis-1.5-permissive":
     - "master"
     - "node"
@@ -325,7 +337,13 @@ target_mapping:
     - "node"
     - "controlplane"
     - "etcd"
-    - "policies"  
+    - "policies"
+  "rke-cis-1.24-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
   "eks-1.0.1":
     - "node"
   "gke-1.2.0":
@@ -369,7 +387,19 @@ target_mapping:
     - "node"
     - "controlplane"
     - "etcd"
-    - "policies"        
+    - "policies"
+  "rke2-cis-1.24-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.24-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"   
   "k3s-cis-1.6-hardened":
     - "master"
     - "node"
@@ -405,4 +435,16 @@ target_mapping:
     - "node"
     - "controlplane"
     - "etcd"
-    - "policies"    
+    - "policies"
+  "k3s-cis-1.24-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.24-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
