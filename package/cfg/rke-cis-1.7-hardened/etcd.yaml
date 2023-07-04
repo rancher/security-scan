@@ -27,7 +27,6 @@ groups:
 
       - id: 1.1.12
         text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Automated)"
-        type: "skip"
         audit: "stat -c %U:%G /node/var/lib/etcd"
         tests:
           test_items:
@@ -38,8 +37,6 @@ groups:
           from the command 'ps -ef | grep etcd'.
           Run the below command (based on the etcd data directory found above).
           For example, chown etcd:etcd /var/lib/etcd
-          Permissive - A system service account is required for etcd data directory ownership. 
-          Refer to Rancher's hardening guide for more details on how to configure this ownership.
         scored: true
 
       - id: 1.1.19
