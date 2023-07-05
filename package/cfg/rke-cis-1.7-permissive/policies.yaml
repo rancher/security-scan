@@ -57,7 +57,7 @@ groups:
           to the Kubernetes API server.
           Modify the configuration of each default service account to include this value
           automountServiceAccountToken: false
-          Permissive: Kubernetes provides default service accounts to be used.
+          Permissive - Kubernetes provides default service accounts to be used.
         scored: false
 
       - id: 5.1.6
@@ -142,7 +142,7 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostPID` containers.
-          Permissive: Enabling Pod Security Policy can cause applications to unexpectedly fail.
+          Permissive - Enabling Pod Security Policy can cause applications to unexpectedly fail.
         scored: false
 
       - id: 5.2.4
@@ -151,7 +151,7 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostIPC` containers.
-          Permissive: Enabling Pod Security Policy can cause applications to unexpectedly fail.
+          Permissive - Enabling Pod Security Policy can cause applications to unexpectedly fail.
         scored: false
 
       - id: 5.2.5
@@ -160,7 +160,7 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostNetwork` containers.
-	  Permissive: Enabling Pod Security Policy can cause applications to unexpectedly fail.
+	  Permissive - Enabling Pod Security Policy can cause applications to unexpectedly fail.
         scored: false
 
       - id: 5.2.6
@@ -245,7 +245,7 @@ groups:
         type: "skip"
         remediation: |
           Follow the documentation and create NetworkPolicy objects as you need them.
-          Permissive: Enabling Network Policies can prevent certain applications from communicating with each other.
+          Permissive - Enabling Network Policies can prevent certain applications from communicating with each other.
         scored: false
 
   - id: 5.4
@@ -314,4 +314,5 @@ groups:
         remediation: |
           Ensure that namespaces are created to allow for appropriate segregation of Kubernetes
           resources and that all new resources are created in a specific namespace.
+          Permissive - Kubernetes provides a default namespace.
         scored: false
