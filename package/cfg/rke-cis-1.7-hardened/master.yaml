@@ -22,7 +22,7 @@ groups:
           Run the below command (based on the file location on your system) on the
           control plane node.
           For example, chmod 600 $apiserverconf
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -36,7 +36,7 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chown root:root $apiserverconf
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -53,7 +53,7 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chmod 600 $controllermanagerconf
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -67,7 +67,7 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chown root:root $controllermanagerconf
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -84,7 +84,7 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chmod 600 $schedulerconf
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -98,7 +98,7 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chown root:root $schedulerconf
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -117,7 +117,7 @@ groups:
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
           chmod 600 $etcdconf
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -133,7 +133,7 @@ groups:
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
           chown root:root $etcdconf
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -182,7 +182,7 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chmod 600 /etc/kubernetes/admin.conf
-          Not Applicable: Cluster provisioned by RKE does not store the kubernetes default kubeconfig credentials file on the nodes.
+          Not Applicable -  Cluster provisioned by RKE does not store the kubernetes default kubeconfig credentials file on the nodes.
         scored: true
 
       - id: 1.1.14
@@ -195,7 +195,7 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chown root:root /etc/kubernetes/admin.conf
-          Not Applicable: Cluster provisioned by RKE does not store the kubernetes default kubeconfig credentials file on the nodes.
+          Not Applicable -  Cluster provisioned by RKE does not store the kubernetes default kubeconfig credentials file on the nodes.
         scored: true
 
       - id: 1.1.15
@@ -212,7 +212,7 @@ groups:
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
           chmod 600 $schedulerkubeconfig
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for scheduler.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for scheduler.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -227,7 +227,7 @@ groups:
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
           chown root:root $schedulerkubeconfig
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for scheduler.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for scheduler.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -245,7 +245,7 @@ groups:
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
           chmod 600 $controllermanagerkubeconfig
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for controller-manager.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for controller-manager.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -260,7 +260,7 @@ groups:
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
           chown root:root $controllermanagerkubeconfig
-          Not Applicable: Cluster provisioned by RKE doesn't require or maintain a configuration file for controller-manager.
+          Not Applicable -  Cluster provisioned by RKE doesn't require or maintain a configuration file for controller-manager.
           All configuration is passed in as arguments at container run time.
         scored: true
 

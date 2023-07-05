@@ -324,7 +324,7 @@ groups:
           Based on your system, restart the kubelet service. For example,
           systemctl daemon-reload
           systemctl restart kubelet.service
-          Not applicable: Clusters provisioned by RKE set the --hostname-override to avoid any hostname configuration errors
+          Not Applicable - Clusters provisioned by RKE set the --hostname-override to avoid any hostname configuration errors
         scored: false
 
       - id: 4.2.8
@@ -426,7 +426,7 @@ groups:
           Based on your system, restart the kubelet service. For example:
           systemctl daemon-reload
           systemctl restart kubelet.service
-          Not applicable: Clusters provisioned by RKE handles certificate rotation directly through RKE.
+          Not Applicable - Clusters provisioned by RKE handles certificate rotation directly through RKE.
         scored: false
 
       - id: 4.2.12
