@@ -201,39 +201,38 @@ managedservices:
 
 # TODO: Clean up in the next refactor
 version_mapping:
-  "rke-1.13": 
-    - "rke-cis-1.4"
-  "rke-1.14": 
-    - "rke-cis-1.4"
-  "rke-1.15": 
-    - "rke-cis-1.5-permissive"
-  "rke-1.16": 
-    - "rke-cis-1.6-permissive"
-  "rke-1.17": 
-    - "rke-cis-1.6-permissive"
-  "rke-1.18": 
-    - "rke-cis-1.6-permissive"
-  "rke-1.19": 
-    - "rke-cis-1.20-permissive"
-  "rke-1.20": 
-    - "rke-cis-1.20-permissive"
-  "v1.18.10+rke2r1": 
-    - "rke2-cis-1.5-hardened"
-    - "rke2-cis-1.5-permissive"
-  "eks-1.0.1": 
-    - "eks-1.0.1"
-  "gke-1.0": 
-    - "gke-1.0"
-  "aks-1.0": 
-    - "aks-1.0"	
-  "v1.20.5+rke2r1": 
-    - "rke2-cis-1.6-hardened"
-    - "rke2-cis-1.6-permissive"
-  "v1.20.5+k3s1": 
-    - "k3s-cis-1.6-hardened"
-    - "k3s-cis-1.6-permissive"
+  "rke-1.13": "rke-cis-1.4"
+  "rke-1.14": "rke-cis-1.4"
+  "rke-1.15": "rke-cis-1.5-permissive"
+  "rke-1.16": "rke-cis-1.6-permissive"
+  "rke-1.17": "rke-cis-1.6-permissive"
+  "rke-1.18": "rke-cis-1.6-permissive"
+  "rke-1.19": "rke-cis-1.20-permissive"
+  "rke-1.20": "rke-cis-1.20-permissive"
+  "v1.18.10+rke2r1": "rke2-cis-1.5-hardened"
+  "v1.18.10+rke2r1": "rke2-cis-1.5-permissive"
+  "eks-1.0.1": "eks-1.0.1"
+  "gke-1.0": "gke-1.0"
+  "aks-1.0": "aks-1.0"	
+  "v1.20.5+rke2r1": "rke2-cis-1.6-hardened"
+  "v1.20.5+rke2r1": "rke2-cis-1.6-permissive"
+  "v1.20.5+k3s1": "k3s-cis-1.6-hardened"
+  "v1.20.5+k3s1": "k3s-cis-1.6-permissive"
 
 target_mapping:
+# EKS
+  "eks-1.0.1":
+    - "node"
+# GKE
+  "gke-1.0":
+    - "node"
+    - "managedservices"
+    - "policies"
+# AKS
+  "aks-1.0":	
+    - "node"
+
+# CIS - Generic profiles
   "cis-1.4":
     - "master"
     - "node"
@@ -261,54 +260,28 @@ target_mapping:
     - "node"
     - "controlplane"
     - "etcd"
-    - "policies"     
+    - "policies"    
+  "cis-1.24":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"  
+
+# RKE1
+# rke1: Generic
   "rke-cis-1.4":
     - "master"
     - "node"
     - "etcd"
-  "rke-cis-1.5-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke2-cis-1.5-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke-cis-1.6-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke-cis-1.20-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke-cis-1.23-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"    
+# rke1: Permissive
   "rke-cis-1.5-permissive":
     - "master"
     - "node"
     - "controlplane"
     - "etcd"
     - "policies"
-  "rke2-cis-1.5-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke-cis-1.6-permissive":
+    "rke-cis-1.6-permissive":
     - "master"
     - "node"
     - "controlplane"
@@ -325,16 +298,49 @@ target_mapping:
     - "node"
     - "controlplane"
     - "etcd"
-    - "policies"  
-  "eks-1.0.1":
-    - "node"
-  "gke-1.0":
-    - "node"
-    - "managedservices"
     - "policies"
-  "aks-1.0":	
+  "rke-cis-1.24-permissive":
+    - "master"
     - "node"
-  "rke2-cis-1.6-hardened":
+    - "controlplane"
+    - "etcd"
+    - "policies"
+# rke1 : Hardened
+    "rke-cis-1.5-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+    "rke-cis-1.6-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke-cis-1.20-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke-cis-1.23-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke-cis-1.24-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+
+# RKE2
+# rke2: Generic
+# rke2: Permissive
+  "rke2-cis-1.5-permissive":
     - "master"
     - "node"
     - "controlplane"
@@ -346,13 +352,38 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
-  "rke2-cis-1.20-hardened":
+  "rke2-cis-1.20-permissive":
     - "master"
     - "node"
     - "controlplane"
     - "etcd"
     - "policies"
-  "rke2-cis-1.20-permissive":
+  "rke2-cis-1.23-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.24-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies" 
+# rke2: Hardened
+  "rke2-cis-1.5-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.6-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.20-hardened":
     - "master"
     - "node"
     - "controlplane"
@@ -364,19 +395,42 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
-  "rke2-cis-1.23-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"        
-  "k3s-cis-1.6-hardened":
+  "rke2-cis-1.24-hardened":
     - "master"
     - "node"
     - "controlplane"
     - "etcd"
     - "policies"
+
+# K3S
+# k3s: Generic
+# k3s: Permissive
   "k3s-cis-1.6-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.20-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies" 
+  "k3s-cis-1.23-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.24-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  # k3s: Hardened
+  "k3s-cis-1.6-hardened":
     - "master"
     - "node"
     - "controlplane"
@@ -394,15 +448,25 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
-  "k3s-cis-1.20-permissive":
+  "k3s-cis-1.24-hardened":
     - "master"
     - "node"
     - "controlplane"
     - "etcd"
-    - "policies"   
-  "k3s-cis-1.23-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"    
+    - "policies"
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+
+
