@@ -348,7 +348,6 @@ groups:
 
       - id: 4.2.9
         text: "Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Manual)"
-	type: "skip"	        
 	audit:  "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1"
         tests:
           test_items:
@@ -368,7 +367,6 @@ groups:
           Based on your system, restart the kubelet service. For example,
           systemctl daemon-reload
           systemctl restart kubelet.service
-          Permissive - When generating serving certificates, functionality could break in conjunction with hostname overrides which are required for certain cloud providers.
         scored: false
 
       - id: 4.2.10
