@@ -1,6 +1,6 @@
 ---
 controls:
-version: 1.24
+version: "1.7"
 id: 3
 text: "Control Plane Configuration"
 type: "controlplane"
@@ -15,14 +15,28 @@ groups:
           Alternative mechanisms provided by Kubernetes such as the use of OIDC should be
           implemented in place of client certificates.
         scored: false
+      - id: 3.1.2
+        text: "Service account token authentication should not be used for users (Manual)"
+        type: "manual"
+        remediation: |
+          Alternative mechanisms provided by Kubernetes such as the use of OIDC should be implemented
+          in place of service account tokens.
+        scored: false
+      - id: 3.1.3
+        text: "Bootstrap token authentication should not be used for users (Manual)"
+        type: "manual"
+        remediation: |
+          Alternative mechanisms provided by Kubernetes such as the use of OIDC should be implemented
+          in place of bootstrap tokens.
+        scored: false
 
   - id: 3.2
     text: "Logging"
     checks:
       - id: 3.2.1
         text: "Ensure that a minimal audit policy is created (Automated)"
+	type: "skip"
         audit: "/bin/ps -ef | grep kube-apiserver | grep -v grep | grep -o audit-policy-file"
-        type: "skip"
         tests:
           test_items:
             - flag: "--audit-policy-file"
@@ -32,6 +46,7 @@ groups:
               set: true
         remediation: |
           Create an audit policy file for your cluster.
+	   Permissive.
         scored: true
 
       - id: 3.2.2
