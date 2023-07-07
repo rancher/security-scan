@@ -337,7 +337,7 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
-    "rke-cis-1.6-hardened":
+  "rke-cis-1.6-hardened":
     - "master"
     - "node"
     - "controlplane"
