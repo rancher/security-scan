@@ -1,6 +1,6 @@
 ---
 controls:
-version: 1.23
+version: 1.24
 id: 4
 text: "Worker Node Security Configuration"
 type: "node"
@@ -9,7 +9,7 @@ groups:
     text: "Worker Node Configuration Files"
     checks:
       - id: 4.1.1
-        text: "Ensure that the kubelet service file permissions are set to 644 or more restrictive (Automated)"
+        text: "Ensure that the kubelet service file permissions are set to 600 or more restrictive (Automated)"
         type: "skip"
         audit: '/bin/sh -c ''if test -e $kubeletsvc; then stat -c permissions=%a $kubeletsvc; fi'' '
         tests:
@@ -17,10 +17,10 @@ groups:
             - flag: "permissions"
               compare:
                 op: bitmask
-                value: "644"
+                value: "600"
         remediation: |
-          Cluster provisioned by RKE doesn’t require or maintain a configuration file for the kubelet service.
-          All configuration is passed in as arguments at container run time.
+          Run the below command (based on the file location on your system) on the each worker node.
+          For example, chmod 600 $kubeletsvc
         scored: true
 
       - id: 4.1.2
@@ -31,12 +31,13 @@ groups:
           test_items:
             - flag: root:root
         remediation: |
-          Cluster provisioned by RKE doesn’t require or maintain a configuration file for the kubelet service.
-          All configuration is passed in as arguments at container run time.
+          Run the below command (based on the file location on your system) on the each worker node.
+          For example,
+          chown root:root $kubeletsvc
         scored: true
 
       - id: 4.1.3
-        text: "If proxy kubeconfig file exists ensure permissions are set to 644 or more restrictive (Manual)"
+        text: "If proxy kubeconfig file exists ensure permissions are set to 600 or more restrictive (Manual)"
         audit: '/bin/sh -c ''if test -e $proxykubeconfig; then stat -c permissions=%a $proxykubeconfig; fi'' '
         tests:
           bin_op: or
@@ -45,13 +46,13 @@ groups:
               set: true
               compare:
                 op: bitmask
-                value: "644"
+                value: "600"
             - flag: "$proxykubeconfig"
               set: false
         remediation: |
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
-          chmod 644 $proxykubeconfig
+          chmod 600 $proxykubeconfig
         scored: true
 
       - id: 4.1.4
@@ -69,18 +70,18 @@ groups:
         scored: true
 
       - id: 4.1.5
-        text: "Ensure that the --kubeconfig kubelet.conf file permissions are set to 644 or more restrictive (Automated)"
+        text: "Ensure that the --kubeconfig kubelet.conf file permissions are set to 600 or more restrictive (Automated)"
         audit: '/bin/sh -c ''if test -e /node$kubeletkubeconfig; then stat -c permissions=%a /node$kubeletkubeconfig; fi'' '
         tests:
           test_items:
             - flag: "permissions"
               compare:
                 op: bitmask
-                value: "644"
+                value: "600"
         remediation: |
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
-          chmod 644 $kubeletkubeconfig
+          chmod 600 $kubeletkubeconfig
         scored: true
 
       - id: 4.1.6
@@ -96,17 +97,17 @@ groups:
         scored: true
 
       - id: 4.1.7
-        text: "Ensure that the certificate authorities file permissions are set to 644 or more restrictive (Automated)"
+        text: "Ensure that the certificate authorities file permissions are set to 600 or more restrictive (Automated)"
         audit: "stat -c permissions=%a /node/etc/kubernetes/ssl/kube-ca.pem"
         tests:
           test_items:
             - flag: "permissions"
               compare:
                 op: bitmask
-                value: "644"
+                value: "600"
         remediation: |
           Run the following command to modify the file permissions of the
-          --client-ca-file chmod 644 <filename>
+          --client-ca-file chmod 600 <filename>
         scored: true
 
       - id: 4.1.8
@@ -124,7 +125,7 @@ groups:
         scored: true
 
       - id: 4.1.9
-        text: "Ensure that the kubelet --config configuration file has permissions set to 644 or more restrictive (Automated)"
+        text: "If the kubelet config.yaml configuration file is being used validate permissions set to 600 or more restrictive (Manual)"
         type: "skip"
         audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c permissions=%a $kubeletconf; fi'' '
         tests:
@@ -132,27 +133,21 @@ groups:
             - flag: "permissions"
               compare:
                 op: bitmask
-                value: "644"
+                value: "600"
         remediation: |
-          Clusters provisioned by RKE doesn’t require or maintain a configuration file for the kubelet.
-          All configuration is passed in as arguments at container run time.
-
-          Clusters provisioned by RKE doesn’t require or maintain a configuration file for the kubelet.
+          Cluster provisioned by RKE doesn't require or maintain a configuration file for the kubelet.
           All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 4.1.10
-        text: "Ensure that the kubelet --config configuration file ownership is set to root:root (Automated)"
+        text: "If the kubelet config.yaml configuration file is being used validate file ownership is set to root:root (Manual)"
         type: "skip"
         audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c %U:%G $kubeletconf; fi'' '
         tests:
           test_items:
             - flag: root:root
         remediation: |
-          Clusters provisioned by RKE doesn’t require or maintain a configuration file for the kubelet.
-          All configuration is passed in as arguments at container run time.
-
-          Clusters provisioned by RKE doesn’t require or maintain a configuration file for the kubelet.
+          Cluster provisioned by RKE doesn’t require or maintain a configuration file for the kubelet.
           All configuration is passed in as arguments at container run time.
         scored: true
 
@@ -225,7 +220,7 @@ groups:
         scored: true
 
       - id: 4.2.4
-        text: "Ensure that the --read-only-port argument is set to 0 (Automated)"
+        text: "Verify that the --read-only-port argument is set to 0 (Automated)"
         audit: "/bin/ps -fC $kubeletbin"
         audit_config: "/bin/sh -c 'if test -e $kubeletconf; then /bin/cat $kubeletconf; fi' "
         tests:
@@ -345,11 +340,11 @@ groups:
           Based on your system, restart the kubelet service. For example,
           systemctl daemon-reload
           systemctl restart kubelet.service
-          Clusters provisioned by RKE set the --hostname-override to avoid any hostname configuration errors          
+          Clusters provisioned by RKE set the --hostname-override to avoid any hostname configuration errors
         scored: false
 
       - id: 4.2.9
-        text: "Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture (Automated)"
+        text: "Ensure that the eventRecordQPS argument is set to a level which ensures appropriate event capture (Automated)"
         audit: "/bin/ps -fC $kubeletbin"
         audit_config: "/bin/sh -c 'if test -e $kubeletconf; then /bin/cat $kubeletconf; fi' "
         tests:
@@ -445,8 +440,7 @@ groups:
           Based on your system, restart the kubelet service. For example:
           systemctl daemon-reload
           systemctl restart kubelet.service
-          
-          Clusters provisioned by RKE handles certificate rotation directly through RKE.          
+          Clusters provisioned by RKE handles certificate rotation directly through RKE.
         scored: false
 
       - id: 4.2.13

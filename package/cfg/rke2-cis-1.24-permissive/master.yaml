@@ -1,6 +1,6 @@
 ---
 controls:
-version: 1.23
+version: 1.24
 id: 1
 text: "Control Plane Security Configuration"
 type: "master"
@@ -10,118 +10,96 @@ groups:
     checks:
       - id: 1.1.1
         text: "Ensure that the API server pod specification file permissions are set to 644 or more restrictive (Automated)"
-        type: "skip"
-        audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c permissions=%a $apiserverconf; fi'"
+        audit: "stat -c permissions=%a /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml"
         tests:
           test_items:
             - flag: "permissions"
               compare:
-                op: bitmask
+                op: eq
                 value: "644"
+              set: true  
         remediation: |
-          Clusters provisioned by RKE do not require or maintain a configuration file for kube-apiserver.
-          All configuration is passed in as arguments at container run time.
+          Run the below command (based on the file location on your system) on the
+          control plane node.
+          For example, chmod 644 $apiserverconf
         scored: true
 
       - id: 1.1.2
         text: "Ensure that the API server pod specification file ownership is set to root:root (Automated)"
-        type: "skip"
         audit: "/bin/sh -c 'if test -e $apiserverconf; then stat -c %U:%G $apiserverconf; fi'"
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for kube-apiserver.
-          All configuration is passed in as arguments at container run time.
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example, chown root:root $apiserverconf
         scored: true
 
       - id: 1.1.3
-        text: "Ensure that the controller manager pod specification file permissions are set to 644 or more restrictive (Automated)"
-        type: "skip"
+        text: "Ensure that the controller manager pod specification file permissions are set to 600 or more restrictive (Automated)"
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c permissions=%a $controllermanagerconf; fi'"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "644"
               compare:
-                op: bitmask
-                value: "644"
+                op: eq
+                value: "600"
+              set: true
         remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for controller-manager.
-          All configuration is passed in as arguments at container run time.
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example, chmod 600 $controllermanagerconf
         scored: true
 
       - id: 1.1.4
         text: "Ensure that the controller manager pod specification file ownership is set to root:root (Automated)"
-        type: "skip"
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c %U:%G $controllermanagerconf; fi'"
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for controller-manager.
-          All configuration is passed in as arguments at container run time.
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example, chown root:root $controllermanagerconf
         scored: true
 
       - id: 1.1.5
-        text: "Ensure that the scheduler pod specification file permissions are set to 644 or more restrictive (Automated)"
-        type: "skip"
+        text: "Ensure that the scheduler pod specification file permissions are set to 600 or more restrictive (Automated)"
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c permissions=%a $schedulerconf; fi'"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "600"
               compare:
-                op: bitmask
-                value: "644"
+                op: eq
+                value: "600"
+              set: true
         remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for scheduler.
-          All configuration is passed in as arguments at container run time.
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example, chmod 600 $schedulerconf
         scored: true
 
       - id: 1.1.6
         text: "Ensure that the scheduler pod specification file ownership is set to root:root (Automated)"
-        type: "skip"
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c %U:%G $schedulerconf; fi'"
         tests:
           test_items:
             - flag: "root:root"
+              set: true
         remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for scheduler.
-          All configuration is passed in as arguments at container run time.
-        scored: true
-
-      - id: 1.1.7
-        text: "Ensure that the etcd pod specification file permissions are set to 644 or more restrictive (Automated)"
-        type: "skip"
-        audit: "/bin/sh -c 'if test -e $etcdconf; then find $etcdconf -name '*etcd*' | xargs stat -c permissions=%a; fi'"
-        use_multiple_values: true
-        tests:
-          test_items:
-            - flag: "permissions"
-              compare:
-                op: bitmask
-                value: "644"
-        remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for etcd.
-          All configuration is passed in as arguments at container run time.
-        scored: true
-
-      - id: 1.1.8
-        text: "Ensure that the etcd pod specification file ownership is set to root:root (Automated)"
-        type: "skip"
-        audit: "/bin/sh -c 'if test -e $etcdconf; then find $etcdconf -name '*etcd*' | xargs stat -c %U:%G; fi'"
-        use_multiple_values: true
-        tests:
-          test_items:
-            - flag: "root:root"
-        remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for etcd.
-          All configuration is passed in as arguments at container run time.
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example, chown root:root $schedulerconf
         scored: true
 
       - id: 1.1.9
-        text: "Ensure that the Container Network Interface file permissions are set to 644 or more restrictive (Manual)"
+        text: "Ensure that the Container Network Interface file permissions are set to 600 or more restrictive (Manual)"
         audit: |
-          ps -ef | grep $kubeletbin | grep -- --cni-conf-dir | sed 's%.*cni-conf-dir[= ]\([^ ]*\).*%\1%' | xargs -I{} find {} -mindepth 1 | xargs --no-run-if-empty stat -c permissions=%a
+          ps -fC ${kubeletbin:-kubelet} | grep -- --cni-conf-dir || echo "/etc/cni/net.d" | sed 's%.*cni-conf-dir[= ]\([^ ]*\).*%\1%' | xargs -I{} find {} -mindepth 1 | xargs --no-run-if-empty stat -c permissions=%a
           find /var/lib/cni/networks -type f 2> /dev/null | xargs --no-run-if-empty stat -c permissions=%a
         use_multiple_values: true
         tests:
@@ -129,16 +107,16 @@ groups:
             - flag: "permissions"
               compare:
                 op: bitmask
-                value: "644"
+                value: "600"
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
-          For example, chmod 644 <path/to/cni/files>
+          For example, chmod 600 <path/to/cni/files>
         scored: false
 
       - id: 1.1.10
         text: "Ensure that the Container Network Interface file ownership is set to root:root (Manual)"
         audit: |
-          ps -ef | grep $kubeletbin | grep -- --cni-conf-dir | sed 's%.*cni-conf-dir[= ]\([^ ]*\).*%\1%' | xargs -I{} find {} -mindepth 1 | xargs --no-run-if-empty stat -c %U:%G
+          ps -fC ${kubeletbin:-kubelet} | grep -- --cni-conf-dir || echo "/etc/cni/net.d" | sed 's%.*cni-conf-dir[= ]\([^ ]*\).*%\1%' | xargs -I{} find {} -mindepth 1 | xargs --no-run-if-empty stat -c %U:%G
           find /var/lib/cni/networks -type f 2> /dev/null | xargs --no-run-if-empty stat -c %U:%G
         use_multiple_values: true
         tests:
@@ -152,102 +130,167 @@ groups:
 
       - id: 1.1.13
         text: "Ensure that the admin.conf file permissions are set to 600 or more restrictive (Automated)"
-        type: "skip"
-        audit: "/bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c permissions=%a /etc/kubernetes/admin.conf; fi'"
+        audit: "stat -c permissions=%a /var/lib/rancher/rke2/server/cred/admin.kubeconfig"
         tests:
           test_items:
             - flag: "permissions"
               compare:
                 op: bitmask
                 value: "600"
+              set: true
         remediation: |
-          A cluster provisioned by RKE does not store the kubernetes default kubeconfig credentials file on the nodes.
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example, chmod 600 /etc/kubernetes/admin.conf
         scored: true
 
       - id: 1.1.14
         text: "Ensure that the admin.conf file ownership is set to root:root (Automated)"
-        type: "skip"
-        audit: "/bin/sh -c 'if test -e /etc/kubernetes/admin.conf; then stat -c %U:%G /etc/kubernetes/admin.conf; fi'"
+        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/cred/admin.kubeconfig"
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
-          Cluster provisioned by RKE does not store the kubernetes default kubeconfig credentials file on the nodes.
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example, chown root:root /etc/kubernetes/admin.conf
         scored: true
 
       - id: 1.1.15
-        text: "Ensure that the scheduler.conf file permissions are set to 644 or more restrictive (Automated)"
-        type: "skip"
-        audit: "/bin/sh -c 'if test -e $schedulerkubeconfig; then stat -c permissions=%a $schedulerkubeconfig; fi'"
+        text: "Ensure that the scheduler.conf file permissions are set to 600 or more restrictive (Automated)"
+        audit: "stat -c %a /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig"
         tests:
           test_items:
-            - flag: "permissions"
+            - flag: "600"
               compare:
-                op: bitmask
-                value: "644"
+                op: eq
+                value: "600"
+              set: true
         remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for scheduler.
-          All configuration is passed in as arguments at container run time.
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example,
+          chmod 600 $schedulerkubeconfig
         scored: true
 
       - id: 1.1.16
         text: "Ensure that the scheduler.conf file ownership is set to root:root (Automated)"
-        type: "skip"
-        audit: "/bin/sh -c 'if test -e $schedulerkubeconfig; then stat -c %U:%G $schedulerkubeconfig; fi'"
+        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig"
         tests:
           test_items:
             - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
         remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for scheduler.
-          All configuration is passed in as arguments at container run time.
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example,
+          chown root:root $schedulerkubeconfig
         scored: true
 
       - id: 1.1.17
-        text: "Ensure that the controller-manager.conf file permissions are set to 644 or more restrictive (Automated)"
-        type: "skip"
-        audit: "/bin/sh -c 'if test -e $controllermanagerkubeconfig; then stat -c permissions=%a $controllermanagerkubeconfig; fi'"
+        text: "Ensure that the controller-manager.conf file permissions are set to 600 or more restrictive (Automated)"
+        audit: "stat -c %a /var/lib/rancher/rke2/server/cred/controller.kubeconfig"
+        tests:
+          test_items:
+            - flag: "600"
+              compare:
+                op: eq
+                value: "600"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example,
+          chmod 600 $controllermanagerkubeconfig
+        scored: true
+
+      - id: 1.1.18
+        text: "Ensure that the controller-manager.conf file ownership is set to root:root (Automated)"
+        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/cred/controller.kubeconfig"
+        tests:
+          test_items:
+            - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example,
+          chown root:root /var/lib/rancher/rke2/server/cred/controller.kubeconfig
+        scored: true
+
+      - id: 1.1.19
+        text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Automated)"
+        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/tls"
+        use_multiple_values: true
+        tests:
+          test_items:
+            - flag: "root:root"
+              compare:
+                op: eq
+                value: "root:root"
+              set: true
+        remediation: |
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example,
+          chown -R root:root /etc/kubernetes/pki/
+        scored: true
+
+      - id: 1.1.20
+        text: "Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Manual)"
+        audit: "stat -c permissions=%a /var/lib/rancher/rke2/server/tls/*.crt"
+        use_multiple_values: true
         tests:
           test_items:
             - flag: "permissions"
               compare:
                 op: bitmask
-                value: "644"
+                value: "600"
+              set: true
         remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for controller-manager.
-          All configuration is passed in as arguments at container run time.
-        scored: true
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example,
+          chmod -R 600 /var/lib/rancher/rke2/server/tls/*.crt
+        scored: false
 
-      - id: 1.1.18
-        text: "Ensure that the controller-manager.conf file ownership is set to root:root (Automated)"
-        type: "skip"
-        audit: "/bin/sh -c 'if test -e $controllermanagerkubeconfig; then stat -c %U:%G $controllermanagerkubeconfig; fi'"
+      - id: 1.1.21
+        text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Manual)"
+        audit: "stat -c permissions=%a /var/lib/rancher/rke2/server/tls/*.key"
+        use_multiple_values: true
         tests:
           test_items:
-            - flag: "root:root"
+            - flag: "permissions"
+              compare:
+                op: eq
+                value: "600"
+              set: true
         remediation: |
-          Cluster provisioned by RKE doesn't require or maintain a configuration file for controller-manager.
-          All configuration is passed in as arguments at container run time.
-        scored: true
-
+          Run the below command (based on the file location on your system) on the control plane node.
+          For example,
+          chmod -R 600 /var/lib/rancher/rke2/server/tls/*.key
+        scored: false
 
   - id: 1.2
     text: "API Server"
     checks:
       - id: 1.2.1
-        text: "Ensure that the --anonymous-auth argument is set to false (Automated)"
+        text: "Ensure that the --anonymous-auth argument is set to false (Manual)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: manual
         tests:
           test_items:
             - flag: "--anonymous-auth"
               compare:
                 op: eq
                 value: false
-              set: true  
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the below parameter.
           --anonymous-auth=false
-        scored: true
+        scored: false
 
       - id: 1.2.2
         text: "Ensure that the --token-auth-file parameter is not set (Automated)"
@@ -319,7 +362,6 @@ groups:
 
       - id: 1.2.6
         text: "Ensure that the --kubelet-certificate-authority argument is set as appropriate (Automated)"
-        type: "skip"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           test_items:
@@ -331,7 +373,6 @@ groups:
           $apiserverconf on the control plane node and set the
           --kubelet-certificate-authority parameter to the path to the cert file for the certificate authority.
           --kubelet-certificate-authority=<ca-string>
-          When generating serving certificates, functionality could break in conjunction with hostname overrides which are required for certain cloud providers.
         scored: true
 
       - id: 1.2.7
@@ -343,7 +384,7 @@ groups:
               compare:
                 op: nothave
                 value: "AlwaysAllow"
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --authorization-mode parameter to values other than AlwaysAllow.
@@ -360,7 +401,7 @@ groups:
               compare:
                 op: has
                 value: "Node"
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --authorization-mode parameter to a value that includes Node.
@@ -376,7 +417,7 @@ groups:
               compare:
                 op: has
                 value: "RBAC"
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --authorization-mode parameter to a value that includes RBAC,
@@ -384,7 +425,7 @@ groups:
         scored: true
 
       - id: 1.2.10
-        text: "Ensure that the admission control plugin EventRateLimit is set (Automated)"
+        text: "Ensure that the admission control plugin EventRateLimit is set (Manual)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           test_items:
@@ -392,7 +433,7 @@ groups:
               compare:
                 op: has
                 value: "EventRateLimit"
-              set: true  
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set the desired limits in a configuration file.
           Then, edit the API server pod specification file $apiserverconf
@@ -411,7 +452,7 @@ groups:
               compare:
                 op: nothave
                 value: AlwaysAdmit
-              set: true  
+              set: true
             - flag: "--enable-admission-plugins"
               set: false
         remediation: |
@@ -422,7 +463,6 @@ groups:
 
       - id: 1.2.12
         text: "Ensure that the admission control plugin AlwaysPullImages is set (Manual)"
-        type: "manual"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           test_items:
@@ -430,6 +470,7 @@ groups:
               compare:
                 op: has
                 value: "AlwaysPullImages"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --enable-admission-plugins parameter to include
@@ -439,7 +480,6 @@ groups:
 
       - id: 1.2.13
         text: "Ensure that the admission control plugin SecurityContextDeny is set if PodSecurityPolicy is not used (Manual)"
-        type: "manual"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           bin_op: or
@@ -448,10 +488,12 @@ groups:
               compare:
                 op: has
                 value: "SecurityContextDeny"
+              set: true
             - flag: "--enable-admission-plugins"
               compare:
                 op: has
                 value: "PodSecurityPolicy"
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --enable-admission-plugins parameter to include
@@ -469,7 +511,6 @@ groups:
               compare:
                 op: nothave
                 value: "ServiceAccount"
-              set: true  
             - flag: "--disable-admission-plugins"
               set: false
         remediation: |
@@ -489,7 +530,6 @@ groups:
               compare:
                 op: nothave
                 value: "NamespaceLifecycle"
-              set: true  
             - flag: "--disable-admission-plugins"
               set: false
         remediation: |
@@ -507,7 +547,7 @@ groups:
               compare:
                 op: has
                 value: "NodeRestriction"
-              set: true  
+              set: true
         remediation: |
           Follow the Kubernetes documentation and configure NodeRestriction plug-in on kubelets.
           Then, edit the API server pod specification file $apiserverconf
@@ -526,7 +566,7 @@ groups:
               compare:
                 op: gt
                 value: 0
-              set: true  
+              set: true
             - flag: "--secure-port"
               set: false
         remediation: |
@@ -544,7 +584,7 @@ groups:
               compare:
                 op: eq
                 value: false
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the below parameter.
@@ -554,6 +594,7 @@ groups:
       - id: 1.2.19
         text: "Ensure that the --audit-log-path argument is set (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-path"
@@ -568,13 +609,14 @@ groups:
       - id: 1.2.20
         text: "Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxage"
               compare:
                 op: gte
                 value: 30
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxage parameter to 30
@@ -585,13 +627,14 @@ groups:
       - id: 1.2.21
         text: "Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxbackup"
               compare:
                 op: gte
                 value: 10
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxbackup parameter to 10 or to an appropriate
@@ -602,13 +645,14 @@ groups:
       - id: 1.2.22
         text: "Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
+        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxsize"
               compare:
                 op: gte
                 value: 100
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxsize parameter to an appropriate size in MB.
@@ -616,14 +660,19 @@ groups:
         scored: true
 
       - id: 1.2.23
-        text: "Ensure that the --request-timeout argument is set as appropriate (Manual)"
+        text: "Ensure that the --request-timeout argument is set as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        type: manual
+        tests:
+          bin_op: or
+          test_items:
+            - flag: "--request-timeout"
+              set: false
+            - flag: "--request-timeout"
         remediation: |
           Edit the API server pod specification file $apiserverconf
           and set the below parameter as appropriate and if needed.
           For example, --request-timeout=300s
-        scored: false
+        scored: true
 
       - id: 1.2.24
         text: "Ensure that the --service-account-lookup argument is set to true (Automated)"
@@ -637,7 +686,6 @@ groups:
               compare:
                 op: eq
                 value: true
-              set: true  
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the below parameter.
@@ -726,12 +774,10 @@ groups:
 
       - id: 1.2.30
         text: "Ensure that the --encryption-provider-config argument is set as appropriate (Manual)"
-        type: "skip"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           test_items:
             - flag: "--encryption-provider-config"
-              set: true
         remediation: |
           Follow the Kubernetes documentation and configure a EncryptionConfig file.
           Then, edit the API server pod specification file $apiserverconf
@@ -741,7 +787,7 @@ groups:
 
       - id: 1.2.31
         text: "Ensure that encryption providers are appropriately configured (Manual)"
-        type: "skip"
+        type: "skip"        
         audit: |
           ENCRYPTION_PROVIDER_CONFIG=$(ps -ef | grep $apiserverbin | grep -- --encryption-provider-config | sed 's%.*encryption-provider-config[= ]\([^ ]*\).*%\1%')
           if test -e $ENCRYPTION_PROVIDER_CONFIG; then grep -A1 'providers:' $ENCRYPTION_PROVIDER_CONFIG | tail -n1 | grep -o "[A-Za-z]*" | sed 's/^/provider=/'; fi
@@ -754,12 +800,10 @@ groups:
         remediation: |
           Follow the Kubernetes documentation and configure a EncryptionConfig file.
           In this file, choose aescbc, kms or secretbox as the encryption provider.
-          Enabling encryption changes how data can be recovered as data is encrypted.
         scored: false
 
       - id: 1.2.32
         text: "Ensure that the API Server only makes use of Strong Cryptographic Ciphers (Manual)"
-        type: "manual"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           test_items:
@@ -779,22 +823,22 @@ groups:
           TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,TLS_RSA_WITH_3DES_EDE_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA,
           TLS_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_256_GCM_SHA384
         scored: false
+        type: skip
 
   - id: 1.3
     text: "Controller Manager"
     checks:
       - id: 1.3.1
-        text: "Ensure that the --terminated-pod-gc-threshold argument is set as appropriate (Automated)"
+        text: "Ensure that the --terminated-pod-gc-threshold argument is set as appropriate (Manual)"
         audit: "/bin/ps -ef | grep $controllermanagerbin | grep -v grep"
         tests:
           test_items:
             - flag: "--terminated-pod-gc-threshold"
-              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node and set the --terminated-pod-gc-threshold to an appropriate threshold,
           for example, --terminated-pod-gc-threshold=10
-        scored: true
+        scored: false
 
       - id: 1.3.2
         text: "Ensure that the --profiling argument is set to false (Automated)"
@@ -805,7 +849,7 @@ groups:
               compare:
                 op: eq
                 value: false
-              set: true  
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node and set the below parameter.
@@ -821,7 +865,7 @@ groups:
               compare:
                 op: noteq
                 value: false
-              set: true  
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node to set the below parameter.
@@ -857,7 +901,6 @@ groups:
 
       - id: 1.3.6
         text: "Ensure that the RotateKubeletServerCertificate argument is set to true (Automated)"
-        type: "skip"
         audit: "/bin/ps -ef | grep $controllermanagerbin | grep -v grep"
         tests:
           bin_op: or
@@ -873,9 +916,8 @@ groups:
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node and set the --feature-gates parameter to include RotateKubeletServerCertificate=true.
           --feature-gates=RotateKubeletServerCertificate=true
-          
-          Cluster provisioned by RKE handles certificate rotation directly through RKE.
         scored: true
+        type: skip
 
       - id: 1.3.7
         text: "Ensure that the --bind-address argument is set to 127.0.0.1 (Automated)"
@@ -887,7 +929,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
-              set: true  
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |
@@ -907,7 +949,7 @@ groups:
               compare:
                 op: eq
                 value: false
-              set: true  
+              set: true
         remediation: |
           Edit the Scheduler pod specification file $schedulerconf file
           on the control plane node and set the below parameter.
@@ -924,7 +966,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
-              set: true  
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |
