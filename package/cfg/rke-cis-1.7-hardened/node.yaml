@@ -21,8 +21,8 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the each worker node.
           For example, chmod 600 $kubeletsvc
-	  Not Applicable - Clusters provisioned by RKE doesn’t require or maintain a configuration file for the kubelet service.
-           All configuration is passed in as arguments at container run time.
+          Not Applicable - Clusters provisioned by RKE doesn’t require or maintain a configuration file for the kubelet service.
+          All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 4.1.2
@@ -139,7 +139,7 @@ groups:
                 op: bitmask
                 value: "600"
         remediation: |
-	  Run the following command (using the config file location identified in the Audit step)
+          Run the following command (using the config file location identified in the Audit step)
           chmod 600 $kubeletconf
           Not Applicable - Clusters provisioned by RKE do not require or maintain a configuration file for the kubelet.
           All configuration is passed in as arguments at container run time.
@@ -153,7 +153,7 @@ groups:
           test_items:
             - flag: root:root
         remediation: |
-	   Run the following command (using the config file location identified in the Audit step)
+          Run the following command (using the config file location identified in the Audit step)
           chown root:root $kubeletconf
           Not Applicable - Clusters provisioned by RKE doesn’t require or maintain a configuration file for the kubelet.
           All configuration is passed in as arguments at container run time.

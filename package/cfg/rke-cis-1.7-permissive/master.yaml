@@ -467,7 +467,7 @@ groups:
           on the control plane node and set the --enable-admission-plugins parameter to include
           SecurityContextDeny, unless PodSecurityPolicy is already in place.
           --enable-admission-plugins=...,SecurityContextDeny,...
-	  Permissive - Enabling Pod Security Policy can cause applications to unexpectedly fail.
+          Permissive - Enabling Pod Security Policy can cause applications to unexpectedly fail.
         scored: false
 
       - id: 1.2.13
@@ -720,7 +720,7 @@ groups:
 
       - id: 1.2.29
         text: "Ensure that the --encryption-provider-config argument is set as appropriate (Manual)"
-	type: "skip"
+        type: "skip"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           test_items:
@@ -730,7 +730,7 @@ groups:
           Then, edit the API server pod specification file $apiserverconf
           on the control plane node and set the --encryption-provider-config parameter to the path of that file.
           For example, --encryption-provider-config=</path/to/EncryptionConfig/File>
-	  Permissive - Enabling encryption changes how data can be recovered as data is encrypted.
+          Permissive - Enabling encryption changes how data can be recovered as data is encrypted.
         scored: false
 
       - id: 1.2.30
@@ -748,7 +748,7 @@ groups:
         remediation: |
           Follow the Kubernetes documentation and configure a EncryptionConfig file.
           In this file, choose aescbc, kms or secretbox as the encryption provider.
-	  Permissive - Enabling encryption changes how data can be recovered as data is encrypted.
+          Permissive - Enabling encryption changes how data can be recovered as data is encrypted.
         scored: false
 
       - id: 1.2.31
