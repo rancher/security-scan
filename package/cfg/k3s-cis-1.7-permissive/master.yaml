@@ -40,7 +40,7 @@ groups:
 
       - id: 1.1.3
         text: "Ensure that the controller manager pod specification file permissions are set to 600 or more restrictive (Automated)"
-	 type: "skip"
+        type: "skip"
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c permissions=%a $controllermanagerconf; fi'"
         tests:
           test_items:
@@ -56,7 +56,7 @@ groups:
 
       - id: 1.1.4
         text: "Ensure that the controller manager pod specification file ownership is set to root:root (Automated)"
-	type: "skip"
+        type: "skip"
         audit: "/bin/sh -c 'if test -e $controllermanagerconf; then stat -c %U:%G $controllermanagerconf; fi'"
         tests:
           test_items:
@@ -69,7 +69,7 @@ groups:
 
       - id: 1.1.5
         text: "Ensure that the scheduler pod specification file permissions are set to 600 or more restrictive (Automated)"
-	type: "skip"
+        type: "skip"
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c permissions=%a $schedulerconf; fi'"
         tests:
           test_items:
@@ -85,7 +85,7 @@ groups:
 
       - id: 1.1.6
         text: "Ensure that the scheduler pod specification file ownership is set to root:root (Automated)"
-	type: "skip"
+        type: "skip"
         audit: "/bin/sh -c 'if test -e $schedulerconf; then stat -c %U:%G $schedulerconf; fi'"
         tests:
           test_items:
@@ -98,7 +98,7 @@ groups:
 
       - id: 1.1.7
         text: "Ensure that the etcd pod specification file permissions are set to 600 or more restrictive (Automated)"
-	type: "skip"
+        type: "skip"
         audit: "/bin/sh -c 'if test -e $etcdconf; then find $etcdconf -name '*etcd*' | xargs stat -c permissions=%a; fi'"
         use_multiple_values: true
         tests:
@@ -116,7 +116,7 @@ groups:
 
       - id: 1.1.8
         text: "Ensure that the etcd pod specification file ownership is set to root:root (Automated)"
-	type: "skip"
+        type: "skip"
         audit: "/bin/sh -c 'if test -e $etcdconf; then find $etcdconf -name '*etcd*' | xargs stat -c %U:%G; fi'"
         use_multiple_values: true
         tests:
@@ -145,7 +145,7 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chmod 600 <path/to/cni/files>
-	  Not Applicable.
+          Not Applicable.
         scored: false
 
       - id: 1.1.10
@@ -192,7 +192,7 @@ groups:
           from the command 'ps -ef | grep etcd'.
           Run the below command (based on the etcd data directory found above).
           For example, chown etcd:etcd /var/lib/etcd
-	  Not Applicable.
+          Not Applicable.
         scored: true
 
       - id: 1.1.13
@@ -528,7 +528,7 @@ groups:
           on the control plane node and set the --enable-admission-plugins parameter to include
           SecurityContextDeny, unless PodSecurityPolicy is already in place.
           --enable-admission-plugins=...,SecurityContextDeny,...
-	  Permissive - Enabling Pod Security Policy can cause applications to unexpectedly fail.
+          Permissive - Enabling Pod Security Policy can cause applications to unexpectedly fail.
         scored: false
 
       - id: 1.2.13
@@ -630,7 +630,7 @@ groups:
           on the control plane node and set the --audit-log-path parameter to a suitable path and
           file where you would like audit logs to be written, for example,
           --audit-log-path=/var/log/apiserver/audit.log
-	Permissive.
+          Permissive.
         scored: true
 
       - id: 1.2.19
@@ -648,7 +648,7 @@ groups:
           on the control plane node and set the --audit-log-maxage parameter to 30
           or as an appropriate number of days, for example,
           --audit-log-maxage=30
-	Permissive.
+          Permissive.
         scored: true
 
       - id: 1.2.20
@@ -666,7 +666,7 @@ groups:
           on the control plane node and set the --audit-log-maxbackup parameter to 10 or to an appropriate
           value. For example,
           --audit-log-maxbackup=10
-	Permissive.
+          Permissive.
         scored: true
 
       - id: 1.2.21
@@ -683,7 +683,7 @@ groups:
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxsize parameter to an appropriate size in MB.
           For example, to set it as 100 MB, --audit-log-maxsize=100
-	 Permissive.
+          Permissive.
         scored: true
 
       - id: 1.2.22
@@ -697,7 +697,7 @@ groups:
           Edit the API server pod specification file $apiserverconf
           and set the below parameter as appropriate and if needed.
           For example, --request-timeout=300s
-	Permissive.
+          Permissive.
         scored: false
 
       - id: 1.2.23
@@ -798,7 +798,7 @@ groups:
 
       - id: 1.2.29
         text: "Ensure that the --encryption-provider-config argument is set as appropriate (Manual)"
-	type: "skip"
+        type: "skip"
         audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-apiserver' | tail -n1 | grep 'encryption-provider-config'"
         tests:
           test_items:
@@ -808,7 +808,7 @@ groups:
           Then, edit the API server pod specification file $apiserverconf
           on the control plane node and set the --encryption-provider-config parameter to the path of that file.
           For example, --encryption-provider-config=</path/to/EncryptionConfig/File>
-	  Permissive - Enabling encryption changes how data can be recovered as data is encrypted.
+          Permissive - Enabling encryption changes how data can be recovered as data is encrypted.
         scored: false
 
       - id: 1.2.30
@@ -826,7 +826,7 @@ groups:
         remediation: |
           Follow the Kubernetes documentation and configure a EncryptionConfig file.
           In this file, choose aescbc, kms or secretbox as the encryption provider.
-	  Permissive - Enabling encryption changes how data can be recovered as data is encrypted.
+          Permissive - Enabling encryption changes how data can be recovered as data is encrypted.
         scored: false
 
       - id: 1.2.32
@@ -923,7 +923,7 @@ groups:
 
       - id: 1.3.6
         text: "Ensure that the RotateKubeletServerCertificate argument is set to true (Automated)"
-	type: "skip"
+        type: "skip"
         audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-controller-manager' | tail -n1 | grep 'RotateKubeletServerCertificate'"
         tests:
           bin_op: or

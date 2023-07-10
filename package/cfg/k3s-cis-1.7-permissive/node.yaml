@@ -10,7 +10,7 @@ groups:
     checks:
       - id: 4.1.1
         text: "Ensure that the kubelet service file permissions are set to 600 or more restrictive (Automated)"
-	type: "skip"
+        type: "skip"
         audit: '/bin/sh -c ''if test -e $kubeletsvc; then stat -c permissions=%a $kubeletsvc; fi'' '
         tests:
           test_items:
@@ -21,13 +21,12 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the each worker node.
           For example, chmod 600 $kubeletsvc
-	  Not Applicable.
-           All configuration is passed in as arguments at container run time.
+          Not Applicable - All configuration is passed in as arguments at container run time.
         scored: true
 
       - id: 4.1.2
         text: "Ensure that the kubelet service file ownership is set to root:root (Automated)"
-	 type: "skip"
+        type: "skip"
         audit: '/bin/sh -c ''if test -e $kubeletsvc; then stat -c %U:%G $kubeletsvc; fi'' '
         tests:
           test_items:
@@ -130,8 +129,8 @@ groups:
 
       - id: 4.1.9
         text: "Ensure that the kubelet --config configuration file has permissions set to 600 or more restrictive (Automated)"
-        type: "skip"        
-	audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c permissions=%a $kubeletconf; fi'' '
+        type: "skip"
+        audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c permissions=%a $kubeletconf; fi'' '
         tests:
           test_items:
             - flag: "permissions"
@@ -144,8 +143,8 @@ groups:
         scored: true
 
       - id: 4.1.10
-	text: "Ensure that the kubelet --config configuration file ownership is set to root:root (Automated)"
-	type: "skip"
+        text: "Ensure that the kubelet --config configuration file ownership is set to root:root (Automated)"
+        type: "skip"
         audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c %U:%G $kubeletconf; fi'' '
         tests:
           test_items:
@@ -226,7 +225,7 @@ groups:
       - id: 4.2.4
         text: "Verify that the --read-only-port argument is set to 0 (Manual)"
         audit: "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1 | grep 'read-only-port' "
-	audit_config: "/bin/sh -c 'if test -e $kubeletconf; then /bin/cat $kubeletconf; fi' "
+        audit_config: "/bin/sh -c 'if test -e $kubeletconf; then /bin/cat $kubeletconf; fi' "
         tests:
           bin_op: or
           test_items:
@@ -348,8 +347,8 @@ groups:
 
       - id: 4.2.9
         text: "Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Manual)"
-	type: "skip"	        
-	audit:  "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1"
+        type: "skip"
+        audit: "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1"
         tests:
           test_items:
             - flag: --tls-cert-file
