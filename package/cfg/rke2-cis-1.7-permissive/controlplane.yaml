@@ -35,7 +35,7 @@ groups:
     checks:
       - id: 3.2.1
         text: "Ensure that a minimal audit policy is created (Automated)"
-	type: "skip"
+        type: "skip"
         audit: "/bin/ps -ef | grep kube-apiserver | grep -v grep | grep -o audit-policy-file"
         tests:
           test_items:
@@ -46,7 +46,7 @@ groups:
               set: true
         remediation: |
           Create an audit policy file for your cluster.
-	   Permissive.
+          Permissive.
         scored: true
 
       - id: 3.2.2

@@ -56,7 +56,7 @@ groups:
           Run the below command (based on the etcd data directory found above). For example,
           chmod 700 /var/lib/etcd
         scored: true
-      
+
       - id: 1.1.12
         text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Automated)"
         type: "skip"
@@ -69,14 +69,14 @@ groups:
           from the command 'ps -ef | grep etcd'.
           Run the below command (based on the etcd data directory found above).
           For example, chown etcd:etcd /var/lib/etcd
-        scored: true        
-  
+        scored: true
+
   - id: 2
     text: "Etcd Node Configuration"
     checks:
       - id: 2.1
         text: "Ensure that the --cert-file and --key-file arguments are set as appropriate (Automated)"
-	type: "skip"
+        type: "skip"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
         tests:
           bin_op: and
@@ -91,12 +91,12 @@ groups:
           on the master node and set the below parameters.
           --cert-file=</path/to/ca-file>
           --key-file=</path/to/key-file>
-	  Not Applicable.
+          Not Applicable.
         scored: true
 
       - id: 2.2
         text: "Ensure that the --client-cert-auth argument is set to true (Automated)"
-	type: "skip"
+        type: "skip"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
         tests:
           test_items:
@@ -109,7 +109,7 @@ groups:
           Edit the etcd pod specification file $etcdconf on the master
           node and set the below parameter.
           --client-cert-auth="true"
-	  Not Applicable.
+          Not Applicable.
         scored: true
 
       - id: 2.3
@@ -153,12 +153,12 @@ groups:
           master node and set the below parameters.
           --peer-client-file=</path/to/peer-cert-file>
           --peer-key-file=</path/to/peer-key-file>
-	  Not Applicable.
+          Not Applicable.
         scored: true
 
       - id: 2.5
         text: "Ensure that the --peer-client-cert-auth argument is set to true (Automated)"
-	type: "skip"
+        type: "skip"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
         tests:
           test_items:
@@ -172,7 +172,7 @@ groups:
           Edit the etcd pod specification file $etcdconf on the master
           node and set the below parameter.
           --peer-client-cert-auth=true
-	  Not Applicable.
+          Not Applicable.
         scored: true
 
       - id: 2.6
