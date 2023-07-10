@@ -1,4 +1,4 @@
-FROM registry.suse.com/bci/bci-base:15.4
+FROM registry.suse.com/bci/bci-base:15.5
 
 ARG kube_bench_version=0.6.12
 ARG sonobuoy_version=0.56.16
