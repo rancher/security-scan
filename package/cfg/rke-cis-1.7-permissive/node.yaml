@@ -405,7 +405,7 @@ groups:
           systemctl restart kubelet.service
         scored: true
 
-      - id: 4.2.12
+      - id: 4.2.11
         text: "Verify that the RotateKubeletServerCertificate argument is set to true (Manual)"
         type: "skip"
         audit: "/bin/ps -fC $kubeletbin"
