@@ -19,6 +19,8 @@ steps:
 - name: docker-publish
   image: plugins/docker
   settings:
+    build_args:
+    - ARCH=arm64
     dockerfile: package/Dockerfile
     password:
       from_secret: docker_password
@@ -61,6 +63,8 @@ steps:
 - name: docker-publish
   image: plugins/docker
   settings:
+    build_args:
+    - ARCH=arm64
     dockerfile: package/Dockerfile
     password:
       from_secret: docker_password
