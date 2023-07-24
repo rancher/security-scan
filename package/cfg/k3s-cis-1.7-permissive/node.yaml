@@ -276,6 +276,7 @@ groups:
 
       - id: 4.2.6
         text: "Ensure that the --make-iptables-util-chains argument is set to true (Automated)"
+        type: "skip"
         audit: "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1 | grep 'make-iptables-util-chains'"
         tests:
           test_items:
@@ -297,6 +298,7 @@ groups:
           Based on your system, restart the kubelet service. For example:
           systemctl daemon-reload
           systemctl restart kubelet.service
+          Permissive.
         scored: true
 
       - id: 4.2.7
