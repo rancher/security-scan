@@ -63,6 +63,10 @@ echo "> Deploying test resources"
 envsubst < ./tests/deploy.yaml | kubectl apply -f -
 kubectl wait --for=condition=ready -n cis-operator-system pod security-scan-runner-scan-test --timeout=30s
 
+echo "> Check binaries:"
+kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- /usr/bin/sonobuoy
+kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- /usr/bin/kube-bench version
+kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- /usr/local/bin/kubectl version
 kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- run.sh &
 
 sleep 20 # Wait for the new daemonset to be created
