@@ -21,8 +21,9 @@ RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${son
 RUN curl -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_version}/kube-bench_${kube_bench_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /usr/bin
 
 # Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/.
-RUN curl -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/v${kube_bench_version}.tar.gz" | \
-    tar xvz -C . --strip-components=1 "kube-bench-${kube_bench_version}/cfg"
+RUN mkdir -p /etc/kube-bench/ && \
+    curl -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/v${kube_bench_version}.tar.gz" | \
+    tar xvz -C /etc/kube-bench/ --strip-components=1 "kube-bench-${kube_bench_version}/cfg"
 
 COPY package/cfg/ /etc/kube-bench/cfg/
 COPY package/run.sh \
