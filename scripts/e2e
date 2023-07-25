@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eou pipefail
 
 export ARCH="${ARCH:-amd64}"
 export IMAGE=security-scan:e2e
@@ -11,7 +11,8 @@ KINDCONFIG="$(mktemp)"
 E2E_TIMEOUT_SECONDS=600
 
 function cleanup() {
-    rm -rf "${KINDCONFIG}" | true    
+  kind delete cluster --name "${CLUSTER_NAME}" | true
+  rm -rf "${KINDCONFIG}" | true
 }
 trap cleanup EXIT
 
@@ -67,6 +68,27 @@ echo "> Check binaries:"
 kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- /usr/bin/sonobuoy
 kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- /usr/bin/kube-bench version
 kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- /usr/local/bin/kubectl version
+
+echo "> Check for upstream test files:"
+dirs="ack-1.0 aks-1.0 cis-1.20 cis-1.23 cis-1.24 cis-1.5 cis-1.6 cis-1.6-k3s config.yaml eks-1.0.1 eks-1.1.0 eks-stig-kubernetes-v1r6 gke-1.0 gke-1.2.0 rh-0.7 rh-1.0"
+
+for d in ${dirs}; do
+  if ! kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- stat "/etc/kube-bench/cfg/$d"; then
+    echo "/etc/kube-bench/cfg/$d not found"
+    exit 1
+  fi
+done
+
+echo "> Check for our own test files:"
+dirs="$(ls package/cfg)"
+
+for d in ${dirs}; do
+  if ! kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- stat "/etc/kube-bench/cfg/$d"; then
+    echo "/etc/kube-bench/cfg/$d not found"
+    exit 1
+  fi
+done
+
 kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- run.sh &
 
 sleep 20 # Wait for the new daemonset to be created

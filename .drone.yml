@@ -20,7 +20,7 @@ steps:
   image: plugins/docker
   settings:
     build_args:
-    - ARCH=arm64
+    - ARCH=amd64
     dockerfile: package/Dockerfile
     password:
       from_secret: docker_password
