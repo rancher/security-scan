@@ -239,8 +239,6 @@ target_mapping:
   # GKE
   "gke-1.2.0":
     - "node"
-    - "managedservices"
-    - "policies"
   # AKS
   "aks-1.0":
     - "node"
