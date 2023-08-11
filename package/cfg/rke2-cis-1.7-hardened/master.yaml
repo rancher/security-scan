@@ -160,7 +160,7 @@ groups:
 
       - id: 1.1.15
         text: "Ensure that the scheduler.conf file permissions are set to 600 or more restrictive (Automated)"
-        audit: "stat -c %a /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig"
+        audit: "stat -c permissions=%a /var/lib/rancher/rke2/server/cred/scheduler.kubeconfig"
         tests:
           test_items:
             - flag: "600"
@@ -192,7 +192,7 @@ groups:
 
       - id: 1.1.17
         text: "Ensure that the controller-manager.conf file permissions are set to 600 or more restrictive (Automated)"
-        audit: "stat -c %a /var/lib/rancher/rke2/server/cred/controller.kubeconfig"
+        audit: "stat -c permissions=%a /var/lib/rancher/rke2/server/cred/controller.kubeconfig"
         tests:
           test_items:
             - flag: "600"
