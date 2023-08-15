@@ -30,6 +30,8 @@ master:
       - kube-controller-manager
     confs:
       - /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
+    kubeconfig:
+      - /var/lib/rancher/rke2/server/cred/controller.kubeconfig
     defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
 
   etcd:
