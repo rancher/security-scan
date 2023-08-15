@@ -269,7 +269,7 @@ groups:
 
       - id: 1.1.18
         text: "Ensure that the controller-manager.conf file ownership is set to root:root (Automated)"
-        audit: "stat -c %U:%G /var/lib/rancher/k3s/server/tls"
+        audit: "stat -c %U:%G /var/lib/rancher/k3s/server/cred/controller.kubeconfig"
         tests:
           test_items:
             - flag: "root:root"
@@ -285,7 +285,7 @@ groups:
 
       - id: 1.1.19
         text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Automated)"
-        audit: "find /var/lib/rancher/k3s/server/tls | xargs stat -c %U:%G"
+        audit: "check_files_owner_in_dir.sh /etc/kubernetes/pki/"
         use_multiple_values: true
         tests:
           test_items:
