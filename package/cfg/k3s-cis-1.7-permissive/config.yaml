@@ -4,6 +4,7 @@
 master:
   components:
     - apiserver
+    - kubelet
     - scheduler
     - controllermanager
     - etcd
@@ -12,6 +13,12 @@ master:
   apiserver:
     bins:
       - containerd
+
+  kubelet:
+    bins:
+      - containerd
+    defaultkubeconfig: /var/lib/rancher/k3s/agent/kubelet.kubeconfig
+    defaultcafile: /var/lib/rancher/k3s/agent/client-ca.crt
 
   scheduler:
     bins:
@@ -32,9 +39,7 @@ master:
 
     kubelet:
       bins:
-        - "containerd"
-        - "hyperkube kubelet"
-        - "kubelet"
+        - containerd
       defaultkubeconfig: /var/lib/rancher/k3s/agent/kubelet.kubeconfig
       defaultcafile: /var/lib/rancher/k3s/agent/client-ca.crt
 
