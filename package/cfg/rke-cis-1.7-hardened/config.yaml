@@ -22,4 +22,4 @@ node:
       - kubelet
 
   proxy:
-    defaultkubeconfig: "/etc/kubernetes/ssl/kubecfg-kube-proxy.yaml"
+    defaultkubeconfig: "/node/etc/kubernetes/ssl/kubecfg-kube-proxy.yaml"
