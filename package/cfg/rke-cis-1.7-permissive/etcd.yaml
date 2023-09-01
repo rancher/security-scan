@@ -59,19 +59,19 @@ groups:
         scored: true
 
       - id: 1.1.20
-        text: "Ensure that the Kubernetes PKI certificate file permissions are set to 644 or more restrictive (Manual)"
-        audit: "check_files_permissions.sh '/etc/kubernetes/pki/*.crt'"
+        text: "Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Manual)"
+        audit: "find /node/etc/kubernetes/ssl/  -name '*.pem' ! -name '*key.pem' | xargs stat -c permissions=%a"
         use_multiple_values: true
         tests:
           test_items:
             - flag: "permissions"
               compare:
                 op: bitmask
-                value: "644"
+                value: "600"
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
-          chmod -R 644 /etc/kubernetes/pki/*.crt
+          find /node/etc/kubernetes/ssl/  -name '*.pem' ! -name '*key.pem' -exec chmod -R 600 {} +
         scored: false
 
       - id: 1.1.21
