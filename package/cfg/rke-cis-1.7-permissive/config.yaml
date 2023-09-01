@@ -1,14 +1,25 @@
 ---
 ## Version-specific settings that override the values in cfg/config.yaml
 
+master:
+  components:
+    - apiserver
+    - kubelet
+    - scheduler
+    - controllermanager
+    - etcd
+    - policies
+
+  kubelet:
+    bins:
+      - kubelet
+
 node:
   kubelet:
     defaultkubeconfig: "/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
     defaultcafile: "/etc/kubernetes/ssl/kube-ca.pem"
     bins:
-      - "containerd"
-      - "hyperkube kubelet"
-      - "kubelet"
+      - kubelet
 
   proxy:
-    defaultkubeconfig: "/etc/kubernetes/ssl/kubecfg-kube-proxy.yaml"
+    defaultkubeconfig: "/node/etc/kubernetes/ssl/kubecfg-kube-proxy.yaml"
