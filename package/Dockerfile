@@ -2,7 +2,7 @@ FROM registry.suse.com/bci/bci-base:15.5
 
 ARG kube_bench_version=0.6.12
 ARG sonobuoy_version=0.56.16
-ARG kubectl_version=1.26.3
+ARG kubectl_version=1.28.0
 ARG ARCH
 
 RUN zypper --non-interactive update \
