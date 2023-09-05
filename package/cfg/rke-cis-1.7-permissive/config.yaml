@@ -16,8 +16,8 @@ master:
 
 node:
   kubelet:
-    defaultkubeconfig: "/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
-    defaultcafile: "/etc/kubernetes/ssl/kube-ca.pem"
+    defaultkubeconfig: "/node/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
+    defaultcafile: "/node/etc/kubernetes/ssl/kube-ca.pem"
     bins:
       - kubelet
 
