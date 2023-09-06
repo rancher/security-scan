@@ -6,7 +6,7 @@ export IMAGE=security-scan:e2e
 export SONOBUOY_IMAGE=rancher/mirrored-sonobuoy-sonobuoy:v0.56.7
 
 CLUSTER_NAME="kind-${RANDOM}"
-KUBE_VERSION="${KUBE_VERSION:-v1.26.0}"
+KUBE_VERSION="${KUBE_VERSION:-v1.28.0}"
 KINDCONFIG="$(mktemp)"
 E2E_TIMEOUT_SECONDS=600
 
