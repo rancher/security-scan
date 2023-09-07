@@ -98,7 +98,7 @@ groups:
         scored: true
 
       - id: 4.1.7
-        text: "Ensure that the certificate authorities file permissions are set to 600 or more restrictive (Automated)"
+        text: "Ensure that the certificate authorities file permissions are set to 600 or more restrictive (Manual)"
         audit: "stat -c %a /var/lib/rancher/k3s/server/tls/server-ca.crt"
         tests:
           test_items:
@@ -110,7 +110,7 @@ groups:
         remediation: |
           Run the following command to modify the file permissions of the
           --client-ca-file chmod 600 <filename>
-        scored: true
+        scored: false
 
       - id: 4.1.8
         text: "Ensure that the client certificate authorities file ownership is set to root:root (Manual)"
