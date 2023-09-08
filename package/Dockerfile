@@ -9,8 +9,6 @@ RUN zypper --non-interactive update \
     && zypper --non-interactive install \
     curl \
     jq \
-    vim \
-    systemd \
     tar \
     awk \
     gzip
