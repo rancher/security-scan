@@ -117,7 +117,7 @@ groups:
         tests:
           bin_op: or
           test_items:
-            - flag: "--client-cert-auth"              
+            - flag: "--client-cert-auth"
               set: true
             - flag: "--client-cert-auth"
               env: "ETCD_CLIENT_CERT_AUTH"
