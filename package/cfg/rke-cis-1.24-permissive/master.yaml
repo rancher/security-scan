@@ -764,7 +764,7 @@ groups:
         scored: false
 
       - id: 1.2.32
-        text: "Ensure that the API Server only makes use of Strong Cryptographic Ciphers (Automated)"       
+        text: "Ensure that the API Server only makes use of Strong Cryptographic Ciphers (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           test_items:
