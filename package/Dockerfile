@@ -7,6 +7,7 @@ ARG ARCH
 
 RUN zypper --non-interactive update \
     && zypper --non-interactive install \
+    systemd \
     curl \
     jq \
     tar \
