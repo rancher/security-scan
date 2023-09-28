@@ -1,5 +1,8 @@
+# Final micro image
+FROM registry.suse.com/bci/bci-micro:15.5 AS micro
+
 # Temporary build stage
-FROM registry.suse.com/bci/bci-base:15.5 as builder
+FROM registry.suse.com/bci/bci-base:15.5 AS builder
 
 # Define build arguments
 ARG kube_bench_version=0.6.17
@@ -8,50 +11,37 @@ ARG kubectl_version=1.28.0
 ARG ARCH
 
 # Install build dependencies
-RUN zypper --non-interactive update && zypper --non-interactive install jq awk tar systemd
+RUN zypper --non-interactive update && zypper --non-interactive install jq awk
 
-# Install kubectl
-RUN curl -Lo ./kubectl "https://storage.googleapis.com/kubernetes-release/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl" && \
-    chmod +x ./kubectl && \
-    mv ./kubectl /usr/local/bin/
+# Install system packages using builder image that has zypper 
+COPY --from=micro / /chroot/
 
-# Install Sonobuoy
-RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /usr/bin sonobuoy
+# Install kubectl into micro
+RUN curl -Lo /chroot/usr/local/bin/kubectl "https://storage.googleapis.com/kubernetes-release/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl" && chmod +x /chroot/usr/local/bin/kubectl
 
-# Install kube-bench
-RUN curl -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_version}/kube-bench_${kube_bench_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /usr/bin
+## Install Sonobuoy into micro
+RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /chroot/usr/bin sonobuoy
 
-# Fix ownership to root:root for all three binaries
-RUN chown root:root /usr/bin/sonobuoy /usr/local/bin/kubectl /usr/bin/kube-bench
+## Install kube-bench into micro
+RUN curl -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_version}/kube-bench_${kube_bench_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /chroot/usr/bin
 
-# Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/
-RUN mkdir -p /etc/kube-bench/ && \
+## Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
+RUN mkdir -p /chroot/etc/kube-bench/ && \
     curl -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/v${kube_bench_version}.tar.gz" | \
-    tar xvz -C /etc/kube-bench/ --strip-components=1 "kube-bench-${kube_bench_version}/cfg"
+    tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${kube_bench_version}/cfg"
 
-# Main stage using bci-base as the base image
-FROM registry.suse.com/bci/bci-minimal:15.5
+## OS binaries to run kube-bench audit commands
+RUN zypper --installroot /chroot -n --gpg-auto-import-keys in --no-recommends findutils tar jq gawk diffutils procps systemd  && \
+    zypper --installroot /chroot clean -a && \
+    rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/*
 
-# Copy main binaries and configuration files from the builder stage
-COPY --from=builder /usr/local/bin/kubectl /usr/local/bin/
-COPY --from=builder /usr/bin/sonobuoy /usr/bin/
-COPY --from=builder /usr/bin/kube-bench /usr/bin/
-COPY --from=builder /usr/bin/journalctl /usr/bin/
-COPY --from=builder /etc/kube-bench/ /etc/kube-bench/
+# Main stage using bco-mirco as the base image
+FROM micro
 
-# Copy os binaries from the builder stage to serve kube-bench audit commands
-COPY --from=builder /usr/bin/pgrep /usr/bin/
-COPY --from=builder /usr/bin/find /usr/bin/
-COPY --from=builder /usr/bin/tar /usr/bin/
-COPY --from=builder /usr/bin/jq /usr/bin/
-COPY --from=builder /usr/bin/find  /usr/bin/
-COPY --from=builder /usr/bin/jq /usr/bin/
-COPY --from=builder /usr/bin/awk /usr/bin/
-COPY --from=builder /usr/bin/diff /usr/bin/
-COPY --from=builder /usr/bin/xargs /usr/bin/
-COPY --from=builder /usr/bin/ps /usr/bin/
+# Copy binaries and configuration files from builder to micro
+COPY --from=builder /chroot/ /
 
-# Copy binaries and configuration files from the local repository
+# Copy binaries and configuration files from the local repository to micro
 COPY package/cfg/ /etc/kube-bench/cfg/
 COPY package/run.sh \
     package/run_sonobuoy_plugin.sh \
