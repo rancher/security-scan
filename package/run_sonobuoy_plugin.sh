@@ -64,7 +64,7 @@ mkdir -p "${RESULTS_DIR}"
 
 # etcd
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(ps -e | grep etcd | wc -l)" -gt 0  ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s -u k3s-agent | grep -wv 'No entries' | grep -wv 'Logs begin' | wc -l)" -gt 0 ]]; then
+  if [[ "$(ps -e | grep etcd | wc -l)" -gt 0  ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s -u k3s-agent | grep -m1 "Managed etcd cluster initializing" | wc -l )" -gt 0 ]]; then
     echo "etcd: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets etcd \
@@ -97,7 +97,7 @@ fi
 
 # master (no etcd)
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep kube-apiserver | wc -l)" -gt 0 ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep 'Running kube-apiserver' | grep -v grep | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep kube-apiserver | wc -l)" -gt 0 ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Running kube-apiserver' | wc -l)" -gt 0 ]]; then
     echo "master: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets master \
@@ -131,7 +131,7 @@ fi
 kubeletconf="/node/var/lib/kubelet/config"
 
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep 'Running kubelet' | grep -v grep | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Running kubelet' | wc -l)" -gt 0 ]]; then
     echo "node: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets node \
@@ -169,7 +169,7 @@ fi
 #   there would be some controls which require running on
 #   master nodes only
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep kube-apiserver | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep 'Running kube-apiserver' | grep -v grep | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep kube-apiserver | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Running kube-apiserver' | wc -l)" -gt 0 ]]; then
     for controlFile in $(find ${CONFIG_DIR}/${OVERRIDE_BENCHMARK_VERSION}/ -name '*.yaml' ! -name config.yaml ! -name master.yaml ! -name node.yaml ! -name etcd.yaml); do
         echo "controlFile: ${controlFile}"
         target=$(basename "${controlFile}" .yaml)
