@@ -31,7 +31,7 @@ RUN mkdir -p /chroot/etc/kube-bench/ && \
     tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${kube_bench_version}/cfg"
 
 ## OS binaries to run kube-bench audit commands
-RUN zypper --installroot /chroot -n --gpg-auto-import-keys in --no-recommends findutils tar jq gawk diffutils procps systemd gzip  && \
+RUN zypper --installroot /chroot -n --gpg-auto-import-keys in --no-recommends findutils tar jq gawk diffutils procps systemd gzip curl  && \
     zypper --installroot /chroot clean -a && \
     rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/*
 
