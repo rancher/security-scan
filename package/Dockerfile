@@ -10,9 +10,6 @@ ARG sonobuoy_version=0.56.16
 ARG kubectl_version=1.28.0
 ARG ARCH
 
-# Install build dependencies
-RUN zypper --non-interactive update && zypper --non-interactive install jq awk
-
 # Install system packages using builder image that has zypper 
 COPY --from=micro / /chroot/
 
