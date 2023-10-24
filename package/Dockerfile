@@ -13,7 +13,7 @@ RUN zypper --non-interactive update \
     tar \
     awk \
     gzip
-RUN curl -Lo ./kubectl "https://storage.googleapis.com/kubernetes-release/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl" && \
+RUN curl -Lo ./kubectl "https://dl.k8s.io/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl" && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/
 RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /usr/bin sonobuoy

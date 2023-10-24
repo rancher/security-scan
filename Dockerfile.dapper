@@ -13,7 +13,7 @@ RUN curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v
     chmod +x ./kind && \
     mv ./kind /usr/local/bin/
 
-RUN curl -Lo ./kubectl "https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/${ARCH}/kubectl" && \
+RUN curl -Lo ./kubectl "https://dl.k8s.io/release/v${KUBERNETES_VERSION}/bin/linux/${ARCH}/kubectl" && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/
 
