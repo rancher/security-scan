@@ -1,7 +1,7 @@
 FROM registry.suse.com/bci/bci-base:15.5
 
-ARG kube_bench_version=0.6.12
-ARG sonobuoy_version=0.56.16
+ARG kube_bench_version=0.6.19
+ARG sonobuoy_version=0.57.0
 ARG kubectl_version=1.28.0
 ARG ARCH
 
