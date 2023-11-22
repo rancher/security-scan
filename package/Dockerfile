@@ -14,7 +14,7 @@ ARG ARCH
 COPY --from=micro / /chroot/
 
 # Install kubectl into micro
-RUN curl -Lo /chroot/usr/local/bin/kubectl "https://storage.googleapis.com/kubernetes-release/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl" && chmod +x /chroot/usr/local/bin/kubectl
+RUN curl -Lo /chroot/usr/local/bin/kubectl "https://dl.k8s.io/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl" && chmod +x /chroot/usr/local/bin/kubectl
 
 ## Install Sonobuoy into micro
 RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /chroot/usr/bin sonobuoy
