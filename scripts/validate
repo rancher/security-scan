@@ -6,7 +6,6 @@ cd $(dirname $0)/..
 echo Running validation
 
 PACKAGES="$(go list ./...)"
-
 echo Running: go vet
 go vet ${PACKAGES}
 echo Running: golint
@@ -16,5 +15,21 @@ for i in ${PACKAGES}; do
     fi
 done
 test -z "$failed"
-echo Running: go fmt
+echo "Running: go fmt"
 test -z "$(go fmt ${PACKAGES} | tee /dev/stderr)"
+
+echo "!! Running: yamllint against security-scan cfgs"
+CFGS="$(find package/cfg/ -mindepth 1 -type d)"
+FAILED_CFGS=()
+for cfg in ${CFGS}; do
+set -x
+    if [ -n "$(yamllint -s $cfg)" ]; then
+	#echo "!! $cfg FAILED"
+        FAILED_CFGS+=("$cfg")
+    fi
+set +x
+done
+if [ ${#FAILED_CFGS[@]} -gt 0 ]; then
+	echo "!!Error - yamllint failed for these cfgs: ${FAILED_CFGS[@]}"
+	exit 1
+fi
