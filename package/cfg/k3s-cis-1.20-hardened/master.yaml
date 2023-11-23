@@ -202,7 +202,7 @@ groups:
               compare:
                 op: eq
                 value: "644"
-              set : true
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,

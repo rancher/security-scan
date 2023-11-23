@@ -955,7 +955,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
-              set: true  
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |
@@ -992,7 +992,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
-              set: true  
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |

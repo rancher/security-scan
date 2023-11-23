@@ -286,12 +286,12 @@ groups:
         audit_config: "/bin/cat $kubeletconf"
         tests:
           bin_op: or
-          test_items:          
+          test_items:
             - flag: --protect-kernel-defaults
               path: '{.protectKernelDefaults}'
               compare:
                 op: eq
-                value: true                
+                value: true
               set: true
             - flag: --protect-kernel-defaults
               path: '{.protectKernelDefaults}'

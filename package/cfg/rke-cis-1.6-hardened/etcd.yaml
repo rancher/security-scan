@@ -100,10 +100,10 @@ groups:
         tests:
           bin_op: and
           test_items:
-              - flag: "--cert-file"
-                set: true
-              - flag: "--key-file"
-                set: true
+            - flag: "--cert-file"
+              set: true
+            - flag: "--key-file"
+              set: true
         remediation: |
           Follow the etcd service documentation and configure TLS encryption.
           Then, edit the etcd pod specification file /etc/kubernetes/manifests/etcd.yaml

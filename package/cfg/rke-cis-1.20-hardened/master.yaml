@@ -153,8 +153,6 @@ groups:
           chown root:root <path/to/cni/files>
         scored: false
 
-     
-
       - id: 1.1.13
         text: "Ensure that the admin.conf file permissions are set to 644 or more restrictive (Automated)"
         type: "skip"
@@ -963,7 +961,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
-              set: true  
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |
@@ -1000,7 +998,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
-              set: true  
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |

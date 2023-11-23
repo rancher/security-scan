@@ -116,7 +116,7 @@ groups:
 
       - id: 4.1.8
         text: "Ensure that the client certificate authorities file ownership is set to root:root (Manual)"
-        audit:  '/bin/sh -c ''if test -e $kubeletcafile; then stat -c %U:%G $kubeletcafile; fi'' '
+        audit: '/bin/sh -c ''if test -e $kubeletcafile; then stat -c %U:%G $kubeletcafile; fi'' '
         tests:
           test_items:
             - flag: root:root
@@ -282,12 +282,12 @@ groups:
         audit_config: "/bin/cat $kubeletconf"
         tests:
           bin_op: or
-          test_items:          
+          test_items:
             - flag: --protect-kernel-defaults
               path: '{.protectKernelDefaults}'
               compare:
                 op: eq
-                value: true                
+                value: true
               set: true
             - flag: --protect-kernel-defaults
               path: '{.protectKernelDefaults}'

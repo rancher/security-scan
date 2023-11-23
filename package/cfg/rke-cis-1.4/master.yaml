@@ -27,7 +27,7 @@ groups:
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           test_items:
-            - flag:  "--insecure-allow-any-token"
+            - flag: "--insecure-allow-any-token"
               set: false
         remediation: |
           Edit the API server pod specification file $apiserverconf
@@ -88,7 +88,7 @@ groups:
         tests:
           bin_op: or
           test_items:
-            - flag:  "--secure-port"
+            - flag: "--secure-port"
               compare:
                 op: gt
                 value: 0

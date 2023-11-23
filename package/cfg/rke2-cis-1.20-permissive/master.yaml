@@ -17,7 +17,7 @@ groups:
               compare:
                 op: eq
                 value: "644"
-              set: true  
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the
           master node.
@@ -827,7 +827,7 @@ groups:
 
       - id: 1.2.33
         text: "Ensure that encryption providers are appropriately configured (Manual)"
-        type: "skip"        
+        type: "skip"
         audit: |
           ENCRYPTION_PROVIDER_CONFIG=$(ps -ef | grep $apiserverbin | grep -- --encryption-provider-config | sed 's%.*encryption-provider-config[= ]\([^ ]*\).*%\1%')
           if test -e $ENCRYPTION_PROVIDER_CONFIG; then grep -A1 'providers:' $ENCRYPTION_PROVIDER_CONFIG | tail -n1 | grep -o "[A-Za-z]*" | sed 's/^/provider=/'; fi

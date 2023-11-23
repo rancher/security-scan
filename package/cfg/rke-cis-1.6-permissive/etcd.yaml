@@ -119,13 +119,13 @@ groups:
         tests:
           bin_op: or
           test_items:
-          - flag: "--client-cert-auth"
-            set: true
-          - flag: "--client-cert-auth"
-            compare:
-              op: eq
-              value: true
-            set: true
+            - flag: "--client-cert-auth"
+              set: true
+            - flag: "--client-cert-auth"
+              compare:
+                op: eq
+                value: true
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and set the below parameter.

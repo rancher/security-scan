@@ -34,7 +34,7 @@ RUN zypper --installroot /chroot -n --gpg-auto-import-keys in --no-recommends fi
     zypper --installroot /chroot clean -a && \
     rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/*
 
-# Main stage using bco-mirco as the base image
+# Main stage using bco-micro as the base image
 FROM micro
 
 # Copy binaries and configuration files from builder to micro

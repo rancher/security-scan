@@ -24,7 +24,7 @@ groups:
           ps -ef | grep etcd
           Run the below command (based on the etcd data directory found above). For example,
           chmod 700 /var/lib/etcd
-        scored: true  
+        scored: true
   - id: 2
     text: "Etcd Node Configuration Files"
     checks:

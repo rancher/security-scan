@@ -12,7 +12,7 @@ master:
   apiserver:
     bins:
       - kube-apiserver
-    confs: 
+    confs:
       - /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml
     defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-apiserver.yaml
 
@@ -29,7 +29,7 @@ master:
     confs:
       - /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
     defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
-  
+
   etcd:
     bins:
       - etcd
@@ -45,7 +45,7 @@ master:
     kubelet:
       defaultkubeconfig: /var/lib/rancher/rke2/agent/kubelet.kubeconfig
       defaultcafile: /var/lib/rancher/rke2/agent/client-ca.crt
-  
+
     proxy:
       defaultkubeconfig: /var/lib/rancher/rke2/agent/kubeproxy.kubeconfig
 

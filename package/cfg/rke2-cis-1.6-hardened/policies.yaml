@@ -73,12 +73,12 @@ groups:
         text: "Minimize the admission of privileged containers (Automated)"
         audit: "kubectl get psp global-restricted-psp -o json | jq -r '.spec.runAsUser.rule'"
         tests:
-           test_items:
-             - flag: "MustRunAsNonRoot"
-               compare:
-                 op: eq
-                 value: "MustRunAsNonRoot"
-               set: true
+          test_items:
+            - flag: "MustRunAsNonRoot"
+              compare:
+                op: eq
+                value: "MustRunAsNonRoot"
+              set: true
         remediation: |
           Create a PSP as described in the Kubernetes documentation, ensuring that
           the .spec.privileged field is omitted or set to false.

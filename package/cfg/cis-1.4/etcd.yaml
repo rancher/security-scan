@@ -13,11 +13,11 @@ groups:
         audit: ps -ef | grep $etcdbin | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | xargs stat -c %a
         tests:
           test_items:
-          - flag: "700"
-            compare:
-              op: eq
-              value: "700"
-            set: true
+            - flag: "700"
+              compare:
+                op: eq
+                value: "700"
+              set: true
         remediation: |
           On the etcd server node, get the etcd data directory, passed as an argument --data-dir ,
           from the below command:
@@ -31,8 +31,8 @@ groups:
         audit: ps -ef | grep $etcdbin | grep -- --data-dir | sed 's%.*data-dir[= ]\([^ ]*\).*%\1%' | xargs stat -c %U:%G
         tests:
           test_items:
-          - flag: "etcd:etcd"
-            set: true
+            - flag: "etcd:etcd"
+              set: true
         remediation: |
           On the etcd server node, get the etcd data directory, passed as an argument --data-dir ,
           from the below command:
@@ -47,11 +47,11 @@ groups:
         type: "manual"
         tests:
           test_items:
-          - flag: "root root"
-            compare:
-              op: eq
-              value: "root root"
-            set: true
+            - flag: "root root"
+              compare:
+                op: eq
+                value: "root root"
+              set: true
         remediation: |
           [Manual test]
           Run the below command (based on the file location on your system) on the master node.
@@ -111,10 +111,10 @@ groups:
         audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
         tests:
           test_items:
-          - flag: "--cert-file"
-            set: true
-          - flag:  "--key-file"
-            set: true
+            - flag: "--cert-file"
+              set: true
+            - flag: "--key-file"
+              set: true
         remediation: |
           Follow the etcd service documentation and configure TLS encryption.
           Then, edit the etcd pod specification file $etcdconf on the
@@ -128,11 +128,11 @@ groups:
         audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
         tests:
           test_items:
-          - flag: "--client-cert-auth"
-            compare:
-              op: eq
-              value: true
-            set: true
+            - flag: "--client-cert-auth"
+              compare:
+                op: eq
+                value: true
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and set the below parameter.
@@ -145,12 +145,12 @@ groups:
         tests:
           bin_op: or
           test_items:
-          - flag: "--auto-tls"
-            set: false
-          - flag: "--auto-tls"
-            compare:
-              op: eq
-              value: false
+            - flag: "--auto-tls"
+              set: false
+            - flag: "--auto-tls"
+              compare:
+                op: eq
+                value: false
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and either remove the --auto-tls parameter or set it to false.
@@ -164,10 +164,10 @@ groups:
         tests:
           bin_op: and
           test_items:
-          - flag: "--peer-cert-file"
-            set: true
-          - flag: "--peer-key-file"
-            set: true
+            - flag: "--peer-cert-file"
+              set: true
+            - flag: "--peer-key-file"
+              set: true
         remediation: |
           Follow the etcd service documentation and configure peer TLS encryption as appropriate
           for your etcd cluster. Then, edit the etcd pod specification file $etcdconf on the
@@ -181,11 +181,11 @@ groups:
         audit: "/bin/ps -ef | grep $etcdbin | grep -v grep"
         tests:
           test_items:
-          - flag: "--peer-client-cert-auth"
-            compare:
-              op: eq
-              value: true
-            set: true
+            - flag: "--peer-client-cert-auth"
+              compare:
+                op: eq
+                value: true
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and set the below parameter.
@@ -198,13 +198,13 @@ groups:
         tests:
           bin_op: or
           test_items:
-          - flag: "--peer-auto-tls"
-            set: false
-          - flag: "--peer-auto-tls"
-            compare:
-              op: eq
-              value: false
-            set: true
+            - flag: "--peer-auto-tls"
+              set: false
+            - flag: "--peer-auto-tls"
+              compare:
+                op: eq
+                value: false
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and either remove the --peer-auto-tls parameter or set it to false.
@@ -217,8 +217,8 @@ groups:
         type: "manual"
         tests:
           test_items:
-          - flag: "--trusted-ca-file"
-            set: true
+            - flag: "--trusted-ca-file"
+              set: true
         remediation: |
           [Manual test]
           Follow the etcd documentation and create a dedicated certificate authority setup for the

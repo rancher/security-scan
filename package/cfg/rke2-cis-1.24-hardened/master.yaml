@@ -78,7 +78,7 @@ groups:
               compare:
                 op: eq
                 value: "600"
-              set: true  
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chmod 600 $schedulerconf
@@ -137,7 +137,7 @@ groups:
               compare:
                 op: bitmask
                 value: "600"
-              set: true  
+              set: true
         remediation: |
           Run the below command (based on the file location on your system) on the control plane node.
           For example, chmod 600 /etc/kubernetes/admin.conf
@@ -311,7 +311,7 @@ groups:
               compare:
                 op: nothave
                 value: "DenyServiceExternalIPs"
-              set: true  
+              set: true
             - flag: "--enable-admission-plugins"
               set: false
         remediation: |
