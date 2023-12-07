@@ -219,8 +219,8 @@ version_mapping:
   "v1.18.10+rke2r1":
     - "rke2-cis-1.5-hardened"
     - "rke2-cis-1.5-permissive"
-  "eks-1.0.1":
-    - "eks-1.0.1"
+  "eks-1.2.0":
+    - "eks-1.2.0"
   "gke-1.2.0":
     - "gke-1.2.0"
   "aks-1.0":
@@ -234,7 +234,7 @@ version_mapping:
 
 target_mapping:
   # EKS
-  "eks-1.0.1":
+  "eks-1.2.0":
     - "node"
   # GKE
   "gke-1.2.0":
