@@ -1,12 +1,14 @@
 # Final micro image
 FROM registry.suse.com/bci/bci-micro:15.5 AS micro
 
+
 # Temporary build stage
 FROM registry.suse.com/bci/bci-base:15.5 AS builder
 
 # Define build arguments
-ARG kube_bench_version=0.6.17
-ARG sonobuoy_version=0.56.16
+ARG kube_bench_version=0.6.19
+ARG sonobuoy_version=0.57.0
+
 ARG kubectl_version=1.28.0
 ARG ARCH
 

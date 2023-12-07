@@ -70,7 +70,7 @@ kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-ci
 kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- /usr/local/bin/kubectl version
 
 echo "> Check for upstream test files:"
-dirs="ack-1.0 aks-1.0 cis-1.20 cis-1.23 cis-1.24 cis-1.5 cis-1.6 cis-1.6-k3s config.yaml eks-1.0.1 eks-1.1.0 eks-stig-kubernetes-v1r6 gke-1.0 gke-1.2.0 rh-0.7 rh-1.0"
+dirs="ack-1.0 aks-1.0 cis-1.20 cis-1.23 cis-1.24 cis-1.5 cis-1.6 cis-1.6-k3s config.yaml eks-1.0.1 eks-1.1.0 eks-1.2.0 eks-stig-kubernetes-v1r6 gke-1.0 gke-1.2.0 rh-0.7 rh-1.0"
 
 for d in ${dirs}; do
   if ! kubectl exec -n cis-operator-system security-scan-runner-scan-test -c rancher-cis-benchmark -- stat "/etc/kube-bench/cfg/$d"; then
