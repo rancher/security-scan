@@ -286,7 +286,7 @@ groups:
               path: '{.protectKernelDefaults}'
               compare:
                 op: eq
-                value: true                
+                value: true
               set: true
             - flag: --protect-kernel-defaults
               path: '{.protectKernelDefaults}'

@@ -3,18 +3,37 @@ set -e
 
 cd $(dirname $0)/..
 
-echo Running validation
+echo "Running validation scripts"
 
-PACKAGES="$(go list ./...)"
+## validation : go file with golint
+echo "Running: go vet"
 
-echo Running: go vet
+PACKAGES="$(go list ./... | grep 'rancher/security-scan')"
 go vet ${PACKAGES}
-echo Running: golint
+
+echo "Running: golint"
 for i in ${PACKAGES}; do
     if [ -n "$(golint $i | grep -v 'should have comment.*or be unexported' | tee /dev/stderr)" ]; then
         failed=true
     fi
 done
 test -z "$failed"
-echo Running: go fmt
+echo "Running: go fmt"
 test -z "$(go fmt ${PACKAGES} | tee /dev/stderr)"
+
+## validation: Benchmarks (cfgs) yaml files with yamllint
+echo "Running: yamllint against security-scan cfgs"
+
+CFGS="$(find package/cfg/ -mindepth 1 -type d -printf "%f\n")"
+FAILED_CFGS_YML=()
+for cfg in ${CFGS}; do
+set -x
+    if [ -n "$(yamllint -s package/cfg/$cfg)" ]; then
+        FAILED_CFGS_YML+=("$package/cfg/cfg")
+    fi
+set +x
+done
+if [ ${#FAILED_CFGS_YML[@]} -gt 0 ]; then
+	echo "Error - yamllint failed for these cfgs: ${FAILED_CFGS_YML[@]}"
+	exit 1
+fi

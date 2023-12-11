@@ -87,7 +87,7 @@ groups:
           For example,
           chmod -R 600 /etc/kubernetes/pki/*.key
         scored: false
-        
+
   - id: 2
     text: "Etcd Node Configuration"
     checks:
@@ -117,7 +117,7 @@ groups:
         tests:
           bin_op: or
           test_items:
-            - flag: "--client-cert-auth"              
+            - flag: "--client-cert-auth"
               set: true
             - flag: "--client-cert-auth"
               env: "ETCD_CLIENT_CERT_AUTH"
@@ -186,7 +186,7 @@ groups:
               compare:
                 op: eq
                 value: true
-              set: true  
+              set: true
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and set the below parameter.
@@ -207,7 +207,7 @@ groups:
               compare:
                 op: eq
                 value: false
-              set: false  
+              set: false
         remediation: |
           Edit the etcd pod specification file $etcdconf on the master
           node and either remove the --peer-auto-tls parameter or set it to false.

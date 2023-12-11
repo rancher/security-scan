@@ -242,7 +242,7 @@ groups:
               compare:
                 op: eq
                 value: false
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the below parameter.
@@ -272,7 +272,7 @@ groups:
               compare:
                 op: nothave
                 value: "DenyServiceExternalIPs"
-              set: true  
+              set: true
             - flag: "--enable-admission-plugins"
               set: false
         remediation: |
@@ -343,7 +343,7 @@ groups:
               compare:
                 op: nothave
                 value: "AlwaysAllow"
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --authorization-mode parameter to values other than AlwaysAllow.
@@ -360,7 +360,7 @@ groups:
               compare:
                 op: has
                 value: "Node"
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --authorization-mode parameter to a value that includes Node.
@@ -376,7 +376,7 @@ groups:
               compare:
                 op: has
                 value: "RBAC"
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --authorization-mode parameter to a value that includes RBAC,
@@ -392,7 +392,7 @@ groups:
               compare:
                 op: has
                 value: "EventRateLimit"
-              set: true  
+              set: true
         remediation: |
           Follow the Kubernetes documentation and set the desired limits in a configuration file.
           Then, edit the API server pod specification file $apiserverconf
@@ -411,7 +411,7 @@ groups:
               compare:
                 op: nothave
                 value: AlwaysAdmit
-              set: true  
+              set: true
             - flag: "--enable-admission-plugins"
               set: false
         remediation: |
@@ -469,7 +469,7 @@ groups:
               compare:
                 op: nothave
                 value: "ServiceAccount"
-              set: true  
+              set: true
             - flag: "--disable-admission-plugins"
               set: false
         remediation: |
@@ -489,7 +489,7 @@ groups:
               compare:
                 op: nothave
                 value: "NamespaceLifecycle"
-              set: true  
+              set: true
             - flag: "--disable-admission-plugins"
               set: false
         remediation: |
@@ -507,7 +507,7 @@ groups:
               compare:
                 op: has
                 value: "NodeRestriction"
-              set: true  
+              set: true
         remediation: |
           Follow the Kubernetes documentation and configure NodeRestriction plug-in on kubelets.
           Then, edit the API server pod specification file $apiserverconf
@@ -526,7 +526,7 @@ groups:
               compare:
                 op: gt
                 value: 0
-              set: true  
+              set: true
             - flag: "--secure-port"
               set: false
         remediation: |
@@ -544,7 +544,7 @@ groups:
               compare:
                 op: eq
                 value: false
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the below parameter.
@@ -574,7 +574,7 @@ groups:
               compare:
                 op: gte
                 value: 30
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxage parameter to 30
@@ -591,7 +591,7 @@ groups:
               compare:
                 op: gte
                 value: 10
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxbackup parameter to 10 or to an appropriate
@@ -608,7 +608,7 @@ groups:
               compare:
                 op: gte
                 value: 100
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxsize parameter to an appropriate size in MB.
@@ -637,7 +637,7 @@ groups:
               compare:
                 op: eq
                 value: true
-              set: true  
+              set: true
         remediation: |
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the below parameter.
@@ -805,7 +805,7 @@ groups:
               compare:
                 op: eq
                 value: false
-              set: true  
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node and set the below parameter.
@@ -821,7 +821,7 @@ groups:
               compare:
                 op: noteq
                 value: false
-              set: true  
+              set: true
         remediation: |
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node to set the below parameter.
@@ -873,7 +873,7 @@ groups:
           Edit the Controller Manager pod specification file $controllermanagerconf
           on the control plane node and set the --feature-gates parameter to include RotateKubeletServerCertificate=true.
           --feature-gates=RotateKubeletServerCertificate=true
-          
+
           Cluster provisioned by RKE handles certificate rotation directly through RKE.
         scored: true
 
@@ -887,7 +887,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
-              set: true  
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |
@@ -907,7 +907,7 @@ groups:
               compare:
                 op: eq
                 value: false
-              set: true  
+              set: true
         remediation: |
           Edit the Scheduler pod specification file $schedulerconf file
           on the control plane node and set the below parameter.
@@ -924,7 +924,7 @@ groups:
               compare:
                 op: eq
                 value: "127.0.0.1"
-              set: true  
+              set: true
             - flag: "--bind-address"
               set: false
         remediation: |

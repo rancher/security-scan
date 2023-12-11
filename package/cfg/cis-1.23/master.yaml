@@ -339,7 +339,7 @@ groups:
               compare:
                 op: nothave
                 value: "DenyServiceExternalIPs"
-              set: true  
+              set: true
             - flag: "--enable-admission-plugins"
               set: false
         remediation: |

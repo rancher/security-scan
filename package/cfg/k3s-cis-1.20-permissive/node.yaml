@@ -401,7 +401,7 @@ groups:
 
       - id: 4.2.10
         text: "Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Manual)"
-        audit:  "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1"
+        audit: "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1"
         tests:
           test_items:
             - flag: --tls-cert-file

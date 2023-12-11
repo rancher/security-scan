@@ -49,7 +49,7 @@ groups:
               compare:
                 op: bitmask
                 value: "700"
-              set: true  
+              set: true
         remediation: |
           On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
           from the below command:
@@ -57,7 +57,7 @@ groups:
           Run the below command (based on the etcd data directory found above). For example,
           chmod 700 /var/lib/etcd
         scored: true
-      
+
       - id: 1.1.12
         text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Automated)"
         type: "skip"
@@ -71,8 +71,8 @@ groups:
           ps -ef | grep etcd
           Run the below command (based on the etcd data directory found above).
           For example, chown etcd:etcd /var/lib/etcd
-        scored: true        
-  
+        scored: true
+
   - id: 2
     text: "Etcd Node Configuration Files"
     checks:

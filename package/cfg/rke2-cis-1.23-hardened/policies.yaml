@@ -95,12 +95,12 @@ groups:
         text: "Minimize the admission of privileged containers (Manual)"
         audit: kubectl get psp global-restricted-psp && kubectl get psp global-restricted-psp -o json | jq -r ".spec.runAsUser.rule" || kubectl get psp restricted-noroot-psp && kubectl get psp restricted-noroot-psp -o json | jq -r ".spec.runAsUser.rule"
         tests:
-           test_items:
-             - flag: "MustRunAsNonRoot"
-               compare:
-                 op: eq
-                 value: "MustRunAsNonRoot"
-               set: true
+          test_items:
+            - flag: "MustRunAsNonRoot"
+              compare:
+                op: eq
+                value: "MustRunAsNonRoot"
+              set: true
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of privileged containers.
