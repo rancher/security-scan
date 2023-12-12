@@ -6,7 +6,7 @@ import (
 
 	"github.com/rancher/security-scan/pkg/kb-summarizer/summarizer"
 	"github.com/sirupsen/logrus"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 const (
@@ -36,46 +36,46 @@ func main() {
 	app.Name = "kb-summarizer"
 	app.Version = VERSION
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  K8SVersionFlag,
 			Value: "",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  BenchmarkVersionFlag,
 			Value: "",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  ControlsDirFlag,
 			Value: summarizer.DefaultControlsDirectory,
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  InputDirFlag,
 			Value: "",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  OutputDirFlag,
 			Value: "",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  OutputFileNameFlag,
 			Value: summarizer.DefaultOutputFileName,
 		},
-		cli.StringFlag{
-			Name:   UserSkipConfigFileFlag,
-			EnvVar: UserSkipConfigFileEnvVar,
-			Value:  "",
+		&cli.StringFlag{
+			Name:    UserSkipConfigFileFlag,
+			EnvVars: []string{UserSkipConfigFileEnvVar},
+			Value:   "",
 		},
-		cli.StringFlag{
-			Name:   DefaultSkipConfigFileFlag,
-			EnvVar: DefaultSkipConfigFileEnvVar,
-			Value:  "",
+		&cli.StringFlag{
+			Name:    DefaultSkipConfigFileFlag,
+			EnvVars: []string{DefaultSkipConfigFileEnvVar},
+			Value:   "",
 		},
-		cli.StringFlag{
-			Name:   NotApplicableConfigFileFlag,
-			EnvVar: NotApplicableConfigFileEnvVar,
-			Value:  "",
+		&cli.StringFlag{
+			Name:    NotApplicableConfigFileFlag,
+			EnvVars: []string{NotApplicableConfigFileEnvVar},
+			Value:   "",
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name: FailuresOnlyFlag,
 		},
 	}
