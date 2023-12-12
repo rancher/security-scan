@@ -1,4 +1,4 @@
-FROM registry.suse.com/bci/golang:1.20
+FROM registry.suse.com/bci/golang:1.21
 
 ARG KIND_VERSION=0.17.0
 ARG KUBERNETES_VERSION=1.28.0
