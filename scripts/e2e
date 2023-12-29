@@ -2,11 +2,11 @@
 set -eou pipefail
 
 export ARCH="${ARCH:-amd64}"
-export IMAGE=security-scan:e2e
+export IMAGE=rancher/security-scan:dev
 export SONOBUOY_IMAGE=rancher/mirrored-sonobuoy-sonobuoy:v0.56.7
 
 CLUSTER_NAME="kind-${RANDOM}"
-KUBE_VERSION="${KUBE_VERSION:-v1.26.0}"
+KUBE_VERSION="${KUBE_VERSION:-v1.28.0}"
 KINDCONFIG="$(mktemp)"
 E2E_TIMEOUT_SECONDS=600
 
@@ -21,7 +21,7 @@ cd $(dirname $0)/..
 echo "Running E2E tests"
 sleep "${E2E_TIMEOUT_SECONDS}" && kind delete cluster --name "${CLUSTER_NAME}" | false &
 
-echo "> Spinning up flux kind cluster"
+echo "> Spinning up ${KUBE_VERSION} kind cluster"
 cat << EOF > "${KINDCONFIG}"
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
@@ -37,24 +37,13 @@ nodes:
 EOF
 
 kind create cluster --name "${CLUSTER_NAME}" --config "${KINDCONFIG}"
-
-# Build, pull and load images while kind cluster is starting to save time.
-echo "> Build and load ${IMAGE} into kind cluster"
-docker build --build-arg ARCH -f package/Dockerfile -t "${IMAGE}" .
 kind load docker-image "${IMAGE}" --name "${CLUSTER_NAME}"
 
 echo "> Pull and load ${SONOBUOY_IMAGE} into kind cluster"
 docker pull "${SONOBUOY_IMAGE}"
 kind load docker-image "${SONOBUOY_IMAGE}" --name "${CLUSTER_NAME}"
 
-# Dapper will run on an isolated docker network.
-# To access kind, grab the current container and connect
-# it to Kind's network.
-NETWORK_ID=$(docker network ls -f name=kind -q)
-CURRENT_CONTAINER=$(cat /etc/hostname)
-docker network connect "${NETWORK_ID}" "${CURRENT_CONTAINER}"
-
-kind export kubeconfig --internal --name "${CLUSTER_NAME}"
+kind export kubeconfig --name "${CLUSTER_NAME}"
 
 echo "> Waiting for kind cluster to be ready"
 kubectl wait node "${CLUSTER_NAME}-control-plane" --for=condition=ready --timeout=30s

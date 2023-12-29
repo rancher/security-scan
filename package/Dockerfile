@@ -1,7 +1,6 @@
 # Final micro image
 FROM registry.suse.com/bci/bci-micro:15.5 AS micro
 
-
 # Temporary build stage
 FROM registry.suse.com/bci/bci-base:15.5 AS builder
 
@@ -10,19 +9,22 @@ ARG kube_bench_version=0.7.0
 ARG sonobuoy_version=0.57.0
 
 ARG kubectl_version=1.28.0
-ARG ARCH
+
+ARG TARGETARCH
 
 # Install system packages using builder image that has zypper 
 COPY --from=micro / /chroot/
 
 # Install kubectl into micro
-RUN curl -Lo /chroot/usr/local/bin/kubectl "https://dl.k8s.io/release/v${kubectl_version}/bin/linux/${ARCH}/kubectl" && chmod +x /chroot/usr/local/bin/kubectl
+ADD --chown=root:root --chmod=0755 \
+    "https://dl.k8s.io/release/v${kubectl_version}/bin/linux/${TARGETARCH}/kubectl" \
+    /chroot/usr/local/bin/kubectl
 
 ## Install Sonobuoy into micro
-RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /chroot/usr/bin sonobuoy
+RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${sonobuoy_version}/sonobuoy_${sonobuoy_version}_linux_${TARGETARCH}.tar.gz" | tar -xvzf - -C /chroot/usr/bin sonobuoy
 
 ## Install kube-bench into micro
-RUN curl -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_version}/kube-bench_${kube_bench_version}_linux_${ARCH}.tar.gz" | tar -xvzf - -C /chroot/usr/bin
+RUN curl -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${kube_bench_version}/kube-bench_${kube_bench_version}_linux_${TARGETARCH}.tar.gz" | tar -xvzf - -C /chroot/usr/bin
 
 ## Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
 RUN mkdir -p /chroot/etc/kube-bench/ && \

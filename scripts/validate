@@ -1,57 +1,90 @@
 #!/bin/bash
-set -e
+set -eo pipefail
 
-cd $(dirname $0)/..
+RUNNER=${RUNNER:-}
+TOOLS_IMAGE=${TOOLS_IMAGE:-}
 
-echo "Running validation scripts"
+function run() {
+    "${RUNNER}" run --rm \
+        -v "$(pwd)":/src:ro "${TOOLS_IMAGE}" "$1"
+}
 
-## validation : go file with golint
-echo "Running: go vet"
+function yamllint(){
+    run "yamllint $1 $2"
+}
 
-PACKAGES="$(go list ./... | grep 'rancher/security-scan')"
-go vet ${PACKAGES}
+function golint(){
+    run "golint $1"
+}
 
-echo "Running: golint"
-for i in ${PACKAGES}; do
-    if [ -n "$(golint $i | grep -v 'should have comment.*or be unexported' | tee /dev/stderr)" ]; then
-        failed=true
+function kube-bench(){
+    local args
+    args=$(printf "%s " "$@")
+    run "kube-bench $args"
+}
+
+function go_checks(){
+    ## validation : go file with golint
+    echo "Running: go vet"
+    
+    local failed=""
+
+    PACKAGES="$(go list ./... | grep 'rancher/security-scan')"
+    go vet ${PACKAGES}
+
+    echo "Running: golint"
+    for i in ${PACKAGES}; do
+        if [ -n "$(golint $i | grep -v 'should have comment.*or be unexported' | tee /dev/stderr)" ]; then
+            failed=true
+        fi
+    done
+    test -z "$failed"
+    echo "Running: go fmt"
+    test -z "$(go fmt ${PACKAGES} | tee /dev/stderr)"
+}
+
+function yaml_checks(){
+    ## validation: Benchmarks (cfgs) with yamllint and kube-bench (dry-run) 
+    echo "Running: yamllint against security-scan cfgs"
+
+    # CFGS lists all benchmark directories such as cis-1.7
+    CFGS="$(find package/cfg/ -mindepth 1 -type d -printf "%f\n")"
+
+    FAILED_CFGS_YML=()
+    FAILED_CFGS_KB=()
+
+    # Loop through all benchmarks
+    for cfg in ${CFGS}; do
+    set -x
+        # yammlint is configured with ../.yamllint.yaml, to catch any liniting errors for a given benchmark. If result isn't empty, FAILED_CFGS_YML is appended with the failing benchmark.
+        if [ -n "$(yamllint -s package/cfg/$cfg)" ]; then
+            FAILED_CFGS_YML+=("package/cfg/$cfg")
+        fi
+        # kube-bench dry-run to detect any errors for a given benchmark's files - check 1.1 is common to all benchmarks and used to speed up the test. If kube-bench commands fails, FAILED_CFGS_KB is appended with the failing benchmark.
+        if kube-bench --config-dir package/cfg --config package/cfg/config.yaml --benchmark "$cfg" --check 1.1 --noremediations --noresults --nosummary --nototals; then
+        echo "$cfg is OK"
+        else
+            FAILED_CFGS_KB+=("$cfg")
+        fi
+    set +x
+    done
+
+    # Test if any profiles have errors, either FAILED_CFGS_YML or FAILED_CFGS_KB is greater than 0, fails. 
+    if [ ${#FAILED_CFGS_YML[@]} -gt 0 ]; then
+        echo "Error - yamllint failed for these cfgs: ${FAILED_CFGS_YML[@]}"
+        exit 1
     fi
-done
-test -z "$failed"
-echo "Running: go fmt"
-test -z "$(go fmt ${PACKAGES} | tee /dev/stderr)"
-
-## validation: Benchmarks (cfgs) with yamllint and kube-bench (dry-run) 
-echo "Running: yamllint against security-scan cfgs"
-
-# CFGS lists all benchmark directories such as cis-1.7
-CFGS="$(find package/cfg/ -mindepth 1 -type d -printf "%f\n")"
-
-FAILED_CFGS_YML=()
-FAILED_CFGS_KB=()
-
-# Loop through all benchmarks
-for cfg in ${CFGS}; do
-set -x
-# yammlint is configured with ../.yamllint.yaml, to catch any liniting errors for a given benchmark. If result isn't empty, FAILED_CFGS_YML is appended with the failing benchmark.
-    if [ -n "$(yamllint -s package/cfg/$cfg)" ]; then
-        FAILED_CFGS_YML+=("package/cfg/$cfg")
+    if [ ${#FAILED_CFGS_KB[@]} -gt 0 ]; then
+        echo "Error - kube-bench dry-run failed for these cfgs: ${FAILED_CFGS_KB[@]}"
+        exit 1
     fi
-# kube-bench dry-run to detect any errors for a given benchmark's files - check 1.1 is common to all benchmarks and used to speed up the test. If kube-bench commands fails, FAILED_CFGS_KB is appended with the failing benchmark.
-    if kube-bench --config-dir package/cfg --config package/cfg/config.yaml --benchmark "$cfg" --check 1.1 --noremediations --noresults --nosummary --nototals; then
-	echo "$cfg is OK"
-    else
-        FAILED_CFGS_KB+=("$cfg")
-    fi
-set +x
-done
+}
 
-# Test if any profiles have errors, either FAILED_CFGS_YML or FAILED_CFGS_KB is greater than 0, fails. 
-if [ ${#FAILED_CFGS_YML[@]} -gt 0 ]; then
-	echo "Error - yamllint failed for these cfgs: ${FAILED_CFGS_YML[@]}"
-	exit 1
-fi
-if [ ${#FAILED_CFGS_KB[@]} -gt 0 ]; then
-	echo "Error - kube-bench dry-run failed for these cfgs: ${FAILED_CFGS_KB[@]}"
-	exit 1
-fi
+function main() {
+    echo "Running validation scripts"
+
+    go_checks
+    yaml_checks
+}
+
+main
