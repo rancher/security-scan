@@ -32,7 +32,7 @@ master:
     bins:
       - containerd
 
-  node:
+node:
     components:
       - kubelet
       - proxy
@@ -40,6 +40,8 @@ master:
     kubelet:
       bins:
         - containerd
+       confs:
+        - /var/lib/rancher/k3s/agent/kubelet.kubeconfig
       defaultkubeconfig: /var/lib/rancher/k3s/agent/kubelet.kubeconfig
       defaultcafile: /var/lib/rancher/k3s/agent/client-ca.crt
 
@@ -48,6 +50,6 @@ master:
         - containerd
       defaultkubeconfig: /var/lib/rancher/k3s/agent/kubeproxy.kubeconfig
 
-  policies:
+policies:
     components:
       - policies
