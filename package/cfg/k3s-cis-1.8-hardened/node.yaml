@@ -124,7 +124,6 @@ groups:
 
       - id: 4.1.9
         text: "Ensure that the kubelet --config configuration file has permissions set to 600 or more restrictive (Automated)"
-        type: "skip"
         audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c permissions=%a $kubeletconf; fi'' '
         tests:
           test_items:
@@ -139,7 +138,6 @@ groups:
 
       - id: 4.1.10
         text: "Ensure that the kubelet --config configuration file ownership is set to root:root (Automated)"
-        type: "skip"
         audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c %U:%G $kubeletconf; fi'' '
         tests:
           test_items:
@@ -147,8 +145,6 @@ groups:
         remediation: |
           Run the following command (using the config file location identified in the Audit step)
           chown root:root $kubeletconf
-          Not Applicable.
-          All configuration is passed in as arguments at container run time.
         scored: true
 
   - id: 4.2
