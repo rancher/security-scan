@@ -6,7 +6,7 @@ FROM registry.suse.com/bci/bci-micro:15.5 AS micro
 FROM registry.suse.com/bci/bci-base:15.5 AS builder
 
 # Define build arguments
-ARG kube_bench_version=0.6.19
+ARG kube_bench_version=0.7.0
 ARG sonobuoy_version=0.57.0
 
 ARG kubectl_version=1.28.0
