@@ -628,7 +628,7 @@ groups:
           For example, to set it as 100 MB, --audit-log-maxsize=100
         scored: true
 
-      - id: 1.2.25
+      - id: 1.2.23
         text: "Ensure that the --request-timeout argument is set as appropriate (Automated)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
