@@ -29,7 +29,6 @@ groups:
           Alternative mechanisms provided by Kubernetes such as the use of OIDC should be implemented
           in place of bootstrap tokens.
         scored: false
-
   - id: 3.2
     text: "Logging"
     checks:
@@ -43,7 +42,6 @@ groups:
         remediation: |
           Create an audit policy file for your cluster.
         scored: false
-
       - id: 3.2.2
         text: "Ensure that the audit policy covers key security concerns (Manual)"
         type: "manual"
