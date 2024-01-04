@@ -1,6 +1,6 @@
 ---
 controls:
-version: 1.4
+version: "cis-1.4"
 id: 2
 text: "Worker Node Security Configuration"
 type: "node"

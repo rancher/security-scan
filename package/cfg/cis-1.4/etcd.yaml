@@ -1,6 +1,6 @@
 ---
 controls:
-version: 1.4
+version: "cis-1.4"
 id: 1
 text: "Master Node Security Configuration"
 type: "etcd"
