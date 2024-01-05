@@ -1,6 +1,6 @@
 ---
 controls:
-version: "1.7"
+version: "cis-1.7"
 id: 1
 text: "Control Plane Security Configuration"
 type: "master"
