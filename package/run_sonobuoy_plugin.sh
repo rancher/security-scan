@@ -58,7 +58,7 @@ LOG_DIR="${RESULTS_DIR}/logs"
 JOURNAL_LOG="${JOURNAL_LOG:-/var/log/journal}"
 if [[ "$(journalctl -D $JOURNAL_LOG --lines=0 2>&1 | grep -s 'No such file or directory' | wc -l)" -gt 0 ]]; then
   JOURNAL_LOG=/run/log/journal
-  find $CONFIG_DIR -name '*.yaml' | xargs -n1 sed -i 's|/var/log/journal|/run/log/journal|'
+  find $CONFIG_DIR -name '*.yaml' | xargs -n1 sed -i 's|/var/log/journal|/run/log/journal|g'
 fi
 mkdir -p "${RESULTS_DIR}"
 
