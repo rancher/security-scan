@@ -37,6 +37,7 @@ build: # build project and output binary to TARGET_BIN.
 .PHONY: image-build
 image-build: buildx-machine ## build (and load) the container image targeting the current platform.
 	$(IMAGE_BUILDER) build -f package/Dockerfile \
+		--builder $(MACHINE) \
 		--build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION) \
 		--build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) \
 		--build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) \
@@ -46,6 +47,7 @@ image-build: buildx-machine ## build (and load) the container image targeting th
 .PHONY: image-push
 image-push: buildx-machine ## build the container image targeting all platforms defined by TARGET_PLATFORMS and push to a registry.
 	$(IMAGE_BUILDER) build -f package/Dockerfile \
+		--builder $(MACHINE) \
 		--build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION) \
 		--build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) \
 		--build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) $(IID_FILE_FLAG) $(BUILDX_ARGS) \
