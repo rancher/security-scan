@@ -26,21 +26,21 @@ master:
   etcd:
     bins:
       - containerd
-  node:
-    components:
-      - kubelet
-      - proxy
-    kubelet:
-      bins:
-        - containerd
-      confs:
-        - /var/lib/rancher/k3s/agent/kubelet.kubeconfig
-      defaultkubeconfig: /var/lib/rancher/k3s/agent/kubelet.kubeconfig
-      defaultcafile: /var/lib/rancher/k3s/agent/client-ca.crt
-    proxy:
-      bins:
-        - containerd
-      defaultkubeconfig: /var/lib/rancher/k3s/agent/kubeproxy.kubeconfig
-  policies:
-    components:
-      - policies
+node:
+  components:
+    - kubelet
+    - proxy
+  kubelet:
+    bins:
+      - containerd
+    confs:
+      - /var/lib/rancher/k3s/agent/kubelet.kubeconfig
+    defaultkubeconfig: /var/lib/rancher/k3s/agent/kubelet.kubeconfig
+    defaultcafile: /var/lib/rancher/k3s/agent/client-ca.crt
+  proxy:
+    bins:
+      - containerd
+    defaultkubeconfig: /var/lib/rancher/k3s/agent/kubeproxy.kubeconfig
+policies:
+  components:
+    - policies
