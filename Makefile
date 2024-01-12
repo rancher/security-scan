@@ -1,7 +1,7 @@
 # The versions of any needed tooling/dependency should be defined here.
 KIND_VERSION ?= 0.17.0
 KUBECTL_VERSION ?= 1.28.0
-KUBERNETES_VERSION ?= $(KUBECTL_VERSION)
+KUBERNETES_VERSION ?= v$(KUBECTL_VERSION)
 KUBE_BENCH_VERSION ?= 0.7.0
 SONOBUOY_VERSION ?= 0.57.0
 SONOBUOY_IMAGE ?= rancher/mirrored-sonobuoy-sonobuoy:v$(SONOBUOY_VERSION)
@@ -13,7 +13,7 @@ include hack/make/tools.mk
 # Define target platforms, image builder and the fully qualified image name.
 TARGET_PLATFORMS ?= linux/amd64,linux/arm64
 
-REPO := rancher
+REPO ?= rancher
 IMAGE = $(REPO)/security-scan:$(TAG)
 TARGET_BIN ?= build/bin/kb-summarizer
 ARCH ?= $(shell docker info --format '{{.ClientInfo.Arch}}')
@@ -48,8 +48,8 @@ image-push: buildx-machine ## build the container image targeting all platforms 
 	$(IMAGE_BUILDER) build -f package/Dockerfile \
 		--build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION) \
 		--build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) \
-		--build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) \
-		-t "$(IMAGE)" --push .
+		--build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) $(IID_FILE_FLAG) $(BUILDX_ARGS) \
+		--platform=$(TARGET_PLATFORMS) -t "$(IMAGE)" --push .
 	@echo "Pushed $(IMAGE)"
 
 e2e: $(KIND) image-build ## run E2E tests.
