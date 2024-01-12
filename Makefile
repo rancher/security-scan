@@ -1,89 +1,68 @@
-# The versions of any tooling should be defined here.
+# The versions of any needed tooling/dependency should be defined here.
 KIND_VERSION ?= 0.17.0
-KUBERNETES_VERSION ?= 1.28.0
-KUBE_BENCH_VERSION ?= 0.6.19
+KUBECTL_VERSION ?= 1.28.0
+KUBERNETES_VERSION ?= $(KUBECTL_VERSION)
+KUBE_BENCH_VERSION ?= 0.7.0
+SONOBUOY_VERSION ?= 0.57.0
+SONOBUOY_IMAGE ?= rancher/mirrored-sonobuoy-sonobuoy:v$(SONOBUOY_VERSION)
 
-# Define VERSION, which is baked into the compiled binary to enable the
-# printing of the application version - via flag --version.
-CHANGES = $(shell git status --porcelain --untracked-files=no)
-ifneq ($(CHANGES),)
-    DIRTY = -dirty
-endif
-
-# Prioritise DRONE_TAG for backwards compatibility. However, the git tag
-# command should be able to gather the current tag, except when the git
-# clone operation was done with "--no-tags".
-ifneq ($(DRONE_TAG),)
-	GIT_TAG = $(DRONE_TAG)
-else
-	GIT_TAG = $(shell git tag -l --contains HEAD | head -n 1)
-endif
-
-COMMIT = $(shell git rev-parse --short HEAD)
-VERSION = $(COMMIT)$(DIRTY)
-
-# Override VERSION with the Git tag if the current HEAD has a tag pointing to
-# it AND the worktree isn't dirty.
-ifneq ($(GIT_TAG),)
-	ifeq ($(DIRTY),)
-		VERSION = $(GIT_TAG)
-	endif
-endif
-
-ifneq ($(shell uname -s), Darwin)
-	LINKFLAGS = -extldflags -static -w -s
-endif
+# Include logic that can be reused across projects.
+include hack/make/build.mk
+include hack/make/tools.mk
 
 # Define target platforms, image builder and the fully qualified image name.
-TARGET_PLATFORMS ?= linux/amd64,linux/arm64,linux/s390x
-RUNNER := docker
-IMAGE_BUILDER := $(RUNNER) buildx
+TARGET_PLATFORMS ?= linux/amd64,linux/arm64
 
 REPO := rancher
-ifeq ($(TAG),)
-	TAG = $(VERSION)
-	ifneq ($(DIRTY),)
-		TAG = dev
-	endif
-endif
-
 IMAGE = $(REPO)/security-scan:$(TAG)
-TOOLS_IMAGE = security-scan-tools
-
-GO := go
+TARGET_BIN ?= build/bin/kb-summarizer
+ARCH ?= $(shell docker info --format '{{.ClientInfo.Arch}}')
 
 .DEFAULT_GOAL := ci
-ci: build test validate e2e
-release: ci
+ci: build test validate e2e ## run the targets needed to validate a PR in CI.
 
-test:
+clean: ## clean up project.
+	rm -rf bin build
+
+test: ## run unit tests.
 	@echo "Running tests"
 	go test -race -cover ./...
 
-build:
-	CGO_ENABLED=0 $(GO) build -ldflags "-X main.VERSION=$(VERSION) $(LINKFLAGS)" -o bin/kb-summarizer cmd/kb-summarizer/main.go
-	./bin/kb-summarizer --version
-	md5sum bin/kb-summarizer
+.PHONY: build
+build: # build project and output binary to TARGET_BIN.
+	CGO_ENABLED=0 $(GO) build -ldflags "-X main.VERSION=$(VERSION) $(LINKFLAGS)" -o $(TARGET_BIN) ./cmd/kb-summarizer/
+	$(TARGET_BIN) --version
+	md5sum $(TARGET_BIN)
 
-.PHONY: package
-package: buildx-machine ## build container image to current platform
-	$(IMAGE_BUILDER) build -f package/Dockerfile -t "$(IMAGE)" --load .
+.PHONY: image-build
+image-build: buildx-machine ## build (and load) the container image targeting the current platform.
+	$(IMAGE_BUILDER) build -f package/Dockerfile \
+		--build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION) \
+		--build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) \
+		--build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) \
+		-t "$(IMAGE)" --load .
 	@echo "Built $(IMAGE)"
 
-e2e: package
-	@KUBE_VERSION=$(KUBE_VERSION) ./scripts/e2e
-
-validate: tools
-	@RUNNER=$(RUNNER) TOOLS_IMAGE=$(TOOLS_IMAGE) \
-	./scripts/validate
-
-tools:
-	$(IMAGE_BUILDER) build -f Dockerfile.tools -t $(TOOLS_IMAGE) \
-		--build-arg KIND_VERSION=$(KIND_VERSION) \
-		--build-arg KUBERNETES_VERSION=$(KUBERNETES_VERSION) \
+.PHONY: image-push
+image-push: buildx-machine ## build the container image targeting all platforms defined by TARGET_PLATFORMS and push to a registry.
+	$(IMAGE_BUILDER) build -f package/Dockerfile \
 		--build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION) \
-		--load .
+		--build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) \
+		--build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) \
+		-t "$(IMAGE)" --push .
+	@echo "Pushed $(IMAGE)"
 
-buildx-machine:
-	@docker buildx ls | grep rancher || \
-		docker buildx create --name=rancher --platform=$(TARGET_PLATFORMS) --use
+e2e: $(KIND) image-build ## run E2E tests.
+	@KUBERNETES_VERSION=$(KUBERNETES_VERSION) IMAGE=$(IMAGE) \
+	SONOBUOY_IMAGE=$(SONOBUOY_IMAGE) ARCH=$(ARCH) \
+	./hack/e2e
+
+validate: validate-go validate-yaml ## run validation checks.
+
+validate-yaml: yamllint $(KUBE_BENCH)
+	@PATH=$(PATH):$(TOOLS_BIN) \
+	./hack/validate-yaml
+
+validate-go: $(GOIMPORTS) $(GOLINT)
+	@PATH=$(PATH):$(TOOLS_BIN) \
+	./hack/validate-go
