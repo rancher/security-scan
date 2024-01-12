@@ -131,7 +131,7 @@ fi
 kubeletconf="/node/var/lib/kubelet/config"
 
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Running kubelet' | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s -u k3s-agent | grep -m1 'Running kubelet' | wc -l)" -gt 0 ]]; then
     echo "node: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets node \
