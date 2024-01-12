@@ -103,7 +103,7 @@ groups:
         scored: false
       - id: 4.1.8
         text: "Ensure that the client certificate authorities file ownership is set to root:root (Manual)"
-        audit: "stat -c %U:%G /var/lib/rancher/k3s/server/tls/client-ca.crt"
+        audit: "stat -c %U:%G $$kubeletcafile"
         tests:
           test_items:
             - flag: root:root
@@ -202,7 +202,7 @@ groups:
         scored: true
       - id: 4.2.4
         text: "Verify that the --read-only-port argument is set to 0 (Manual)"
-        audit: "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1 | grep 'read-only-port' "
+        audit: "journalctl -D /var/log/journal -u k3s -u k3s-agent | grep 'Running kubelet' | tail -n1 | grep 'read-only-port' "
         audit_config: "/bin/sh -c 'if test -e $kubeletconf; then /bin/cat $kubeletconf; fi' "
         tests:
           bin_op: or
@@ -227,7 +227,7 @@ groups:
         scored: false
       - id: 4.2.5
         text: "Ensure that the --streaming-connection-idle-timeout argument is not set to 0 (Manual)"
-        audit: "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1 | grep 'streaming-connection-idle-timeout'"
+        audit: "journalctl -D /var/log/journal -u k3s -u k3s-agent | grep 'Running kubelet' | tail -n1 | grep 'streaming-connection-idle-timeout'"
         tests:
           test_items:
             - flag: --streaming-connection-idle-timeout
@@ -252,7 +252,7 @@ groups:
         scored: false
       - id: 4.2.6
         text: "Ensure that the --make-iptables-util-chains argument is set to true (Automated)"
-        audit: "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1 | grep 'make-iptables-util-chains'"
+        audit: "journalctl -D /var/log/journal -u k3s -u k3s-agent | grep 'Running kubelet' | tail -n1 | grep 'make-iptables-util-chains'"
         tests:
           test_items:
             - flag: --make-iptables-util-chains
