@@ -32,22 +32,22 @@ master:
     bins:
       - containerd
 
-  node:
-    components:
-      - kubelet
-      - proxy
+node:
+  components:
+    - kubelet
+    - proxy
 
-    kubelet:
-      bins:
-        - containerd
-      defaultkubeconfig: /var/lib/rancher/k3s/agent/kubelet.kubeconfig
-      defaultcafile: /var/lib/rancher/k3s/agent/client-ca.crt
+  kubelet:
+    bins:
+      - containerd
+    defaultkubeconfig: /var/lib/rancher/k3s/agent/kubelet.kubeconfig
+    defaultcafile: /var/lib/rancher/k3s/agent/client-ca.crt
 
-    proxy:
-      bins:
-        - containerd
-      defaultkubeconfig: /var/lib/rancher/k3s/agent/kubeproxy.kubeconfig
+  proxy:
+    bins:
+      - containerd
+    defaultkubeconfig: /var/lib/rancher/k3s/agent/kubeproxy.kubeconfig
 
-  policies:
-    components:
-      - policies
+policies:
+  components:
+    - policies

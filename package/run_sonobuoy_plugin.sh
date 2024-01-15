@@ -58,7 +58,7 @@ LOG_DIR="${RESULTS_DIR}/logs"
 JOURNAL_LOG="${JOURNAL_LOG:-/var/log/journal}"
 if [[ "$(journalctl -D $JOURNAL_LOG --lines=0 2>&1 | grep -s 'No such file or directory' | wc -l)" -gt 0 ]]; then
   JOURNAL_LOG=/run/log/journal
-  find $CONFIG_DIR -name '*.yaml' | xargs -n1 sed -i 's|/var/log/journal|/run/log/journal|'
+  find $CONFIG_DIR -name '*.yaml' | xargs -n1 sed -i 's|/var/log/journal|/run/log/journal|g'
 fi
 mkdir -p "${RESULTS_DIR}"
 
@@ -131,7 +131,7 @@ fi
 kubeletconf="/node/var/lib/kubelet/config"
 
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Running kubelet' | wc -l)" -gt 0 ]]; then
+  if [[ "$(pgrep kubelet | wc -l)" -gt 0 ]] || [[ "$(journalctl -D $JOURNAL_LOG -u k3s -u k3s-agent | grep -m1 'Running kubelet' | wc -l)" -gt 0 ]]; then
     echo "node: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets node \
