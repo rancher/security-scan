@@ -103,7 +103,7 @@ groups:
         scored: false
       - id: 4.1.8
         text: "Ensure that the client certificate authorities file ownership is set to root:root (Manual)"
-        audit: "stat -c %U:%G $$kubeletcafile"
+        audit: "stat -c %U:%G $kubeletcafile"
         tests:
           test_items:
             - flag: root:root
@@ -323,7 +323,7 @@ groups:
       - id: 4.2.9
         text: "Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Manual)"
         type: "skip"
-        audit: "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1"
+        audit: "journalctl -D /var/log/journal -u k3s -u k3s-agent | grep 'Running kubelet' | tail -n1"
         tests:
           test_items:
             - flag: --tls-cert-file
