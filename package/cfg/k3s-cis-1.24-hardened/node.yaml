@@ -296,7 +296,7 @@ groups:
 
       - id: 4.2.7
         text: "Ensure that the --make-iptables-util-chains argument is set to true (Automated)"
-        audit: "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1 | grep 'make-iptables-util-chains'"
+        audit: "journalctl -D /var/log/journal -u k3s -u k3s-agent | grep 'Running kubelet' | tail -n1 | grep 'make-iptables-util-chains'"
         tests:
           test_items:
             - flag: --make-iptables-util-chains
@@ -363,7 +363,7 @@ groups:
 
       - id: 4.2.10
         text: "Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate (Manual)"
-        audit: "journalctl -D /var/log/journal -u k3s | grep 'Running kubelet' | tail -n1"
+        audit: "journalctl -D /var/log/journal -u k3s -u k3s-agent | grep 'Running kubelet' | tail -n1"
         tests:
           test_items:
             - flag: --tls-cert-file
