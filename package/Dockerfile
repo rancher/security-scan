@@ -8,35 +8,47 @@ FROM --platform=$BUILDPLATFORM tonistiigi/xx:latest as xx
 FROM registry.suse.com/bci/golang:1.21 AS builder
 
 # Define build arguments
-ARG KUBE_BENCH_VERSION
-ARG SONOBUOY_VERSION
-ARG KUBECTL_VERSION
+ARG KUBE_BENCH_VERSION KUBE_BENCH_SUM_arm64 KUBE_BENCH_SUM_amd64 \
+    SONOBUOY_VERSION SONOBUOY_SUM_arm64 SONOBUOY_SUM_amd64 \
+    KUBECTL_VERSION KUBECTL_SUM_arm64 KUBECTL_SUM_amd64
 
 ARG TARGETARCH
 
 # Install system packages using builder image that has zypper 
 COPY --from=micro / /chroot/
 
-# Install kubectl into micro
+# OS binaries to run kube-bench audit commands.
+# Before removing dependencies here, ensure they are not needed by cis-operator,
+# security-scan or any of the existing kube-bench tests.
+RUN zypper --installroot /chroot -n --gpg-auto-import-keys in --no-recommends findutils tar jq gawk diffutils procps systemd gzip curl && \
+    zypper --installroot /chroot clean -a && \
+    rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/*
+
+
+# Stage Sonobuoy into builder
+ENV SONOBUOY_SUM="SONOBUOY_SUM_${TARGETARCH}"
+RUN curl --output /tmp/sonobuoy.tar.gz -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${SONOBUOY_VERSION}/sonobuoy_${SONOBUOY_VERSION}_linux_${TARGETARCH}.tar.gz" && \
+    echo "${!SONOBUOY_SUM}  /tmp/sonobuoy.tar.gz" | sha256sum -c - && \
+    tar -xvzf /tmp/sonobuoy.tar.gz -C /chroot/usr/bin sonobuoy
+
+# Stage kubectl into builder
 ADD --chown=root:root --chmod=0755 \
     "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl" \
     /chroot/usr/local/bin/kubectl
 
-## Install Sonobuoy into micro
-RUN curl -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${SONOBUOY_VERSION}/sonobuoy_${SONOBUOY_VERSION}_linux_${TARGETARCH}.tar.gz" | tar -xvzf - -C /chroot/usr/bin sonobuoy
+ENV KUBECTL_SUM="KUBECTL_SUM_${TARGETARCH}"
+RUN echo "${!KUBECTL_SUM}  /chroot/usr/local/bin/kubectl" | sha256sum -c -
 
-## Install kube-bench into micro
-RUN curl -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${KUBE_BENCH_VERSION}/kube-bench_${KUBE_BENCH_VERSION}_linux_${TARGETARCH}.tar.gz" | tar -xvzf - -C /chroot/usr/bin
+# Stage kube-bench into builder
+ENV KUBE_BENCH_SUM="KUBE_BENCH_SUM_${TARGETARCH}"
+RUN curl --output /tmp/kubebench.tar.gz -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${KUBE_BENCH_VERSION}/kube-bench_${KUBE_BENCH_VERSION}_linux_${TARGETARCH}.tar.gz" && \
+    echo "${!KUBE_BENCH_SUM}  /tmp/kubebench.tar.gz" | sha256sum -c - && \
+    tar -xvzf /tmp/kubebench.tar.gz -C /chroot/usr/bin
 
-## Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
+# Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
 RUN mkdir -p /chroot/etc/kube-bench/ && \
     curl -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/v${KUBE_BENCH_VERSION}.tar.gz" | \
     tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${KUBE_BENCH_VERSION}/cfg"
-
-## OS binaries to run kube-bench audit commands
-RUN zypper --installroot /chroot -n --gpg-auto-import-keys in --no-recommends findutils tar jq gawk diffutils procps systemd gzip curl  && \
-    zypper --installroot /chroot clean -a && \
-    rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/*
 
 WORKDIR /src
 COPY go.sum \

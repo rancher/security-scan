@@ -1,10 +1,6 @@
-# The versions of any needed tooling/dependency should be defined here.
-KIND_VERSION ?= 0.17.0
-KUBECTL_VERSION ?= 1.28.0
-KUBERNETES_VERSION ?= v$(KUBECTL_VERSION)
-KUBE_BENCH_VERSION ?= 0.7.0
-SONOBUOY_VERSION ?= 0.57.0
-SONOBUOY_IMAGE ?= rancher/mirrored-sonobuoy-sonobuoy:v$(SONOBUOY_VERSION)
+# To avoid poluting the Makefile, versions and checksums for tooling and 
+# dependencies are defined at hack/make/deps.mk.
+include hack/make/deps.mk
 
 # Include logic that can be reused across projects.
 include hack/make/build.mk
@@ -37,20 +33,13 @@ build: # build project and output binary to TARGET_BIN.
 .PHONY: image-build
 image-build: buildx-machine ## build (and load) the container image targeting the current platform.
 	$(IMAGE_BUILDER) build -f package/Dockerfile \
-		--builder $(MACHINE) \
-		--build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION) \
-		--build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) \
-		--build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) \
-		-t "$(IMAGE)" --load .
+		--builder $(MACHINE) $(IMAGE_ARGS) -t "$(IMAGE)" --load .
 	@echo "Built $(IMAGE)"
 
 .PHONY: image-push
 image-push: buildx-machine ## build the container image targeting all platforms defined by TARGET_PLATFORMS and push to a registry.
 	$(IMAGE_BUILDER) build -f package/Dockerfile \
-		--builder $(MACHINE) \
-		--build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION) \
-		--build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) \
-		--build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) $(IID_FILE_FLAG) $(BUILDX_ARGS) \
+		--builder $(MACHINE) $(IMAGE_ARGS) $(IID_FILE_FLAG) $(BUILDX_ARGS) \
 		--platform=$(TARGET_PLATFORMS) -t "$(IMAGE)" --push .
 	@echo "Pushed $(IMAGE)"
 
