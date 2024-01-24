@@ -33,14 +33,15 @@ build: # build project and output binary to TARGET_BIN.
 .PHONY: image-build
 image-build: buildx-machine ## build (and load) the container image targeting the current platform.
 	$(IMAGE_BUILDER) build -f package/Dockerfile \
-		--builder $(MACHINE) $(IMAGE_ARGS) -t "$(IMAGE)" --load .
+		--builder $(MACHINE) $(IMAGE_ARGS) \
+		--build-arg VERSION=$(VERSION) -t "$(IMAGE)" --load .
 	@echo "Built $(IMAGE)"
 
 .PHONY: image-push
 image-push: buildx-machine ## build the container image targeting all platforms defined by TARGET_PLATFORMS and push to a registry.
 	$(IMAGE_BUILDER) build -f package/Dockerfile \
 		--builder $(MACHINE) $(IMAGE_ARGS) $(IID_FILE_FLAG) $(BUILDX_ARGS) \
-		--platform=$(TARGET_PLATFORMS) -t "$(IMAGE)" --push .
+		--build-arg VERSION=$(VERSION) --platform=$(TARGET_PLATFORMS) -t "$(IMAGE)" --push .
 	@echo "Pushed $(IMAGE)"
 
 e2e: $(KIND) image-build ## run E2E tests.

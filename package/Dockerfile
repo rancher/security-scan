@@ -57,12 +57,15 @@ COPY go.sum \
      /src
 RUN go mod download
 
-COPY .git /src/.git
 COPY pkg /src/pkg
 COPY hack /src/hack
 COPY cmd /src/cmd
 
-RUN TARGET_BIN=/chroot/usr/bin/kb-summarizer make build
+# By setting the version as an argument, we can avoid running the version logic 
+# a second time (inside the Docker build process). Therefore, removing the need
+# to access the .git dir.
+ARG VERSION
+RUN VERSION=${VERSION} TARGET_BIN=/chroot/usr/bin/kb-summarizer make build
 
 # Ensures that the binary that was built was cross-compiled correctly
 # and is valid on the target platform.
