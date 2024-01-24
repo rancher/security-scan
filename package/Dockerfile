@@ -2,7 +2,7 @@
 FROM registry.suse.com/bci/bci-micro:15.5 AS micro
 
 # Image that provides cross compilation tooling.
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:latest as xx
+FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.3.0 as xx
 
 # Temporary build stage
 FROM registry.suse.com/bci/golang:1.21 AS builder
