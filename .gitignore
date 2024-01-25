@@ -2,6 +2,7 @@
 /.cache
 /.trash-cache
 /bin
+/build
 /dist
 *.swp
 /cmd/kb-summarizer/kb-summarizer
