@@ -5,7 +5,7 @@ FROM registry.suse.com/bci/bci-micro:15.5 AS micro
 FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.3.0 as xx
 
 # Temporary build stage
-FROM registry.suse.com/bci/golang:1.21 AS builder
+FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.21 AS builder
 
 # Define build arguments
 ARG KUBE_BENCH_VERSION KUBE_BENCH_SUM_arm64 KUBE_BENCH_SUM_amd64 \
@@ -20,7 +20,8 @@ COPY --from=micro / /chroot/
 # OS binaries to run kube-bench audit commands.
 # Before removing dependencies here, ensure they are not needed by cis-operator,
 # security-scan or any of the existing kube-bench tests.
-RUN zypper --installroot /chroot -n --gpg-auto-import-keys in --no-recommends findutils tar jq gawk diffutils procps systemd gzip curl && \
+RUN zypper refresh && \
+    zypper --installroot /chroot -n in --no-recommends findutils tar jq gawk diffutils procps systemd gzip curl && \
     zypper --installroot /chroot clean -a && \
     rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/*
 
@@ -76,7 +77,7 @@ COPY --from=xx \
 RUN mkdir -p /run/lock
 RUN xx-verify --static /chroot/usr/bin/kb-summarizer
 
-# Main stage using bco-micro as the base image
+# Main stage using bci-micro as the base image
 FROM micro
 
 # Copy binaries and configuration files from builder to micro

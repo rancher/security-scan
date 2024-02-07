@@ -26,7 +26,7 @@ test: ## run unit tests.
 
 .PHONY: build
 build: # build project and output binary to TARGET_BIN.
-	CGO_ENABLED=0 $(GO) build -ldflags "-X main.VERSION=$(VERSION) $(LINKFLAGS)" -o $(TARGET_BIN) ./cmd/kb-summarizer/
+	CGO_ENABLED=0 $(GO) build -trimpath -ldflags "-X main.VERSION=$(VERSION) $(LINKFLAGS)" -o $(TARGET_BIN) ./cmd/kb-summarizer/
 	$(TARGET_BIN) --version
 	md5sum $(TARGET_BIN)
 
