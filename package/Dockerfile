@@ -5,7 +5,7 @@ FROM registry.suse.com/bci/bci-micro:15.5 AS micro
 FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.3.0 as xx
 
 # Temporary build stage
-FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.21 AS builder
+FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.22 AS builder
 
 # Define build arguments
 ARG KUBE_BENCH_VERSION KUBE_BENCH_SUM_arm64 KUBE_BENCH_SUM_amd64 \
