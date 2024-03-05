@@ -13,6 +13,7 @@ REPO ?= rancher
 IMAGE = $(REPO)/security-scan:$(TAG)
 TARGET_BIN ?= build/bin/kb-summarizer
 ARCH ?= $(shell docker info --format '{{.ClientInfo.Arch}}')
+BUILD_ACTION = --load
 
 .DEFAULT_GOAL := ci
 ci: build test validate e2e ## run the targets needed to validate a PR in CI.
@@ -30,11 +31,16 @@ build: # build project and output binary to TARGET_BIN.
 	$(TARGET_BIN) --version
 	md5sum $(TARGET_BIN)
 
+image-test: buildx-machine ## build the container image for all target architecures.
+	# Instead of loading image, target all platforms, effectivelly testing
+	# the build for the target architectures.
+	$(MAKE) image-build BUILD_ACTION="--platform=$(TARGET_PLATFORMS)"
+
 .PHONY: image-build
 image-build: buildx-machine ## build (and load) the container image targeting the current platform.
 	$(IMAGE_BUILDER) build -f package/Dockerfile \
 		--builder $(MACHINE) $(IMAGE_ARGS) \
-		--build-arg VERSION=$(VERSION) -t "$(IMAGE)" --load .
+		--build-arg VERSION=$(VERSION) -t "$(IMAGE)" $(BUILD_ACTION) .
 	@echo "Built $(IMAGE)"
 
 .PHONY: image-push

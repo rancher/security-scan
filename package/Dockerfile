@@ -4,15 +4,8 @@ FROM registry.suse.com/bci/bci-micro:15.5 AS micro
 # Image that provides cross compilation tooling.
 FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.3.0 as xx
 
-# Temporary build stage
-FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.22 AS builder
-
-# Define build arguments
-ARG KUBE_BENCH_VERSION KUBE_BENCH_SUM_arm64 KUBE_BENCH_SUM_amd64 \
-    SONOBUOY_VERSION SONOBUOY_SUM_arm64 SONOBUOY_SUM_amd64 \
-    KUBECTL_VERSION KUBECTL_SUM_arm64 KUBECTL_SUM_amd64
-
-ARG TARGETARCH
+# Arch-specific temporary build stage for zypper deps that will be copied into the final image.
+FROM registry.suse.com/bci/golang:1.22 AS zypper
 
 # Install system packages using builder image that has zypper 
 COPY --from=micro / /chroot/
@@ -25,6 +18,17 @@ RUN zypper --non-interactive refresh && \
     zypper --installroot /chroot clean -a && \
     rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/*
 
+# Arch-agnostic temporary build stage for things that can be done at build platform arch.
+FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.22 AS builder
+
+# Define build arguments
+ARG KUBE_BENCH_VERSION KUBE_BENCH_SUM_arm64 KUBE_BENCH_SUM_amd64 \
+    SONOBUOY_VERSION SONOBUOY_SUM_arm64 SONOBUOY_SUM_amd64 \
+    KUBECTL_VERSION KUBECTL_SUM_arm64 KUBECTL_SUM_amd64
+
+ARG TARGETARCH
+
+RUN mkdir -p /chroot/usr/bin
 
 # Stage Sonobuoy into builder
 ENV SONOBUOY_SUM="SONOBUOY_SUM_${TARGETARCH}"
@@ -62,6 +66,12 @@ COPY pkg /src/pkg
 COPY hack /src/hack
 COPY cmd /src/cmd
 
+# Copy xx supporting tools to throw-away layer, not to /chroot.
+COPY --from=xx / /
+
+ARG TARGETPLATFORM
+RUN xx-go --wrap && mkdir -p /run/lock
+
 # By setting the version as an argument, we can avoid running the version logic 
 # a second time (inside the Docker build process). Therefore, removing the need
 # to access the .git dir.
@@ -70,18 +80,14 @@ RUN VERSION=${VERSION} TARGET_BIN=/chroot/usr/bin/kb-summarizer make build
 
 # Ensures that the binary that was built was cross-compiled correctly
 # and is valid on the target platform.
-COPY --from=xx \
-    /usr/bin/xx-verify \
-    /usr/bin/xx-info \
-    /usr/bin
-RUN mkdir -p /run/lock
 RUN xx-verify --static /chroot/usr/bin/kb-summarizer
 
 # Main stage using bci-micro as the base image
 FROM micro
 
-# Copy binaries and configuration files from builder to micro
+# Copy binaries and configuration files from builder and zypper to micro.
 COPY --from=builder /chroot/ /
+COPY --from=zypper /chroot/ /
 
 # Copy binaries and configuration files from the local repository to micro
 COPY package/cfg/ /etc/kube-bench/cfg/
