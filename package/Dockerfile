@@ -4,11 +4,26 @@ FROM registry.suse.com/bci/bci-micro:15.5 AS micro
 # Image that provides cross compilation tooling.
 FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.3.0 as xx
 
+FROM registry.suse.com/bci/golang:1.22 AS golang-arch
+
 # Arch-specific temporary build stage for zypper deps that will be copied into the final image.
-FROM registry.suse.com/bci/golang:1.22 AS zypper
+FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.22 AS builder
+
+# Copy xx supporting tools to throw-away layer. Not this is not being sent to /chroot.
+COPY --from=xx / /
+
+ARG TARGETPLATFORM TARGETARCH
+RUN mkdir -p /run/lock
 
 # Install system packages using builder image that has zypper 
 COPY --from=micro / /chroot/
+
+RUN echo "[main]" > /etc/zypp/zypp.conf && \
+    echo -n "arch = " >> /etc/zypp/zypp.conf && \
+    xx-info march >> /etc/zypp/zypp.conf
+
+COPY --from=golang-arch /etc/products.d/ /etc/products.d/
+COPY --from=golang-arch /etc/zypp/ /chroot/etc/zypp/
 
 # OS binaries to run kube-bench audit commands.
 # Before removing dependencies here, ensure they are not needed by cis-operator,
@@ -18,17 +33,16 @@ RUN zypper --non-interactive refresh && \
     zypper --installroot /chroot clean -a && \
     rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/*
 
-# Arch-agnostic temporary build stage for things that can be done at build platform arch.
-FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.22 AS builder
+RUN xx-verify /chroot/usr/bin/curl && \
+    xx-verify /chroot/usr/bin/diff && \
+    xx-verify /chroot/usr/bin/tar && \
+    xx-verify /chroot/usr/bin/jq && \
+    xx-verify /chroot/usr/bin/gzip
 
 # Define build arguments
 ARG KUBE_BENCH_VERSION KUBE_BENCH_SUM_arm64 KUBE_BENCH_SUM_amd64 \
     SONOBUOY_VERSION SONOBUOY_SUM_arm64 SONOBUOY_SUM_amd64 \
     KUBECTL_VERSION KUBECTL_SUM_arm64 KUBECTL_SUM_amd64
-
-ARG TARGETARCH
-
-RUN mkdir -p /chroot/usr/bin
 
 # Stage Sonobuoy into builder
 ENV SONOBUOY_SUM="SONOBUOY_SUM_${TARGETARCH}"
@@ -66,11 +80,7 @@ COPY pkg /src/pkg
 COPY hack /src/hack
 COPY cmd /src/cmd
 
-# Copy xx supporting tools to throw-away layer, not to /chroot.
-COPY --from=xx / /
-
-ARG TARGETPLATFORM
-RUN xx-go --wrap && mkdir -p /run/lock
+RUN xx-go --wrap 
 
 # By setting the version as an argument, we can avoid running the version logic 
 # a second time (inside the Docker build process). Therefore, removing the need
@@ -87,7 +97,6 @@ FROM micro
 
 # Copy binaries and configuration files from builder and zypper to micro.
 COPY --from=builder /chroot/ /
-COPY --from=zypper /chroot/ /
 
 # Copy binaries and configuration files from the local repository to micro
 COPY package/cfg/ /etc/kube-bench/cfg/
