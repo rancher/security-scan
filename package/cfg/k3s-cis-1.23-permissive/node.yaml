@@ -103,7 +103,7 @@ groups:
 
       - id: 4.1.7
         text: "Ensure that the certificate authorities file permissions are set to 644 or more restrictive (Manual)"
-        audit: "stat -c %a $kubeletcafile"
+        audit: "stat -c permissions=%a $kubeletcafile"
         tests:
           test_items:
             - flag: "permissions"

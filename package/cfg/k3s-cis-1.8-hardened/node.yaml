@@ -90,7 +90,7 @@ groups:
         scored: true
       - id: 4.1.7
         text: "Ensure that the certificate authorities file permissions are set to 600 or more restrictive (Manual)"
-        audit: "stat -c %a /var/lib/rancher/k3s/server/tls/server-ca.crt"
+        audit: "stat -c permissions=%a $kubeletcafile"
         tests:
           test_items:
             - flag: "permissions"
