@@ -105,14 +105,16 @@ RUN VERSION=${VERSION} TARGET_BIN=/chroot/usr/bin/kb-summarizer make build
 # Ensures that the binary that was built is valid for the target platform.
 RUN xx-verify --static /chroot/usr/bin/kb-summarizer
 
-# Main stage using bci-micro as the base image
-FROM micro
+# Override kube-bench cfg files without duplicating them on the final image.
+COPY package/cfg/ /chroot/etc/kube-bench/cfg/
 
-# Copy binaries and configuration files from builder and zypper to micro.
+
+# By using scratch we avoid duplicating files on the final image,
+# as otherwise the COPY below would override the differences between
+# /chroot and "final", increasing the image layer by ~10MB. 
+FROM scratch
+
 COPY --from=builder /chroot/ /
-
-# Copy binaries and configuration files from the local repository to micro
-COPY package/cfg/ /etc/kube-bench/cfg/
 COPY package/run.sh \
     package/run_sonobuoy_plugin.sh \
     package/helper_scripts/check_files_permissions.sh \
