@@ -59,7 +59,7 @@ ARG KUBE_BENCH_VERSION KUBE_BENCH_SUM_arm64 KUBE_BENCH_SUM_amd64 \
 
 # Stage Sonobuoy into builder.
 ENV SONOBUOY_SUM="SONOBUOY_SUM_${TARGETARCH}"
-RUN curl --output /tmp/sonobuoy.tar.gz -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/v${SONOBUOY_VERSION}/sonobuoy_${SONOBUOY_VERSION}_linux_${TARGETARCH}.tar.gz" && \
+RUN curl --output /tmp/sonobuoy.tar.gz -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/${SONOBUOY_VERSION}/sonobuoy_${SONOBUOY_VERSION#v}_linux_${TARGETARCH}.tar.gz" && \
     echo "${!SONOBUOY_SUM}  /tmp/sonobuoy.tar.gz" | sha256sum -c - && \
     tar -xvzf /tmp/sonobuoy.tar.gz -C /chroot/usr/bin sonobuoy
 
@@ -73,14 +73,14 @@ RUN echo "${!KUBECTL_SUM}  /chroot/usr/local/bin/kubectl" | sha256sum -c -
 
 # Stage kube-bench into builder.
 ENV KUBE_BENCH_SUM="KUBE_BENCH_SUM_${TARGETARCH}"
-RUN curl --output /tmp/kubebench.tar.gz -sLf "https://github.com/aquasecurity/kube-bench/releases/download/v${KUBE_BENCH_VERSION}/kube-bench_${KUBE_BENCH_VERSION}_linux_${TARGETARCH}.tar.gz" && \
+RUN curl --output /tmp/kubebench.tar.gz -sLf "https://github.com/aquasecurity/kube-bench/releases/download/${KUBE_BENCH_VERSION}/kube-bench_${KUBE_BENCH_VERSION#v}_linux_${TARGETARCH}.tar.gz" && \
     echo "${!KUBE_BENCH_SUM}  /tmp/kubebench.tar.gz" | sha256sum -c - && \
     tar -xvzf /tmp/kubebench.tar.gz -C /chroot/usr/bin
 
 # Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
 RUN mkdir -p /chroot/etc/kube-bench/ && \
-    curl -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/v${KUBE_BENCH_VERSION}.tar.gz" | \
-    tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${KUBE_BENCH_VERSION}/cfg"
+    curl -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/${KUBE_BENCH_VERSION}.tar.gz" | \
+    tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${KUBE_BENCH_VERSION#v}/cfg"
 
 WORKDIR /src
 COPY go.sum \

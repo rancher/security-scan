@@ -10,7 +10,7 @@ $(GOLINT): ## Download golint locally if not yet downloaded.
 
 KUBE_BENCH = $(TOOLS_BIN)/kube-bench
 $(KUBE_BENCH): ## Download kube-bench locally if not yet downloaded.
-	$(call go-install-tool,$(KUBE_BENCH),github.com/aquasecurity/kube-bench@v$(KUBE_BENCH_VERSION))
+	$(call go-install-tool,$(KUBE_BENCH),github.com/aquasecurity/kube-bench@$(KUBE_BENCH_VERSION))
 
 KIND = $(TOOLS_BIN)/kind
 $(KIND): ## Download kind locally if not yet downloaded.
