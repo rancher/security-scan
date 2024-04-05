@@ -13,11 +13,11 @@ SONOBUOY_IMAGE ?= rancher/mirrored-sonobuoy-sonobuoy:v$(SONOBUOY_VERSION)
 SONOBUOY_SUM_arm64 ?= 75c6f1d590ade2de2fbe59d53ff8005ff99d31517f2f12a6a36a03573f7e73c3
 SONOBUOY_SUM_amd64 ?= f9006ed997fd5a701b34a96786efffa52d5e77873bfc717bc252c2e5ef8a7f3c
 
-KUBECTL_VERSION ?= 1.28.3
-# curk -L "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/arm64/kubectl.sha256"
-KUBECTL_SUM_arm64 ?= 06511f03e34d8ee350bd55717845e27ebec3116526db7c60092eeb33a475a337
-# curk -L "https://dl.k8s.io/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl.sha256"
-KUBECTL_SUM_amd64 ?= 0c680c90892c43e5ce708e918821f92445d1d244f9b3d7513023bcae9a6246d1
+KUBECTL_VERSION ?= 1.28.7
+# curk -L "https://dl.k8s.io/release/v$KUBECTL_VERSION/bin/linux/arm64/kubectl.sha256"
+KUBECTL_SUM_arm64 ?= 13d547495bdea49b223fe06bffb6d2bef96436634847f759107655aa80fc990e
+# curk -L "https://dl.k8s.io/release/v$KUBECTL_VERSION/bin/linux/amd64/kubectl.sha256"
+KUBECTL_SUM_amd64 ?= aff42d3167685e4d8e86fda0ad9c6ce6ec6c047bc24d608041d54717a18192ba
 
 # Reduces the code duplication on Makefile by keeping all args into a single variable.
 IMAGE_ARGS := --build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) --build-arg SONOBUOY_SUM_arm64=$(SONOBUOY_SUM_arm64) --build-arg SONOBUOY_SUM_amd64=$(SONOBUOY_SUM_amd64) \
