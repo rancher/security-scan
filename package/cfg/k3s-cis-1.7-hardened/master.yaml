@@ -300,7 +300,7 @@ groups:
 
       - id: 1.1.20
         text: "Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Manual)"
-        audit: "stat -c %n\ %a /var/lib/rancher/k3s/server/tls/*.crt"
+        audit: "find /var/lib/rancher/k3s/server/tls/ -type f -name '*.crt' | xargs stat -c permissions=%a"
         use_multiple_values: true
         tests:
           test_items:
@@ -309,14 +309,14 @@ groups:
                 op: bitmask
                 value: "600"
         remediation: |
-          Run the below command (based on the file location on your system) on the control plane node.
+          Run the below command (based on the file location on your system) on the master node.
           For example,
-          chmod -R 600 /etc/kubernetes/pki/*.crt
+          find /var/lib/rancher/k3s/server/tls/ -type f -name '*.crt' -exec chmod -v 600 {}+
         scored: false
 
       - id: 1.1.21
         text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Manual)"
-        audit: "stat -c %n\ %a /var/lib/rancher/k3s/server/tls/*.key"
+        audit: "find /var/lib/rancher/k3s/server/tls/ -type f -name '*.key' | xargs stat -c permissions=%a"
         use_multiple_values: true
         tests:
           test_items:
@@ -325,9 +325,9 @@ groups:
                 op: bitmask
                 value: "600"
         remediation: |
-          Run the below command (based on the file location on your system) on the control plane node.
+          Run the below command (based on the file location on your system) on the master node.
           For example,
-          chmod -R 600 /etc/kubernetes/pki/*.key
+          find /var/lib/rancher/k3s/server/tls/ -type f -name "*.crt" -exec chmod -v 600 {}+
         scored: false
 
   - id: 1.2
