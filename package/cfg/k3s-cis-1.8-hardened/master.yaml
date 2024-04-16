@@ -292,7 +292,7 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,
-          find /var/lib/rancher/k3s/server/tls/ -type f -name '*.crt' -exec chmod -v 600 {}+
+          find /var/lib/rancher/k3s/server/tls/ -type f -name '*.crt' -exec chmod -v 600 {} +
         scored: false
       - id: 1.1.21
         text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Manual)"
@@ -307,7 +307,7 @@ groups:
         remediation: |
           Run the below command (based on the file location on your system) on the master node.
           For example,
-          find /var/lib/rancher/k3s/server/tls/ -type f -name "*.crt" -exec chmod -v 600 {}+
+          find /var/lib/rancher/k3s/server/tls/ -type f -name "*.crt" -exec chmod -v 600 {} +
         scored: false
   - id: 1.2
     text: "API Server"
