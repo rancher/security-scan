@@ -3,7 +3,7 @@ module github.com/rancher/security-scan
 go 1.21
 
 require (
-	github.com/aquasecurity/kube-bench v0.7.0
+	github.com/aquasecurity/kube-bench v0.7.3
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.18.2
 	github.com/urfave/cli/v2 v2.27.2
@@ -11,9 +11,9 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.21.0 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.26.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/securityhub v1.37.0 // indirect
-	github.com/aws/smithy-go v1.19.0 // indirect
+	github.com/aws/smithy-go v1.20.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/golang/glog v1.2.0 // indirect
@@ -39,5 +39,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/client-go v0.27.4 // indirect
+	k8s.io/client-go v0.29.3 // indirect
 )
