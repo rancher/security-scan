@@ -1,5 +1,5 @@
 # Platform specific images which must support all target architectures.
-FROM registry.suse.com/bci/bci-micro:15.5 AS final
+FROM registry.suse.com/bci/bci-micro:15.6 AS final
 FROM registry.suse.com/bci/golang:1.22 AS golang
 
 # Builder and xx only need to support the host architecture.
