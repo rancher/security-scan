@@ -39,7 +39,7 @@ COPY --from=golang /etc/zypp/ /chroot/etc/zypp/
 # OS binaries to run kube-bench audit commands.
 # Before removing dependencies here, ensure they are not needed by cis-operator,
 # security-scan or any of the existing kube-bench tests.
-RUN zypper --non-interactive refresh && \
+RUN zypper --non-interactive --releasever=15.6 refresh && \
     zypper --installroot /chroot -n in --no-recommends findutils tar jq gawk diffutils procps systemd gzip curl && \
     zypper --installroot /chroot clean -a && \
     rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/* /chroot/etc/zypp/
