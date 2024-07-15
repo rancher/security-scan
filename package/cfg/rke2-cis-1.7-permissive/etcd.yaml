@@ -133,8 +133,7 @@ groups:
         scored: true
 
       - id: 2.4
-        text: "Ensure that the --peer-cert-file and --peer-key-file arguments are
-        set as appropriate (Automated)"
+        text: "Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Automated)"
         type: "skip"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
         tests:

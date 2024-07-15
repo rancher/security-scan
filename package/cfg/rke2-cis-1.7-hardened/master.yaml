@@ -111,7 +111,7 @@ groups:
           For example,
           chmod 600 $etcdconf
         scored: true
-        
+
       - id: 1.1.8
         text: "Ensure that the etcd pod specification file ownership is set to root:root (Automated)"
         audit: "/bin/sh -c 'if test -e $etcdconf; then stat -c %U:%G $etcdconf; fi'"
