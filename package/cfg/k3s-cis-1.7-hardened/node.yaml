@@ -188,7 +188,7 @@ groups:
                 op: nothave
                 value: AlwaysAllow
         remediation: |
-          By default, K3s does not set the --authorization-mode to AlwaysAllow. 
+          By default, K3s does not set the --authorization-mode to AlwaysAllow.
           If using the K3s config file /etc/rancher/k3s/config.yaml, remove any lines similar to below.
           kublet-arg:
           - "authorization-mode=AlwaysAllow"
@@ -383,7 +383,7 @@ groups:
               set: false
         remediation: |
           Not Applicable.
-          By default, K3s does not set the RotateKubeletServerCertificate feature gate. 
+          By default, K3s does not set the RotateKubeletServerCertificate feature gate.
           If you have enabled this feature gate, you should remove it.
           If using the K3s config file /etc/rancher/k3s/config.yaml, remove any feature-gate=RotateKubeletServerCertificate parameter.
           If using the command line, remove the K3s flag --kublet-arg="feature-gate=RotateKubeletServerCertificate".
