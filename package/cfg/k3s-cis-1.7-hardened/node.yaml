@@ -41,7 +41,7 @@ groups:
 
       - id: 4.1.3
         text: "If proxy kubeconfig file exists ensure permissions are set to 600 or more restrictive (Manual)"
-        audit: 'stat -c %a /var/lib/rancher/k3s/agent/kubeproxy.kubeconfig'
+        audit: '/bin/sh -c ''if test -e $proxykubeconfig; then stat -c permissions=%a $proxykubeconfig; fi'' '
         tests:
           bin_op: or
           test_items:
@@ -358,7 +358,6 @@ groups:
               set: false
           bin_op: or
         remediation: |
-          Not Applicable.
           By default, K3s does not set the --rotate-certificates argument. If you have set this to a different value, you should remove it.
           If using the K3s config file /etc/rancher/k3s/config.yaml, remove any rotate-certificates parameter.
           If using the command line, remove the K3s flag --kublet-arg="rotate-certificates".
