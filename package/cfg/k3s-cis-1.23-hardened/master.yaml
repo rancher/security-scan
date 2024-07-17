@@ -158,11 +158,10 @@ groups:
         audit: "check_for_k3s_etcd.sh 1.1.11"
         tests:
           test_items:
-            - flag: "700"
+            - flag: "permissions"
               compare:
-                op: eq
+                op: bitmask
                 value: "700"
-              set: true
         remediation: |
           On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
           from the command 'ps -ef | grep etcd'.
