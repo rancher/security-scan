@@ -15,7 +15,7 @@ if [[ "$(journalctl -D $JOURNAL_LOG --lines=0 2>&1 | grep -s 'No such file or di
   JOURNAL_LOG=/run/log/journal
 fi
 
-if [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'etcd cluster' | wc -l)" -gt 0 ]]; then
+if [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Managed etcd cluster' | wc -l)" -gt 0 ]]; then
     case $1 in
         "1.1.11")
             echo $(stat -c %a /var/lib/rancher/k3s/server/db/etcd);;
