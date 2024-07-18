@@ -20,9 +20,14 @@ master:
   scheduler:
     bins:
       - containerd
+    kubeconfig:
+      - /var/lib/rancher/k3s/server/cred/scheduler.kubeconfig
   controllermanager:
     bins:
       - containerd
+    kubeconfig:
+      - /var/lib/rancher/k3s/server/cred/controller.kubeconfig
+
   etcd:
     bins:
       - containerd
