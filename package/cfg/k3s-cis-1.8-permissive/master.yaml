@@ -159,7 +159,7 @@ groups:
         audit: |
           if [ "$(journalctl -u k3s | grep -m1 'Managed etcd cluster' | wc -l)" -gt 0 ]; then
             stat -c permissions=%a /var/lib/rancher/k3s/server/db/etcd
-          else 
+          else
             echo "permissions=700"
           fi
         tests:
@@ -433,7 +433,7 @@ groups:
                 value: "Node"
         remediation: |
           By default, K3s sets the --authorization-mode to Node and RBAC.
-          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml, 
+          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml,
           ensure that you are not overriding authorization-mode.
         scored: true
 
@@ -643,7 +643,7 @@ groups:
                 op: gte
                 value: 10
         remediation: |
-          Edit the K3s config file /etc/rancher/k3s/config.yaml on the control plane node and 
+          Edit the K3s config file /etc/rancher/k3s/config.yaml on the control plane node and
           set the audit-log-maxbackup parameter to 10 or to an appropriate value. For example,
           kube-apiserver-arg:
           - "audit-log-maxbackup=10"
@@ -661,7 +661,7 @@ groups:
                 op: gte
                 value: 100
         remediation: |
-          Edit the K3s config file /etc/rancher/k3s/config.yaml on the control plane node and 
+          Edit the K3s config file /etc/rancher/k3s/config.yaml on the control plane node and
           set the audit-log-maxsize parameter to an appropriate size in MB. For example,
           kube-apiserver-arg:
           - "audit-log-maxsize=100"
@@ -675,7 +675,7 @@ groups:
           test_items:
             - flag: "--request-timeout"
         remediation: |
-          Permissive, per CIS guidelines, 
+          Permissive, per CIS guidelines,
           "it is recommended to set this limit as appropriate and change the default limit of 60 seconds only if needed".
           Edit the K3s config file /etc/rancher/k3s/config.yaml
           and set the below parameter if needed. For example,
@@ -724,7 +724,7 @@ groups:
         audit: |
           if [ "$(journalctl -u k3s | grep -m1 'Managed etcd cluster' | wc -l)" -gt 0 ]; then
             journalctl -D /var/log/journal -u k3s | grep -m1 'Running kube-apiserver' | tail -n1
-          else 
+          else
             echo "--etcd-certfile AND --etcd-keyfile"
           fi
         tests:
@@ -856,9 +856,10 @@ groups:
           test_items:
             - flag: "--terminated-pod-gc-threshold"
         remediation: |
-          Edit the Controller Manager pod specification file $controllermanagerconf
-          on the control plane node and set the --terminated-pod-gc-threshold to an appropriate threshold,
-          for example, --terminated-pod-gc-threshold=10
+          Edit the K3s config file /etc/rancher/k3s/config.yaml on the control plane node
+          and set the --terminated-pod-gc-threshold to an appropriate threshold,
+          kube-controller-manager-arg:
+          - "terminated-pod-gc-threshold=10"
         scored: false
 
       - id: 1.3.2
@@ -871,9 +872,10 @@ groups:
                 op: eq
                 value: false
         remediation: |
-          Edit the Controller Manager pod specification file $controllermanagerconf
-          on the control plane node and set the below parameter.
-          --profiling=false
+          By default, K3s sets the --profiling argument to false.
+          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml and remove any lines like below.
+          kube-controller-manager-arg:
+          - "profiling=true"
         scored: true
 
       - id: 1.3.3
@@ -886,9 +888,10 @@ groups:
                 op: noteq
                 value: false
         remediation: |
-          Edit the Controller Manager pod specification file $controllermanagerconf
-          on the control plane node to set the below parameter.
-          --use-service-account-credentials=true
+          By default, K3s sets the --use-service-account-credentials argument to true.
+          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml and remove any lines like below.
+          kube-controller-manager-arg:
+          - "use-service-account-credentials=false"
         scored: true
 
       - id: 1.3.4
@@ -898,10 +901,11 @@ groups:
           test_items:
             - flag: "--service-account-private-key-file"
         remediation: |
-          Edit the Controller Manager pod specification file $controllermanagerconf
-          on the control plane node and set the --service-account-private-key-file parameter
-          to the private key file for service accounts.
-          --service-account-private-key-file=<filename>
+          By default, K3s automatically provides the service account private key file.
+          It is generated and located at /var/lib/rancher/k3s/server/tls/service.current.key.
+          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml and remove any lines like below.
+          kube-controller-manager-arg:
+          - "service-account-private-key-file=<path>"
         scored: true
 
       - id: 1.3.5
@@ -911,15 +915,17 @@ groups:
           test_items:
             - flag: "--root-ca-file"
         remediation: |
-          Edit the Controller Manager pod specification file $controllermanagerconf
-          on the control plane node and set the --root-ca-file parameter to the certificate bundle file`.
-          --root-ca-file=<path/to/file>
+          By default, K3s automatically provides the root CA file.
+          It is generated and located at /var/lib/rancher/k3s/server/tls/server-ca.crt.
+          If for some reason you need to provide your own ca certificate, look at using the k3s certificate command line tool.
+          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml and remove any lines like below.
+          kube-controller-manager-arg:
+          - "root-ca-file=<path>"
         scored: true
 
       - id: 1.3.6
         text: "Ensure that the RotateKubeletServerCertificate argument is set to true (Automated)"
-        type: "skip"
-        audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-controller-manager' | tail -n1 | grep 'RotateKubeletServerCertificate'"
+        audit: "journalctl -D /var/log/journal  -u k3s | grep 'Running kube-controller-manager' | tail -n1"
         tests:
           bin_op: or
           test_items:
@@ -931,10 +937,11 @@ groups:
             - flag: "--feature-gates"
               set: false
         remediation: |
-          Edit the Controller Manager pod specification file $controllermanagerconf
-          on the control plane node and set the --feature-gates parameter to include RotateKubeletServerCertificate=true.
-          --feature-gates=RotateKubeletServerCertificate=true
-          Not Applicable.
+          By default, K3s does not set the RotateKubeletServerCertificate feature gate.
+          If you have enabled this feature gate, you should remove it.
+          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml, remove any lines like below.
+          kube-controller-manager-arg:
+          - "feature-gate=RotateKubeletServerCertificate"
         scored: true
 
       - id: 1.3.7
@@ -951,8 +958,10 @@ groups:
             - flag: "--bind-address"
               set: false
         remediation: |
-          Edit the Controller Manager pod specification file $controllermanagerconf
-          on the control plane node and ensure the correct value for the --bind-address parameter
+          By default, K3s sets the --bind-address argument to 127.0.0.1
+          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml and remove any lines like below.
+          kube-controller-manager-arg:
+          - "bind-address=<IP>"
         scored: true
 
   - id: 1.4
@@ -969,9 +978,10 @@ groups:
                 value: false
               set: true
         remediation: |
-          Edit the Scheduler pod specification file $schedulerconf file
-          on the control plane node and set the below parameter.
-          --profiling=false
+          By default, K3s sets the --profiling argument to false.
+          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml and remove any lines like below.
+          kube-scheduler-arg:
+          - "profiling=true"
         scored: true
 
       - id: 1.4.2
@@ -988,6 +998,8 @@ groups:
             - flag: "--bind-address"
               set: false
         remediation: |
-          Edit the Scheduler pod specification file $schedulerconf
-          on the control plane node and ensure the correct value for the --bind-address parameter
+          By default, K3s sets the --bind-address argument to 127.0.0.1
+          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml and remove any lines like below.
+          kube-scheduler-arg:
+          - "bind-address=<IP>"
         scored: true
