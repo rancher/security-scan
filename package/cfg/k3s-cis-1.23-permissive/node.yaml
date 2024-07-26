@@ -417,7 +417,7 @@ groups:
         scored: true
 
       - id: 4.2.12
-        text: "Verify that the RotateKubeletServerCertificate argument is set to true (Manual)"
+        text: "Verify that the RotateKubeletServerCertificate argument is set to true (Automated)"
         audit: "/bin/ps -fC $kubeletbin"
         type: "skip"
         tests:

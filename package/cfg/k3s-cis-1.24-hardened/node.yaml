@@ -376,7 +376,7 @@ groups:
               set: false
           bin_op: or
         remediation: |
-          By default, K3s does not set the --rotate-certificates argument. If you have set this to a different value, you should remove it.
+          By default, K3s does not set the --rotate-certificates argument. If you have set this flag with a value of `false`, you should either set it to `true` or completely remove the flag.
           If using the K3s config file /etc/rancher/k3s/config.yaml, remove any rotate-certificates parameter.
           If using the command line, remove the K3s flag --kublet-arg="rotate-certificates".
           Based on your system, restart the k3s service. For example,
@@ -384,7 +384,7 @@ groups:
         scored: true
 
       - id: 4.2.12
-        text: "Verify that the RotateKubeletServerCertificate argument is set to true (Manual)"
+        text: "Verify that the RotateKubeletServerCertificate argument is set to true (Automated)"
         audit: "journalctl -D /var/log/journal -u k3s -u k3s-agent | grep 'Running kubelet' | tail -n1"
         tests:
           bin_op: or
@@ -398,14 +398,13 @@ groups:
               path: '{.featureGates.RotateKubeletServerCertificate}'
               set: false
         remediation: |
-          Not Applicable.
           By default, K3s does not set the RotateKubeletServerCertificate feature gate.
           If you have enabled this feature gate, you should remove it.
           If using the K3s config file /etc/rancher/k3s/config.yaml, remove any feature-gate=RotateKubeletServerCertificate parameter.
           If using the command line, remove the K3s flag --kublet-arg="feature-gate=RotateKubeletServerCertificate".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
-        scored: false
+        scored: true
 
       - id: 4.2.13
         text: "Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Manual)"
