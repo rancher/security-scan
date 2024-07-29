@@ -10,13 +10,17 @@ handle_error() {
 
 trap 'handle_error' ERR
 
+JOURNAL_LOG="${JOURNAL_LOG:-/var/log/journal}"
+if [[ "$(journalctl -D $JOURNAL_LOG --lines=0 2>&1 | grep -s 'No such file or directory' | wc -l)" -gt 0 ]]; then
+  JOURNAL_LOG=/run/log/journal
+fi
 
-if [[ "$(journalctl -D /var/log/journal -u k3s | grep -m1 'Managed etcd cluster initializing' | wc -l)" -gt 0 ]]; then
-    case $1 in 
+if [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Managed etcd cluster' | wc -l)" -gt 0 ]]; then
+    case $1 in
         "1.1.11")
             echo $(stat -c %a /var/lib/rancher/k3s/server/db/etcd);;
         "1.2.29")
-            echo $(journalctl -D /var/log/journal -u k3s | grep -m1 'Running kube-apiserver');;
+            echo $(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Running kube-apiserver');;
         "2.1")
             echo $(grep -A 5 'client-transport-security' /var/lib/rancher/k3s/server/db/etcd/config | grep -E 'cert-file|key-file');;
         "2.2")
