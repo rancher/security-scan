@@ -169,10 +169,10 @@ groups:
         remediation: |
           By default, K3s sets the --anonymous-auth to false. If you have set this to a different value, you
           should set it back to false. If using the K3s config file /etc/rancher/k3s/config.yaml, remove any lines similar to below.
-          kublet-arg:
+          kubelet-arg:
           - "anonymous-auth=true"
           If using the command line, edit the K3s service file and remove the below argument.
-          --kublet-arg="anonymous-auth=true"
+          --kubelet-arg="anonymous-auth=true"
           Based on your system, restart the k3s service. For example,
           systemctl daemon-reload
           systemctl restart k3s.service
@@ -192,10 +192,10 @@ groups:
         remediation: |
           By default, K3s does not set the --authorization-mode to AlwaysAllow.
           If using the K3s config file /etc/rancher/k3s/config.yaml, remove any lines similar to below.
-          kublet-arg:
+          kubelet-arg:
           - "authorization-mode=AlwaysAllow"
           If using the command line, edit the K3s service file and remove the below argument.
-          --kublet-arg="authorization-mode=AlwaysAllow"
+          --kubelet-arg="authorization-mode=AlwaysAllow"
           Based on your system, restart the k3s service. For example,
           systemctl daemon-reload
           systemctl restart k3s.service
@@ -231,10 +231,10 @@ groups:
         remediation: |
           By default, K3s sets the --read-only-port to 0. If you have set this to a different value, you
           should set it back to 0. If using the K3s config file /etc/rancher/k3s/config.yaml, remove any lines similar to below.
-          kublet-arg:
+          kubelet-arg:
           - "read-only-port=XXXX"
           If using the command line, edit the K3s service file and remove the below argument.
-          --kublet-arg="read-only-port=XXXX"
+          --kubelet-arg="read-only-port=XXXX"
           Based on your system, restart the k3s service. For example,
           systemctl daemon-reload
           systemctl restart k3s.service
@@ -256,9 +256,9 @@ groups:
           bin_op: or
         remediation: |
           If using the K3s config file /etc/rancher/k3s/config.yaml, set the following parameter to an appropriate value.
-          kublet-arg:
+          kubelet-arg:
           - "streaming-connection-idle-timeout=5m"
-          If using the command line, run K3s with --kublet-arg="streaming-connection-idle-timeout=5m".
+          If using the command line, run K3s with --kubelet-arg="streaming-connection-idle-timeout=5m".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
         scored: false
@@ -299,9 +299,9 @@ groups:
           bin_op: or
         remediation: |
           If using the K3s config file /etc/rancher/k3s/config.yaml, set the following parameter.
-          kublet-arg:
+          kubelet-arg:
           - "make-iptables-util-chains=true"
-          If using the command line, run K3s with --kublet-arg="make-iptables-util-chains=true".
+          If using the command line, run K3s with --kubelet-arg="make-iptables-util-chains=true".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
         scored: true
@@ -334,9 +334,9 @@ groups:
         remediation: |
           By default, K3s sets the event-qps to 0. Should you wish to change this,
           If using the K3s config file /etc/rancher/k3s/config.yaml, set the following parameter to an appropriate value.
-          kublet-arg:
+          kubelet-arg:
           - "event-qps=<value>"
-          If using the command line, run K3s with --kublet-arg="event-qps=<value>".
+          If using the command line, run K3s with --kubelet-arg="event-qps=<value>".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
         scored: false
@@ -378,7 +378,7 @@ groups:
         remediation: |
           By default, K3s does not set the --rotate-certificates argument. If you have set this flag with a value of `false`, you should either set it to `true` or completely remove the flag.
           If using the K3s config file /etc/rancher/k3s/config.yaml, remove any rotate-certificates parameter.
-          If using the command line, remove the K3s flag --kublet-arg="rotate-certificates".
+          If using the command line, remove the K3s flag --kubelet-arg="rotate-certificates".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
         scored: true
@@ -401,7 +401,7 @@ groups:
           By default, K3s does not set the RotateKubeletServerCertificate feature gate.
           If you have enabled this feature gate, you should remove it.
           If using the K3s config file /etc/rancher/k3s/config.yaml, remove any feature-gate=RotateKubeletServerCertificate parameter.
-          If using the command line, remove the K3s flag --kublet-arg="feature-gate=RotateKubeletServerCertificate".
+          If using the command line, remove the K3s flag --kubelet-arg="feature-gate=RotateKubeletServerCertificate".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
         scored: true
