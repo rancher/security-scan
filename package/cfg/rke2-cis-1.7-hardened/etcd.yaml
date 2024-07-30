@@ -42,7 +42,7 @@ groups:
 
       - id: 1.1.11
         text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Automated)"
-        audit: "stat -c permissions=%a /var/lib/rancher/rke2/server/db/etcd"
+        audit: "stat -c permissions=%a $etcddatadir"
         tests:
           test_items:
             - flag: "permissions"
@@ -54,13 +54,13 @@ groups:
           On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
           from the command 'ps -ef | grep etcd'.
           Run the below command (based on the etcd data directory found above). For example,
-          chmod 700 /var/lib/etcd
+          chmod 700 $etcddatadir
         scored: true
 
       - id: 1.1.12
         text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Automated)"
         type: "skip"
-        audit: "stat -c %U:%G /var/lib/rancher/rke2/server/db/etcd"
+        audit: "stat -c %U:%G $etcddatadir"
         tests:
           test_items:
             - flag: "etcd:etcd"
@@ -133,8 +133,7 @@ groups:
         scored: true
 
       - id: 2.4
-        text: "Ensure that the --peer-cert-file and --peer-key-file arguments are
-        set as appropriate (Automated)"
+        text: "Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Automated)"
         type: "skip"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
         tests:
