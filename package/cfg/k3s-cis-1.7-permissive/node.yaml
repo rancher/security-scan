@@ -337,7 +337,7 @@ groups:
           By default, K3s automatically provides the TLS certificate and private key for the Kubelet.
           They are generated and located at /var/lib/rancher/k3s/agent/serving-kubelet.crt and /var/lib/rancher/k3s/agent/serving-kubelet.key
           If for some reason you need to provide your own certificate and key, you can set the
-          the below parameters in the K3s config file /etc/rancher/k3s/config.yaml.
+          below parameters in the K3s config file /etc/rancher/k3s/config.yaml.
           kubelet-arg:
           - "tls-cert-file=<path/to/tls-cert-file>"
           - "tls-private-key-file=<path/to/tls-private-key-file>"

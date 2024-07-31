@@ -348,7 +348,7 @@ groups:
           Follow the documentation and configure alternate mechanisms for authentication.
           If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml and remove anything similar to below.
           kube-apiserver-arg:
-          - "token-auth-file=<path>".
+          - "token-auth-file=<path>"
         scored: true
 
       - id: 1.2.3
@@ -383,7 +383,7 @@ groups:
           By default, K3s automatically provides the kubelet client certificate and key.
           They are generated and located at /var/lib/rancher/k3s/server/tls/client-kube-apiserver.crt and /var/lib/rancher/k3s/server/tls/client-kube-apiserver.key
           If for some reason you need to provide your own certificate and key, you can set the
-          the below parameters in the K3s config file /etc/rancher/k3s/config.yaml.
+          below parameters in the K3s config file /etc/rancher/k3s/config.yaml.
           kube-apiserver-arg:
           - "kubelet-client-certificate=<path/to/client-cert-file>"
           - "kubelet-client-key=<path/to/client-key-file>"
