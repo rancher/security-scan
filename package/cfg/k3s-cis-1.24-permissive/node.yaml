@@ -168,7 +168,7 @@ groups:
           By default, K3s sets the --anonymous-auth to false. If you have set this to a different value, you
           should set it back to false. If using the K3s config file /etc/rancher/k3s/config.yaml, remove any lines similar to below.
           kubelet-arg:
-          - "anonymous-auth=true"
+            - "anonymous-auth=true"
           If using the command line, edit the K3s service file and remove the below argument.
           --kubelet-arg="anonymous-auth=true"
           Based on your system, restart the k3s service. For example,
@@ -191,7 +191,7 @@ groups:
           By default, K3s does not set the --authorization-mode to AlwaysAllow.
           If using the K3s config file /etc/rancher/k3s/config.yaml, remove any lines similar to below.
           kubelet-arg:
-          - "authorization-mode=AlwaysAllow"
+            - "authorization-mode=AlwaysAllow"
           If using the command line, edit the K3s service file and remove the below argument.
           --kubelet-arg="authorization-mode=AlwaysAllow"
           Based on your system, restart the k3s service. For example,
@@ -230,7 +230,7 @@ groups:
           By default, K3s sets the --read-only-port to 0. If you have set this to a different value, you
           should set it back to 0. If using the K3s config file /etc/rancher/k3s/config.yaml, remove any lines similar to below.
           kubelet-arg:
-          - "read-only-port=XXXX"
+            - "read-only-port=XXXX"
           If using the command line, edit the K3s service file and remove the below argument.
           --kubelet-arg="read-only-port=XXXX"
           Based on your system, restart the k3s service. For example,
@@ -255,7 +255,7 @@ groups:
         remediation: |
           If using the K3s config file /etc/rancher/k3s/config.yaml, set the following parameter to an appropriate value.
           kubelet-arg:
-          - "streaming-connection-idle-timeout=5m"
+            - "streaming-connection-idle-timeout=5m"
           If using the command line, run K3s with --kubelet-arg="streaming-connection-idle-timeout=5m".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
@@ -300,7 +300,7 @@ groups:
         remediation: |
           If using the K3s config file /etc/rancher/k3s/config.yaml, set the following parameter.
           kubelet-arg:
-          - "make-iptables-util-chains=true"
+            - "make-iptables-util-chains=true"
           If using the command line, run K3s with --kubelet-arg="make-iptables-util-chains=true".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
@@ -338,7 +338,7 @@ groups:
           By default, K3s sets the event-qps to 0. Should you wish to change this,
           If using the K3s config file /etc/rancher/k3s/config.yaml, set the following parameter to an appropriate value.
           kubelet-arg:
-          - "event-qps=<value>"
+            - "event-qps=<value>"
           If using the command line, run K3s with --kubelet-arg="event-qps=<value>".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
@@ -359,8 +359,8 @@ groups:
           If for some reason you need to provide your own certificate and key, you can set the
           below parameters in the K3s config file /etc/rancher/k3s/config.yaml.
           kubelet-arg:
-          - "tls-cert-file=<path/to/tls-cert-file>"
-          - "tls-private-key-file=<path/to/tls-private-key-file>"
+            - "tls-cert-file=<path/to/tls-cert-file>"
+            - "tls-private-key-file=<path/to/tls-private-key-file>"
         scored: false
 
       - id: 4.2.11
@@ -424,7 +424,7 @@ groups:
         remediation: |
           If using a K3s config file /etc/rancher/k3s/config.yaml, edit the file to set `TLSCipherSuites` to
           kubelet-arg:
-          - "tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"
+            - "tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305"
           or to a subset of these values.
           If using the command line, add the K3s flag --kubelet-arg="tls-cipher-suites=<same values as above>"
           Based on your system, restart the k3s service. For example,
