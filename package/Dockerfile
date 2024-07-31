@@ -82,7 +82,7 @@ RUN curl --output /tmp/kubebench.tar.gz -sLf "https://github.com/aquasecurity/ku
 
 # Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
 RUN mkdir -p /chroot/etc/kube-bench/ && \
-    curl -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/${KUBE_BENCH_VERSION}.tar.gz" | \
+    curl --output - -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/${KUBE_BENCH_VERSION}.tar.gz" | \
     tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${KUBE_BENCH_VERSION#v}/cfg"
 
 WORKDIR /src

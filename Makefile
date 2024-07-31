@@ -31,13 +31,13 @@ build: # build project and output binary to TARGET_BIN.
 	$(TARGET_BIN) --version
 	md5sum $(TARGET_BIN)
 
-image-test: buildx-machine ## build the container image for all target architecures.
+test-image: buildx-machine ## build the container image for all target architecures.
 	# Instead of loading image, target all platforms, effectivelly testing
 	# the build for the target architectures.
-	$(MAKE) image-build BUILD_ACTION="--platform=$(TARGET_PLATFORMS)"
+	$(MAKE) build-image BUILD_ACTION="--platform=$(TARGET_PLATFORMS)"
 
-.PHONY: image-build
-image-build: buildx-machine ## build (and load) the container image targeting the current platform.
+.PHONY: build-image
+build-image: buildx-machine ## build (and load) the container image targeting the current platform.
 	$(IMAGE_BUILDER) build -f package/Dockerfile \
 		--builder $(MACHINE) $(IMAGE_ARGS) \
 		--build-arg VERSION=$(VERSION) -t "$(IMAGE)" $(BUILD_ACTION) .
@@ -50,7 +50,7 @@ push-image: buildx-machine ## build the container image targeting all platforms 
 		--build-arg VERSION=$(VERSION) --platform=$(TARGET_PLATFORMS) -t "$(IMAGE)" --push .
 	@echo "Pushed $(IMAGE)"
 
-e2e: $(KIND) image-build ## run E2E tests.
+e2e: $(KIND) build-image ## run E2E tests.
 	@KUBERNETES_VERSION=$(KUBERNETES_VERSION) IMAGE=$(IMAGE) \
 	SONOBUOY_IMAGE=$(SONOBUOY_IMAGE) ARCH=$(ARCH) \
 	./hack/e2e
