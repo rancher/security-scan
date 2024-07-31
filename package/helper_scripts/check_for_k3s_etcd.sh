@@ -17,10 +17,6 @@ fi
 
 if [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Managed etcd cluster' | wc -l)" -gt 0 ]]; then
     case $1 in
-        "1.1.11")
-            echo $(stat -c %a /var/lib/rancher/k3s/server/db/etcd);;
-        "1.2.29")
-            echo $(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Running kube-apiserver');;
         "2.1")
             echo $(grep -A 5 'client-transport-security' /var/lib/rancher/k3s/server/db/etcd/config | grep -E 'cert-file|key-file');;
         "2.2")
@@ -39,10 +35,6 @@ if [[ "$(journalctl -D $JOURNAL_LOG -u k3s | grep -m1 'Managed etcd cluster' | w
 else
 # If another database is running, return whatever is required to pass the scan
     case $1 in
-        "1.1.11")
-            echo "700";;
-        "1.2.29")
-            echo "--etcd-certfile AND --etcd-keyfile";;
         "2.1")
             echo "cert-file AND key-file";;
         "2.2")
