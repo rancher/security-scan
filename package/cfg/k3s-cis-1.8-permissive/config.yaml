@@ -31,6 +31,10 @@ master:
   etcd:
     bins:
       - containerd
+
+etcd:
+  confs: /var/lib/rancher/k3s/server/db/etcd/config
+
 node:
   components:
     - kubelet
