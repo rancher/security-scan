@@ -10,6 +10,11 @@ FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.22 AS builder
 # won't be copied to the final image.
 COPY --from=xx / /
 
+ARG SONOBUOY_VERSION
+# The upstream project hasn't been released in almost one year, which
+# caused it to accumulate several stdlib Golang vulnerabilities.
+RUN git clone --depth=1 https://github.com/vmware-tanzu/sonobuoy --branch "${SONOBUOY_VERSION}" --single-branch /go/src/github.com/vmware-tanzu/sonobuoy
+
 # From this point onwards, although everything will be executed at the
 # host architecture, it will fork and run separately for each target
 # arch/platform.
@@ -18,6 +23,11 @@ RUN mkdir -p /run/lock
 
 # Set the final image base contents.
 COPY --from=final / /chroot/
+
+RUN cd /go/src/github.com/vmware-tanzu/sonobuoy && \
+    xx-go build -o /chroot/usr/bin/sonobuoy \
+        -ldflags "-s -w -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.Version=${SONOBUOY_VERSION}-rancher -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.GitSHA=$(git rev-parse HEAD)"
+RUN xx-verify /chroot/usr/bin/sonobuoy
 
 # The final image does not have zypper, so we amend the host zypper to
 # look for the target architecture instead, so we can avoid cross-emulation.
@@ -54,14 +64,7 @@ RUN xx-verify /chroot/usr/bin/curl && \
 
 # Define build arguments.
 ARG KUBE_BENCH_VERSION KUBE_BENCH_SUM_arm64 KUBE_BENCH_SUM_amd64 \
-    SONOBUOY_VERSION SONOBUOY_SUM_arm64 SONOBUOY_SUM_amd64 \
     KUBECTL_VERSION KUBECTL_SUM_arm64 KUBECTL_SUM_amd64
-
-# Stage Sonobuoy into builder.
-ENV SONOBUOY_SUM="SONOBUOY_SUM_${TARGETARCH}"
-RUN curl --output /tmp/sonobuoy.tar.gz -sLf "https://github.com/vmware-tanzu/sonobuoy/releases/download/${SONOBUOY_VERSION}/sonobuoy_${SONOBUOY_VERSION#v}_linux_${TARGETARCH}.tar.gz" && \
-    echo "${!SONOBUOY_SUM}  /tmp/sonobuoy.tar.gz" | sha256sum -c - && \
-    tar -xvzf /tmp/sonobuoy.tar.gz -C /chroot/usr/bin sonobuoy
 
 # Stage kubectl into builder.
 ADD --chown=root:root --chmod=0755 \
