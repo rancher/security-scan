@@ -56,8 +56,8 @@ jobs:
 
           public-registry: docker.io
           public-repo: rancher
-          public-username: ${{ env.DOCKERHUB_USERNAME }}
-          public-password: ${{ env.DOCKERHUB_TOKEN }}
+          public-username: ${{ env.DOCKER_USERNAME }}
+          public-password: ${{ env.DOCKER_PASSWORD }}
 
           prime-registry: ${{ env.PRIME_REGISTRY }}
           prime-repo: rancher
