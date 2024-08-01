@@ -20,7 +20,7 @@ groups:
                 value: "600"
         remediation: |
           Not Applicable.
-          The kubelet is embedded in the k3s process. There is not kubelet service file, all configuration is passed in as arguments at runtime.
+          The kubelet is embedded in the k3s process. There is no kubelet service file, all configuration is passed in as arguments at runtime.
         scored: true
 
       - id: 4.1.2
@@ -32,7 +32,7 @@ groups:
             - flag: root:root
         remediation: |
           Not Applicable.
-          The kubelet is embedded in the k3s process. There is not kubelet service file, all configuration is passed in as arguments at runtime.
+          The kubelet is embedded in the k3s process. There is no kubelet service file, all configuration is passed in as arguments at runtime.
         scored: true
 
       - id: 4.1.3
