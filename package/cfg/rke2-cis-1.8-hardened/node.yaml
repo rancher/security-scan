@@ -98,7 +98,7 @@ groups:
 
       - id: 4.1.7
         text: "Ensure that the certificate authorities file permissions are set to 600 or more restrictive (Automated)"
-        audit: "check_cafile_permissions.sh"
+        audit: '/bin/sh -c ''if test -e $kubeletcafile; then stat -c permissions=%a $kubeletcafile; fi'' '
         tests:
           test_items:
             - flag: "permissions"
@@ -107,13 +107,14 @@ groups:
                 value: "600"
               set: true
         remediation: |
-          Run the following command to modify the file permissions of the
-          --client-ca-file chmod 600 <filename>
+          Run the below command (based on the file location on your system) on the each worker node.
+          For example,
+          chmod 600 $kubeletcafile
         scored: true
 
       - id: 4.1.8
         text: "Ensure that the client certificate authorities file ownership is set to root:root (Automated)"
-        audit: "check_cafile_ownership.sh"
+        audit: '/bin/sh -c ''if test -e $kubeletcafile; then stat -c %U:%G $kubeletcafile; fi'' '
         tests:
           test_items:
             - flag: root:root
@@ -122,7 +123,7 @@ groups:
                 value: root:root
         remediation: |
           Run the following command to modify the ownership of the --client-ca-file.
-          chown root:root <filename>
+          chown root:root $kubeletcafile
         scored: true
 
       - id: 4.1.9
