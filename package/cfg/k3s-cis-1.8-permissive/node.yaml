@@ -201,7 +201,7 @@ groups:
               path: '{.authentication.x509.clientCAFile}'
         remediation: |
           By default, K3s automatically provides the client ca certificate for the Kubelet.
-          It is generated and located at /var/lib/rancher/k3s/server/tls/client-ca.crt
+          It is generated and located at /var/lib/rancher/k3s/agent/client-ca.crt
         scored: true
 
       - id: 4.2.4
