@@ -80,8 +80,8 @@ master:
       - /etc/kubernetes/manifests/etcd.manifest
       - /etc/etcd/etcd.conf
       - /var/snap/etcd/common/etcd.conf.yml
-      - /var/lib/rancher/rke2/server/db/etcd/config
       - /var/lib/rancher/k3s/server/db/etcd/config
+      - /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
     defaultconf: /etc/kubernetes/manifests/etcd.yaml
 
   flanneld:
@@ -186,8 +186,8 @@ etcd:
       - /etc/kubernetes/manifests/etcd.manifest
       - /etc/etcd/etcd.conf
       - /var/snap/etcd/common/etcd.conf.yml
-      - /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
       - /var/lib/rancher/k3s/server/db/etcd/config
+      - /var/lib/rancher/rke2/server/db/etcd/config
     defaultconf: /etc/kubernetes/manifests/etcd.yaml
 
 controlplane:

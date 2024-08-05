@@ -33,11 +33,18 @@ master:
   etcd:
     bins:
       - etcd
-    confs:
-      - /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
     datadirs:
       - /var/lib/rancher/rke2/server/db/etcd
     defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
+
+etcd:
+  components:
+    - etcd
+
+  etcd:
+    bins:
+      - etcd
+    defaultconf: /var/lib/rancher/rke2/server/db/etcd/config
 
 node:
   components:
