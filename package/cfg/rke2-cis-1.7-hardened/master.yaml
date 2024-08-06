@@ -574,7 +574,7 @@ groups:
               set: true
         remediation: |
           By default, RKE2 sets the --enable-admission-plugins to NodeRestriction.
-          Check the RKE2 config file /etc/rancher/rke2/config.yaml, and esnure that you are not overriding the admission plugins.
+          Check the RKE2 config file /etc/rancher/rke2/config.yaml, and ensure that you are not overriding the admission plugins.
           If you are, include NodeRestriction in the list.
           kube-apiserver-arg:
             - "enable-admission-plugins=...,NodeRestriction,..."
