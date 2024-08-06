@@ -357,7 +357,7 @@ groups:
           If using the command line, remove the K3s flag --kubelet-arg="rotate-certificates".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
-        scored: false
+        scored: true
 
       - id: 4.2.11
         text: "Verify that the RotateKubeletServerCertificate argument is set to true (Automated)"
