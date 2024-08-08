@@ -10,7 +10,7 @@ groups:
     checks:
       - id: 2.1
         text: "Ensure that the --cert-file and --key-file arguments are set as appropriate (Automated)"
-        audit_config: "check_for_k3s_etcd.sh"
+        audit_config: "cat $etcdconf"
         tests:
           bin_op: and
           test_items:
@@ -23,15 +23,16 @@ groups:
                 op: eq
                 value: "/var/lib/rancher/k3s/server/tls/etcd/server-client.key"
         remediation: |
-          By default, K3s generates cert and key files for etcd.
+          If running on with sqlite or a external DB, etcd checks are Not Applicable.
+          When running with embedded-etcd, K3s generates cert and key files for etcd.
           These are located in /var/lib/rancher/k3s/server/tls/etcd/.
           If this check fails, ensure that the configuration file $etcdconf
           has not been modified to use custom cert and key files.
-        scored: true
+        scored: false
 
       - id: 2.2
         text: "Ensure that the --client-cert-auth argument is set to true (Automated)"
-        audit_config: "check_for_k3s_etcd.sh"
+        audit_config: "cat $etcdconf"
         tests:
           test_items:
             - path: "{.client-transport-security.client-cert-auth}"
@@ -39,14 +40,15 @@ groups:
                 op: eq
                 value: true
         remediation: |
-          By default, K3s sets the --client-cert-auth parameter to true.
+          If running on with sqlite or a external DB, etcd checks are Not Applicable.
+          When running with embedded-etcd, K3s sets the --client-cert-auth parameter to true.
           If this check fails, ensure that the configuration file $etcdconf
           has not been modified to disable client certificate authentication.
-        scored: true
+        scored: false
 
       - id: 2.3
         text: "Ensure that the --auto-tls argument is not set to true (Automated)"
-        audit_config: "check_for_k3s_etcd.sh"
+        audit_config: "cat $etcdconf"
         tests:
           bin_op: or
           test_items:
@@ -57,16 +59,17 @@ groups:
             - path: "{.client-transport-security.auto-tls}"
               set: false
         remediation: |
-          By default, K3s does not set the --auto-tls parameter.
+          If running on with sqlite or a external DB, etcd checks are Not Applicable.
+          When running with embedded-etcd, K3s does not set the --auto-tls parameter.
           If this check fails, edit the etcd pod specification file $etcdconf on the master
           node and either remove the --auto-tls parameter or set it to false.
           client-transport-security:
             auto-tls: false
-        scored: true
+        scored: false
 
       - id: 2.4
         text: "Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Automated)"
-        audit_config: "check_for_k3s_etcd.sh"
+        audit_config: "cat $etcdconf"
         tests:
           bin_op: and
           test_items:
@@ -79,15 +82,16 @@ groups:
                 op: eq
                 value: "/var/lib/rancher/k3s/server/tls/etcd/peer-server-client.key"
         remediation: |
-          By default, K3s generates peer cert and key files for etcd.
+          If running on with sqlite or a external DB, etcd checks are Not Applicable.
+          When running with embedded-etcd, K3s generates peer cert and key files for etcd.
           These are located in /var/lib/rancher/k3s/server/tls/etcd/.
           If this check fails, ensure that the configuration file $etcdconf
           has not been modified to use custom peer cert and key files.
-        scored: true
+        scored: false
 
       - id: 2.5
         text: "Ensure that the --peer-client-cert-auth argument is set to true (Automated)"
-        audit_config: "check_for_k3s_etcd.sh"
+        audit_config: "cat $etcdconf"
         tests:
           test_items:
             - path: "{.peer-transport-security.client-cert-auth}"
@@ -95,14 +99,15 @@ groups:
                 op: eq
                 value: true
         remediation: |
-          By default, K3s sets the --peer-cert-auth parameter to true.
+          If running on with sqlite or a external DB, etcd checks are Not Applicable.
+          When running with embedded-etcd, K3s sets the --peer-cert-auth parameter to true.
           If this check fails, ensure that the configuration file $etcdconf
           has not been modified to disable peer client certificate authentication.
-        scored: true
+        scored: false
 
       - id: 2.6
         text: "Ensure that the --peer-auto-tls argument is not set to true (Automated)"
-        audit_config: "check_for_k3s_etcd.sh"
+        audit_config: "cat $etcdconf"
         tests:
           bin_op: or
           test_items:
@@ -113,16 +118,17 @@ groups:
             - path: "{.peer-transport-security.auto-tls}"
               set: false
         remediation: |
-          By default, K3s does not set the --peer-auto-tls parameter.
+          If running on with sqlite or a external DB, etcd checks are Not Applicable.
+          When running with embedded-etcd, K3s does not set the --peer-auto-tls parameter.
           If this check fails, edit the etcd pod specification file $etcdconf on the master
           node and either remove the --peer-auto-tls parameter or set it to false.
           peer-transport-security:
             auto-tls: false
-        scored: true
+        scored: false
 
       - id: 2.7
         text: "Ensure that a unique Certificate Authority is used for etcd (Automated)"
-        audit_config: "check_for_k3s_etcd.sh"
+        audit_config: "cat $etcdconf"
         tests:
           test_items:
             - path: "{.peer-transport-security.trusted-ca-file}"
@@ -130,8 +136,9 @@ groups:
                 op: eq
                 value: "/var/lib/rancher/k3s/server/tls/etcd/peer-ca.crt"
         remediation: |
-          By default, K3s generates a unique certificate authority for etcd.
+          If running on with sqlite or a external DB, etcd checks are Not Applicable.
+          When running with embedded-etcd, K3s generates a unique certificate authority for etcd.
           This is located at /var/lib/rancher/k3s/server/tls/etcd/peer-ca.crt.
           If this check fails, ensure that the configuration file $etcdconf
           has not been modified to use a shared certificate authority.
-        scored: true
+        scored: false
