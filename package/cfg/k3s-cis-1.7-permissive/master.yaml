@@ -133,7 +133,7 @@ groups:
           Note that for many CNIs, a lock file is created with permissions 750. This is expected and can be ignored.
           If you modify your CNI configuration, ensure that the permissions are set to 600.
           For example, chmod 600 /var/lib/cni/networks/<filename>
-        scored: false
+        scored: true
 
       - id: 1.1.10
         text: "Ensure that the Container Network Interface file ownership is set to root:root (Automated)"

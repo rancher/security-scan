@@ -130,7 +130,7 @@ groups:
         remediation: |
           Not Applicable.
           The default K3s CNI, flannel, does not create any files in /var/lib/cni/networks.
-        scored: false
+        scored: true
 
       - id: 1.1.10
         text: "Ensure that the Container Network Interface file ownership is set to root:root (Manual)"
