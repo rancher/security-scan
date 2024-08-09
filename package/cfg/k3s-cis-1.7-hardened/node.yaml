@@ -131,8 +131,8 @@ groups:
                 op: bitmask
                 value: "600"
         remediation: |
-          Run the following command (using the config file location identified in the Audit step)
-          chmod 600 $kubeletconf
+          Not Applicable.
+          The kubelet is embedded in the k3s process. There is no kubelet config file, all configuration is passed in as arguments at runtime.
         scored: true
 
       - id: 4.1.10
@@ -143,8 +143,8 @@ groups:
           test_items:
             - flag: root:root
         remediation: |
-          Run the following command (using the config file location identified in the Audit step)
-          chown root:root $kubeletconf
+          Not Applicable.
+          The kubelet is embedded in the k3s process. There is no kubelet config file, all configuration is passed in as arguments at runtime.
           Not Applicable.
           All configuration is passed in as arguments at container run time.
         scored: true
