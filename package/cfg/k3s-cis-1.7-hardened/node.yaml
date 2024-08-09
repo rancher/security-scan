@@ -131,8 +131,8 @@ groups:
                 op: bitmask
                 value: "600"
         remediation: |
-          Not Applicable.
-          The kubelet is embedded in the k3s process. There is no kubelet config file, all configuration is passed in as arguments at runtime.
+          Run the following command (using the config file location identified in the Audit step)
+          chmod 600 $kubeletconf
         scored: true
 
       - id: 4.1.10
@@ -336,8 +336,8 @@ groups:
          If for some reason you need to provide your own certificate and key, you can set the
          the below parameters in the K3s config file /etc/rancher/k3s/config.yaml.
          kubelet-arg:
-         - "tls-cert-file=<path/to/tls-cert-file>"
-         - "tls-private-key-file=<path/to/tls-private-key-file>"
+           - "tls-cert-file=<path/to/tls-cert-file>"
+           - "tls-private-key-file=<path/to/tls-private-key-file>"
         scored: true
 
       - id: 4.2.10
