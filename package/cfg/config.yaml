@@ -126,7 +126,6 @@ node:
       - "/etc/kubernetes/kubelet-kubeconfig"
       - "/etc/kubernetes/ssl/kubecfg-kube-node.yaml"
       - "/var/lib/rancher/rke2/agent/kubelet.kubeconfig"
-      - "/var/lib/rancher/k3s/server/cred/admin.kubeconfig"
       - "/var/lib/rancher/k3s/agent/kubelet.kubeconfig"
     confs:
       - "/var/lib/kubelet/config.yaml"
@@ -144,7 +143,6 @@ node:
       - "/etc/systemd/system/kubelet.service"
       - "/lib/systemd/system/kubelet.service"
       - "/etc/systemd/system/snap.kubelet.daemon.service"
-      - "/var/lib/rancher/rke2/agent/kubelet.kubeconfig"
     defaultconf: "/var/lib/kubelet/config.yaml"
     defaultsvc: "/etc/systemd/system/kubelet.service.d/10-kubeadm.conf"
     defaultkubeconfig: "/etc/kubernetes/kubelet.conf"
