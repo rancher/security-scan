@@ -20,7 +20,7 @@ groups:
     text: "Logging"
     checks:
       - id: 3.2.1
-        text: "Ensure that a minimal audit policy is created (Automated)"
+        text: "Ensure that a minimal audit policy is created (Manual)"
         audit: "journalctl -m -u k3s | grep 'Running kube-apiserver' | tail -n1 | grep 'audit-policy-file'"
         tests:
           test_items:

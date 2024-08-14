@@ -140,7 +140,7 @@ groups:
         scored: true
 
       - id: 4.1.10
-        text: "If the kubelet config.yaml configuration file is being used validate file ownership is set to root:root (Manual)"
+        text: "If the kubelet config.yaml configuration file is being used validate file ownership is set to root:root (Automated)"
         audit: '/bin/sh -c ''if test -e $kubeletconf; then stat -c %U:%G $kubeletconf; fi'' '
         type: "skip"
         tests:
@@ -237,7 +237,7 @@ groups:
           Based on your system, restart the k3s service. For example,
           systemctl daemon-reload
           systemctl restart k3s.service
-        scored: false
+        scored: true
 
       - id: 4.2.5
         text: "Ensure that the --streaming-connection-idle-timeout argument is not set to 0 (Manual)"
@@ -322,7 +322,7 @@ groups:
           Not Applicable.
           By default, K3s does set the --hostname-override argument. Per CIS guidelines, this is to comply
           with cloud providers that require this flag to ensure that hostname matches node names.
-        scored: false
+        scored: true
 
       - id: 4.2.9
         text: "Ensure that the eventRecordQPS argument is set to a level which ensures appropriate event capture (Manual)"
@@ -362,7 +362,7 @@ groups:
           kubelet-arg:
             - "tls-cert-file=<path/to/tls-cert-file>"
             - "tls-private-key-file=<path/to/tls-private-key-file>"
-        scored: false
+        scored: true
 
       - id: 4.2.11
         text: "Ensure that the --rotate-certificates argument is not set to false (Automated)"
