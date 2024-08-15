@@ -9,7 +9,7 @@ groups:
     text: "Etcd Node Configuration"
     checks:
       - id: 2.1
-        text: "Ensure that the --cert-file and --key-file arguments are set as appropriate (Automated)"
+        text: "Ensure that the --cert-file and --key-file arguments are set as appropriate (Manual)"
         audit_config: "cat $etcdconf"
         tests:
           bin_op: and
@@ -31,7 +31,7 @@ groups:
         scored: false
 
       - id: 2.2
-        text: "Ensure that the --client-cert-auth argument is set to true (Automated)"
+        text: "Ensure that the --client-cert-auth argument is set to true (Manual)"
         audit_config: "cat $etcdconf"
         tests:
           test_items:
@@ -47,7 +47,7 @@ groups:
         scored: false
 
       - id: 2.3
-        text: "Ensure that the --auto-tls argument is not set to true (Automated)"
+        text: "Ensure that the --auto-tls argument is not set to true (Manual)"
         audit_config: "cat $etcdconf"
         tests:
           bin_op: or
@@ -68,7 +68,7 @@ groups:
         scored: false
 
       - id: 2.4
-        text: "Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Automated)"
+        text: "Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Manual)"
         audit_config: "cat $etcdconf"
         tests:
           bin_op: and
@@ -90,7 +90,7 @@ groups:
         scored: false
 
       - id: 2.5
-        text: "Ensure that the --peer-client-cert-auth argument is set to true (Automated)"
+        text: "Ensure that the --peer-client-cert-auth argument is set to true (Manual)"
         audit_config: "cat $etcdconf"
         tests:
           test_items:
@@ -106,7 +106,7 @@ groups:
         scored: false
 
       - id: 2.6
-        text: "Ensure that the --peer-auto-tls argument is not set to true (Automated)"
+        text: "Ensure that the --peer-auto-tls argument is not set to true (Manual)"
         audit_config: "cat $etcdconf"
         tests:
           bin_op: or
@@ -127,7 +127,7 @@ groups:
         scored: false
 
       - id: 2.7
-        text: "Ensure that a unique Certificate Authority is used for etcd (Automated)"
+        text: "Ensure that a unique Certificate Authority is used for etcd (Manual)"
         audit_config: "cat $etcdconf"
         tests:
           test_items:
