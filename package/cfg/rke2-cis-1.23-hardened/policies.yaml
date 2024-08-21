@@ -104,7 +104,7 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of privileged containers.
-        scored: true
+        scored: false
 
       - id: 5.2.3
         text: "Minimize the admission of containers wishing to share the host process ID namespace (Automated)"
@@ -134,7 +134,7 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostIPC` containers.
-        scored: false
+        scored: true
 
       - id: 5.2.5
         text: "Minimize the admission of containers wishing to share the host network namespace (Automated)"
@@ -202,7 +202,7 @@ groups:
         remediation: |
           Ensure that `allowedCapabilities` is not present in policies for the cluster unless
           it is set to an empty array.
-        scored: false
+        scored: true
 
       - id: 5.2.10
         text: "Minimize the admission of containers with capabilities assigned (Manual)"
@@ -268,7 +268,7 @@ groups:
               set: true
         remediation: |
           Follow the documentation and create NetworkPolicy objects as you need them.
-        scored: false
+        scored: true
 
   - id: 5.4
     text: "Secrets Management"
