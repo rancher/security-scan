@@ -165,7 +165,7 @@ groups:
         remediation: |
           Create a policy for each namespace in the cluster, ensuring that either `MustRunAsNonRoot`
           or `MustRunAs` with the range of UIDs not including 0, is set.
-        scored: false
+        scored: true
 
       - id: 5.2.8
         text: "Minimize the admission of containers with the NET_RAW capability (Automated)"
@@ -173,7 +173,7 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of containers with the `NET_RAW` capability.
-        scored: false
+        scored: true
 
       - id: 5.2.9
         text: "Minimize the admission of containers with added capabilities (Automated)"
@@ -181,7 +181,7 @@ groups:
         remediation: |
           Ensure that `allowedCapabilities` is not present in policies for the cluster unless
           it is set to an empty array.
-        scored: false
+        scored: true
 
       - id: 5.2.10
         text: "Minimize the admission of containers with capabilities assigned (Manual)"

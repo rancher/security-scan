@@ -57,7 +57,7 @@ groups:
           to the Kubernetes API server.
           Modify the configuration of each default service account to include this value
           automountServiceAccountToken: false
-        scored: false
+        scored: true
 
       - id: 5.1.6
         text: "Ensure that Service Account Tokens are only mounted where necessary (Manual)"
@@ -106,7 +106,7 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostPID` containers.
-        scored: false
+        scored: true
 
       - id: 5.2.4
         text: "Minimize the admission of containers wishing to share the host IPC namespace (Automated)"
@@ -114,7 +114,7 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostIPC` containers.
-        scored: false
+        scored: true
 
       - id: 5.2.5
         text: "Minimize the admission of containers wishing to share the host network namespace (Automated)"
@@ -122,7 +122,7 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostNetwork` containers.
-        scored: false
+        scored: true
 
       - id: 5.2.6
         text: "Minimize the admission of containers with allowPrivilegeEscalation (Manual)"

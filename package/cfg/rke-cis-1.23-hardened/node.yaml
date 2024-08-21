@@ -255,7 +255,7 @@ groups:
         scored: true
 
       - id: 4.2.5
-        text: "Ensure that the --streaming-connection-idle-timeout argument is not set to 0 (Manual)"
+        text: "Ensure that the --streaming-connection-idle-timeout argument is not set to 0 (Automated)"
         audit: "/bin/ps -fC $kubeletbin"
         audit_config: "/bin/sh -c 'if test -e $kubeletconf; then /bin/cat $kubeletconf; fi' "
         tests:
@@ -353,7 +353,7 @@ groups:
         scored: false
 
       - id: 4.2.9
-        text: "Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture (Manual)"
+        text: "Ensure that the --event-qps argument is set to 0 or a level which ensures appropriate event capture (Automated)"
         audit: "/bin/ps -fC $kubeletbin"
         audit_config: "/bin/sh -c 'if test -e $kubeletconf; then /bin/cat $kubeletconf; fi' "
         tests:
