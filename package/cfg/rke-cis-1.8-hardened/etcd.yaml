@@ -24,6 +24,7 @@ groups:
           Run the below command (based on the etcd data directory found above). For example,
           chmod 700 /var/lib/etcd
         scored: true
+
       - id: 1.1.12
         text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Automated)"
         audit: "stat -c %U:%G /node/var/lib/etcd"
@@ -37,6 +38,7 @@ groups:
           Run the below command (based on the etcd data directory found above).
           For example, chown etcd:etcd /var/lib/etcd
         scored: true
+
       - id: 1.1.19
         text: "Ensure that the Kubernetes PKI directory and file ownership is set to root:root (Automated)"
         audit: "check_files_owner_in_dir.sh /node/etc/kubernetes/ssl"
@@ -52,6 +54,7 @@ groups:
           For example,
           chown -R root:root /etc/kubernetes/pki/
         scored: true
+
       - id: 1.1.20
         text: "Ensure that the Kubernetes PKI certificate file permissions are set to 600 or more restrictive (Manual)"
         audit: "find /node/etc/kubernetes/ssl/ -name '*.pem' ! -name '*key.pem' | xargs stat -c permissions=%a"
@@ -67,6 +70,7 @@ groups:
           For example,
           find /node/etc/kubernetes/ssl/ -name '*.pem' ! -name '*key.pem' -exec chmod -R 600 {} +
         scored: false
+
       - id: 1.1.21
         text: "Ensure that the Kubernetes PKI key file permissions are set to 600 (Manual)"
         audit: "find /node/etc/kubernetes/ssl/ -name '*key.pem' | xargs stat -c permissions=%a"
@@ -82,6 +86,7 @@ groups:
           For example,
           find /node/etc/kubernetes/ssl/ -name '*key.pem' -exec chmod -R 600 {} +
         scored: false
+
   - id: 2
     text: "Etcd Node Configuration"
     checks:
@@ -102,6 +107,7 @@ groups:
           --cert-file=</path/to/ca-file>
           --key-file=</path/to/key-file>
         scored: true
+
       - id: 2.2
         text: "Ensure that the --client-cert-auth argument is set to true (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
@@ -117,6 +123,7 @@ groups:
           node and set the below parameter.
           --client-cert-auth="true"
         scored: true
+
       - id: 2.3
         text: "Ensure that the --auto-tls argument is not set to true (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
@@ -136,6 +143,7 @@ groups:
           node and either remove the --auto-tls parameter or set it to false.
             --auto-tls=false
         scored: true
+
       - id: 2.4
         text: "Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
@@ -154,6 +162,7 @@ groups:
           --peer-client-file=</path/to/peer-cert-file>
           --peer-key-file=</path/to/peer-key-file>
         scored: true
+
       - id: 2.5
         text: "Ensure that the --peer-client-cert-auth argument is set to true (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
@@ -169,6 +178,7 @@ groups:
           node and set the below parameter.
           --peer-client-cert-auth=true
         scored: true
+
       - id: 2.6
         text: "Ensure that the --peer-auto-tls argument is not set to true (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
@@ -188,6 +198,7 @@ groups:
           node and either remove the --peer-auto-tls parameter or set it to false.
           --peer-auto-tls=false
         scored: true
+
       - id: 2.7
         text: "Ensure that a unique Certificate Authority is used for etcd (Automated)"
         audit: "/bin/ps -ef | /bin/grep $etcdbin | /bin/grep -v grep"
