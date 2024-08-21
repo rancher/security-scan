@@ -313,7 +313,7 @@ groups:
           Run the below command (based on the file location on your system) on the master node.
           For example,
           chmod -R 600 /var/lib/rancher/k3s/server/tls/*.key
-        scored: false
+        scored: true
 
   - id: 1.2
     text: "API Server"
@@ -332,7 +332,7 @@ groups:
           edit the K3s config file /etc/rancher/k3s/config.yaml and remove anything similar to below.
           kube-apiserver-arg:
             - "anonymous-auth=true"
-        scored: false
+        scored: true
 
       - id: 1.2.2
         text: "Ensure that the --token-auth-file parameter is not set (Automated)"
@@ -594,7 +594,7 @@ groups:
         scored: true
 
       - id: 1.2.17
-        text: "Ensure that the --audit-log-path argument is set (Automated)"
+        text: "Ensure that the --audit-log-path argument is set (Manual)"
         audit: "journalctl -m -u k3s | grep 'Running kube-apiserver' | tail -n1"
         tests:
           test_items:

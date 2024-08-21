@@ -62,7 +62,7 @@ groups:
           Run the below command (based on the file location on your system) on the each worker node.
           For example,
           chown root:root $proxykubeconfig
-        scored: false
+        scored: true
 
       - id: 4.1.5
         text: "Ensure that the --kubeconfig kubelet.conf file permissions are set to 600 or more restrictive (Automated)"
@@ -103,7 +103,7 @@ groups:
         remediation: |
           Run the following command to modify the file permissions of the
           --client-ca-file chmod 600 $kubeletcafile
-        scored: false
+        scored: true
 
       - id: 4.1.8
         text: "Ensure that the client certificate authorities file ownership is set to root:root (Automated)"
@@ -117,7 +117,7 @@ groups:
         remediation: |
           Run the following command to modify the ownership of the --client-ca-file.
           chown root:root $kubeletcafile
-        scored: false
+        scored: true
 
       - id: 4.1.9
         text: "Ensure that the kubelet --config configuration file has permissions set to 600 or more restrictive (Automated)"
@@ -231,7 +231,7 @@ groups:
           Based on your system, restart the k3s service. For example,
           systemctl daemon-reload
           systemctl restart k3s.service
-        scored: false
+        scored: true
 
       - id: 4.2.5
         text: "Ensure that the --streaming-connection-idle-timeout argument is not set to 0 (Manual)"
@@ -296,7 +296,7 @@ groups:
           Not Applicable.
           By default, K3s does set the --hostname-override argument. Per CIS guidelines, this is to comply
           with cloud providers that require this flag to ensure that hostname matches node names.
-        scored: false
+        scored: true
 
       - id: 4.2.8
         text: "Ensure that the eventRecordQPS argument is set to a level which ensures appropriate event capture (Manual)"
@@ -342,7 +342,7 @@ groups:
             - "tls-cert-file=<path/to/tls-cert-file>"
             - "tls-private-key-file=<path/to/tls-private-key-file>"
           Permissive - When generating serving certificates, functionality could break in conjunction with hostname overrides which are required for certain cloud providers.
-        scored: false
+        scored: true
 
       - id: 4.2.10
         text: "Ensure that the --rotate-certificates argument is not set to false (Automated)"
@@ -365,7 +365,7 @@ groups:
           If using the command line, remove the K3s flag --kubelet-arg="rotate-certificates".
           Based on your system, restart the k3s service. For example,
           systemctl restart k3s.service
-        scored: false
+        scored: true
 
       - id: 4.2.11
         text: "Verify that the RotateKubeletServerCertificate argument is set to true (Automated)"
