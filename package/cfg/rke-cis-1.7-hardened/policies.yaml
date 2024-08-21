@@ -136,24 +136,27 @@ groups:
 
       - id: 5.2.3
         text: "Minimize the admission of containers wishing to share the host process ID namespace (Automated)"
+        type: "manual"
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostPID` containers.
-        scored: false
+        scored: true
 
       - id: 5.2.4
         text: "Minimize the admission of containers wishing to share the host IPC namespace (Automated)"
+        type: "manual"
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostIPC` containers.
-        scored: false
+        scored: true
 
       - id: 5.2.5
         text: "Minimize the admission of containers wishing to share the host network namespace (Automated)"
+        type: "manual"
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostNetwork` containers.
-        scored: false
+        scored: true
 
       - id: 5.2.6
         text: "Minimize the admission of containers with allowPrivilegeEscalation (Manual)"
