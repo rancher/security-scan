@@ -64,7 +64,7 @@ mkdir -p "${RESULTS_DIR}"
 
 # etcd
 if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
-  if [[ "$(ps -e | grep etcd | wc -l)" -gt 0  ]]  || [[ "$(journalctl -D $JOURNAL_LOG -u k3s -u k3s-agent | grep -m1 "etcd cluster" | wc -l )" -gt 0 ]]; then
+  if [[ "$(ps -e | grep etcd | wc -l)" -gt 0  ]]  || [[ "$(journalctl -m -u k3s | grep -m1 "Managed etcd cluster initializing" | wc -l )" -gt 0 ]] || [[ "$(journalctl -m -u k3s | grep -m1 "Managed etcd cluster bootstrap already complete and initialized" | wc -l )" -gt 0 ]]; then
     echo "etcd: Using OVERRIDE_BENCHMARK_VERSION=${OVERRIDE_BENCHMARK_VERSION}"
     kube-bench run \
       --targets etcd \
