@@ -146,7 +146,7 @@ groups:
         remediation: |
           Ensure that `allowedCapabilities` is not present in policies for the cluster unless
           it is set to an empty array.
-        scored: false
+        scored: true
 
       - id: 5.2.10
         text: "Minimize the admission of containers with capabilities assigned (Manual)"

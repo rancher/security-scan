@@ -384,7 +384,7 @@ groups:
         scored: true
 
       - id: 1.2.10
-        text: "Ensure that the admission control plugin EventRateLimit is set (Automated)"
+        text: "Ensure that the admission control plugin EventRateLimit is set (Manual)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
         tests:
           test_items:

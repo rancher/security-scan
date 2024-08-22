@@ -699,7 +699,7 @@ groups:
           Edit the API server pod specification file $apiserverconf
           and set the below parameter as appropriate and if needed.
           For example, --request-timeout=300s
-        scored: true
+        scored: false
 
       - id: 1.2.24
         text: "Ensure that the --service-account-lookup argument is set to true (Automated)"

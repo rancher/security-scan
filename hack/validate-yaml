@@ -10,14 +10,36 @@ function main(){
 
     FAILED_CFGS_YML=()
     FAILED_CFGS_KB=()
+    FAILED_CHECKS_TYPE=()
 
     # Loop through all benchmarks
     for cfg in ${CFGS}; do
     set -x
         # yammlint is configured with ../.yamllint.yaml, to catch any liniting errors for a given benchmark. If result isn't empty, FAILED_CFGS_YML is appended with the failing benchmark.
         if [ -n "$(yamllint -s package/cfg/$cfg)" ]; then
-            FAILED_CFGS_YML+=("package/cfg/$cfg")
+            FAILED_CFGS_YML+=("$cfg")
         fi
+        # verify each check content to confirm type Automated matches scored to true and type Manual matches scored to false.
+        for component in $(find package/cfg/$cfg -type f -name "*.yaml" ! -name "config.yaml"); do
+            readarray checks < <(yq -o=j -I=0 '.groups[].checks[]' $component )
+            for check in "${checks[@]}"; do
+                id=$(echo $check | yq '.id')
+                text=$(echo $check | yq '.text')
+                scored=$(echo $check | yq '.scored')
+                type=$(echo $text | sed -n 's/.*(\(.*\)).*/\1/p')
+                # check if type is present and spelled correctly.
+                if [[ "$type" == "Automated" || "$type" == "Manual" ]]; then
+                        # check if type is Automated with scored to true or type is Manual with scored to false.
+                        if [[ "$type" == "Automated" && "$scored" != "true" ]] || [[ "$type" == "Manual" && "$scored" != "false" ]] ; then
+                            echo "Error mismatch found in $id: $text - 'type' is $type but 'scored' is $scored."
+                            FAILED_CHECKS_TYPE+=("$cfg:$id")
+                        fi
+                else
+                    echo "Error in $id: $text - type is misspelled or not recognized. Make sure to set title type to Manual/Automated."
+                    FAILED_CHECKS_TYPE+=("$cfg:$id")
+                fi
+            done
+        done
         # kube-bench dry-run to detect any errors for a given benchmark's files - check 1.1 is common to all benchmarks and used to speed up the test. If kube-bench commands fails, FAILED_CFGS_KB is appended with the failing benchmark.
         if kube-bench --config-dir package/cfg --config package/cfg/config.yaml --benchmark "$cfg" --check 1.1 --noremediations --noresults --nosummary --nototals; then
         echo "$cfg is OK"
@@ -27,13 +49,17 @@ function main(){
     set +x
     done
 
-    # Test if any profiles have errors, either FAILED_CFGS_YML or FAILED_CFGS_KB is greater than 0, fails. 
+    # Test if any profiles have errors, either FAILED_CFGS_YML or FAILED_CFGS_KB or FAILED_CHECKS_TYPE is greater than 0, fails. 
     if [ ${#FAILED_CFGS_YML[@]} -gt 0 ]; then
         echo "Error - yamllint failed for these cfgs: ${FAILED_CFGS_YML[@]}"
         exit 1
     fi
     if [ ${#FAILED_CFGS_KB[@]} -gt 0 ]; then
         echo "Error - kube-bench dry-run failed for these cfgs: ${FAILED_CFGS_KB[@]}"
+        exit 1
+    fi
+    if [ ${#FAILED_CHECKS_TYPE[@]} -gt 0 ]; then
+        echo "Error - check type verification failed for these checks: ${FAILED_CHECKS_TYPE[@]}"
         exit 1
     fi
 }

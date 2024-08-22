@@ -143,7 +143,7 @@ groups:
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostPID` containers.
           Permissive - Enabling Pod Security Policy can cause applications to unexpectedly fail.
-        scored: false
+        scored: true
 
       - id: 5.2.4
         text: "Minimize the admission of containers wishing to share the host IPC namespace (Automated)"
@@ -152,7 +152,7 @@ groups:
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostIPC` containers.
           Permissive - Enabling Pod Security Policy can cause applications to unexpectedly fail.
-        scored: false
+        scored: true
 
       - id: 5.2.5
         text: "Minimize the admission of containers wishing to share the host network namespace (Automated)"
@@ -161,7 +161,7 @@ groups:
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostNetwork` containers.
           Permissive - Enabling Pod Security Policy can cause applications to unexpectedly fail.
-        scored: false
+        scored: true
 
       - id: 5.2.6
         text: "Minimize the admission of containers with allowPrivilegeEscalation (Manual)"

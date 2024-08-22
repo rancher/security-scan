@@ -324,10 +324,10 @@ groups:
           Not Applicable.
           By default, RKE2 does set the --hostname-override argument. Per CIS guidelines, this is to comply
           with cloud providers that require this flag to ensure that hostname matches node names.
-        scored: false
+        scored: true
 
       - id: 4.2.9
-        text: "Ensure that the eventRecordQPS argument is set to a level which ensures appropriate event capture (Automated)"
+        text: "Ensure that the eventRecordQPS argument is set to a level which ensures appropriate event capture (Manual)"
         audit: "/bin/ps -fC $kubeletbin"
         audit_config: "/bin/cat $kubeletconf"
         tests:
@@ -408,7 +408,7 @@ groups:
           If this check fails, edit the RKE2 config file /etc/rancher/rke2/config.yaml, remove any RotateKubeletServerCertificate parameter.
           Based on your system, restart the RKE2 service. For example,
           systemctl restart rke2-server.service
-        scored: false
+        scored: true
 
       - id: 4.2.13
         text: "Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers (Manual)"
