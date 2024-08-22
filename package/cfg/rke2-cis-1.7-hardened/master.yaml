@@ -146,7 +146,7 @@ groups:
         scored: false
 
       - id: 1.1.10
-        text: "Ensure that the Container Network Interface file ownership is set to root:root (Automated)"
+        text: "Ensure that the Container Network Interface file ownership is set to root:root (Manual)"
         audit: |
           ps -fC ${kubeletbin:-kubelet} | grep -- --cni-conf-dir || echo "/etc/cni/net.d" | sed 's%.*cni-conf-dir[= ]\([^ ]*\).*%\1%' | xargs -I{} find {} -mindepth 1 | xargs --no-run-if-empty stat -c %U:%G
           find /var/lib/cni/networks -type f 2> /dev/null | xargs --no-run-if-empty stat -c %U:%G
@@ -303,7 +303,7 @@ groups:
           Run the below command (based on the file location on your system) on the control plane node.
           For example,
           chmod -R 600 /var/lib/rancher/rke2/server/tls/*.key
-        scored: false
+        scored: true
 
   - id: 1.2
     text: "API Server"
