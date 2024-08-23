@@ -5,6 +5,35 @@ id: 2
 text: "Etcd Node Configuration"
 type: "etcd"
 groups:
+  - id: 1.1
+    text: "Master Node Configuration Files"
+    # Check 1.1.11 is related to etcd and in upstream it is present in master.yaml, But this check
+    # fails on controlplane nodes which does not have etcd so it is moved to etcd.yaml, so that the
+    # scan pass on the clusters which have seperate controlplane and etcd nodes. The check will also
+    # run on controlplane nodes which have etcd since run_sonobuoy_plugin.sh script detects etcd process
+    # and runs on any node where etcd is found.
+    checks:
+      - id: 1.1.11
+        text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Automated)"
+        audit: |
+          if [ "$(journalctl -m -u k3s | grep -m1 'Managed etcd cluster initializing' | wc -l)" -gt 0 ] || [ "$(journalctl -m -u k3s | grep -m1 'Managed etcd cluster bootstrap already complete and initialized' | wc -l )" -gt 0 ]; then
+            stat -c permissions=%a /var/lib/rancher/k3s/server/db/etcd
+          else
+            echo "permissions=700"
+          fi
+        tests:
+          test_items:
+            - flag: "permissions"
+              compare:
+                op: bitmask
+                value: "700"
+        remediation: |
+          On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
+          from the command 'ps -ef | grep etcd'.
+          Run the below command (based on the etcd data directory found above). For example,
+          chmod 700 /var/lib/etcd
+        scored: true
+
   - id: 2
     text: "Etcd Node Configuration"
     checks:
