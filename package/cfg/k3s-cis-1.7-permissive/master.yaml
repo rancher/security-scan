@@ -349,24 +349,20 @@ groups:
         scored: true
 
       - id: 1.2.3
-        text: "Ensure that the --DenyServiceExternalIPs is not set (Automated)"
+        text: "Ensure that the --DenyServiceExternalIPs is set (Manual)"
         audit: "journalctl -m -u k3s | grep 'Running kube-apiserver' | tail -n1"
         tests:
-          bin_op: or
           test_items:
             - flag: "--enable-admission-plugins"
               compare:
-                op: nothave
+                op: has
                 value: "DenyServiceExternalIPs"
-              set: true
-            - flag: "--enable-admission-plugins"
-              set: false
         remediation: |
           By default, K3s does not set DenyServiceExternalIPs.
-          If this check fails, edit the K3s config file /etc/rancher/k3s/config.yaml, remove any lines like below.
+          To enable this flag, edit the K3s config file /etc/rancher/k3s/config.yaml like below.
           kube-apiserver-arg:
             - "enable-admission-plugins=DenyServiceExternalIPs"
-        scored: true
+        scored: false
 
       - id: 1.2.4
         text: "Ensure that the --kubelet-client-certificate and --kubelet-client-key arguments are set as appropriate (Automated)"
