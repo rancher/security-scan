@@ -7,6 +7,11 @@ type: "etcd"
 groups:
   - id: 1.1
     text: "Master Node Configuration Files"
+    # These checks (1.1.7,1.1.8,1.1.11,1.1.12) are related to etcd and in upstream they are present
+    # in master.yaml, But these checks fail on controlplane nodes which does not have etcd.
+    # so these are moved to etcd.yaml, so that the scan passes on the clusters which have seperate
+    # controlplane, etcd node. These checks will also run on controlplane nodes which have etcd since
+    # run_sonobuoy_plugin.sh script detects etcd process and runs on any node where etcd is found.
     checks:
       - id: 1.1.7
         text: "Ensure that the etcd pod specification file permissions are set to 644 or more restrictive (Automated)"
