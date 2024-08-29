@@ -613,8 +613,7 @@ groups:
         scored: true
 
       - id: 1.2.18
-        text: "Ensure that the --audit-log-path argument is set (Automated)"
-        type: "skip"
+        text: "Ensure that the --audit-log-path argument is set (Manual)"
         audit: "/bin/ps -fC $apiserverbin"
         tests:
           test_items:
@@ -628,11 +627,10 @@ groups:
           kube-apiserver-arg:
             - "audit-log-path=/var/log/rke2/audit.log"
           Permissive.
-        scored: true
+        scored: false
 
       - id: 1.2.19
-        text: "Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Automated)"
-        type: "skip"
+        text: "Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Manual)"
         audit: "/bin/ps -fC $apiserverbin"
         tests:
           test_items:
@@ -648,11 +646,10 @@ groups:
           kube-apiserver-arg:
             - "audit-log-maxage=40"
           Permissive.
-        scored: true
+        scored: false
 
       - id: 1.2.20
-        text: "Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Automated)"
-        type: "skip"
+        text: "Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Manual)"
         audit: "/bin/ps -fC $apiserverbin"
         tests:
           test_items:
@@ -669,11 +666,10 @@ groups:
           kube-apiserver-arg:
             - "audit-log-maxbackup=15"
           Permissive.
-        scored: true
+        scored: false
 
       - id: 1.2.21
-        text: "Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Automated)"
-        type: "skip"
+        text: "Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Manual)"
         audit: "/bin/ps -fC $apiserverbin"
         tests:
           test_items:
@@ -689,7 +685,7 @@ groups:
           For example,
           kube-apiserver-arg:
             - "audit-log-maxsize=150"
-        scored: true
+        scored: false
 
       - id: 1.2.22
         text: "Ensure that the --request-timeout argument is set as appropriate (Automated)"

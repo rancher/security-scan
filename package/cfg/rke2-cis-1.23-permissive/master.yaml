@@ -623,9 +623,8 @@ groups:
         scored: true
 
       - id: 1.2.19
-        text: "Ensure that the --audit-log-path argument is set (Automated)"
+        text: "Ensure that the --audit-log-path argument is set (Manual)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-path"
@@ -635,12 +634,11 @@ groups:
           on the control plane node and set the --audit-log-path parameter to a suitable path and
           file where you would like audit logs to be written, for example,
           --audit-log-path=/var/log/apiserver/audit.log
-        scored: true
+        scored: false
 
       - id: 1.2.20
-        text: "Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Automated)"
+        text: "Ensure that the --audit-log-maxage argument is set to 30 or as appropriate (Manual)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxage"
@@ -653,12 +651,11 @@ groups:
           on the control plane node and set the --audit-log-maxage parameter to 30
           or as an appropriate number of days, for example,
           --audit-log-maxage=30
-        scored: true
+        scored: false
 
       - id: 1.2.21
-        text: "Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Automated)"
+        text: "Ensure that the --audit-log-maxbackup argument is set to 10 or as appropriate (Manual)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxbackup"
@@ -671,12 +668,11 @@ groups:
           on the control plane node and set the --audit-log-maxbackup parameter to 10 or to an appropriate
           value. For example,
           --audit-log-maxbackup=10
-        scored: true
+        scored: false
 
       - id: 1.2.22
-        text: "Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Automated)"
+        text: "Ensure that the --audit-log-maxsize argument is set to 100 or as appropriate (Manual)"
         audit: "/bin/ps -ef | grep $apiserverbin | grep -v grep"
-        type: "skip"
         tests:
           test_items:
             - flag: "--audit-log-maxsize"
@@ -688,7 +684,7 @@ groups:
           Edit the API server pod specification file $apiserverconf
           on the control plane node and set the --audit-log-maxsize parameter to an appropriate size in MB.
           For example, to set it as 100 MB, --audit-log-maxsize=100
-        scored: true
+        scored: false
 
       - id: 1.2.23
         text: "Ensure that the --request-timeout argument is set as appropriate (Automated)"
