@@ -180,18 +180,20 @@ groups:
         scored: false
 
       - id: 1.1.12
-        text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Automated)"
+        text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Manual)"
         type: "skip"
         audit: "stat -c %U:%G $etcddatadir"
         tests:
           test_items:
             - flag: "etcd:etcd"
         remediation: |
+          If running master only with no etcd role, this check is Not applicable.
+          If controlplane and etcd roles are present on the same nodes but this check is warn then
           On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
           from the command 'ps -ef | grep etcd'.
           Run the below command (based on the etcd data directory found above).
-          For example, chown etcd:etcd /var/lib/etcd
-        scored: true
+          For example, chown etcd:etcd $etcddatadir
+        scored: false
 
       - id: 1.1.13
         text: "Ensure that the admin.conf file permissions are set to 600 or more restrictive (Automated)"

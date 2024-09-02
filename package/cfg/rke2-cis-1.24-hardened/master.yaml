@@ -193,7 +193,7 @@ groups:
           On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
           from the command 'ps -ef | grep etcd'.
           Run the below command (based on the etcd data directory found above).
-          For example, chown etcd:etcd /var/lib/etcd
+          For example, chown etcd:etcd $etcddatadir
         scored: false
 
       - id: 1.1.13
