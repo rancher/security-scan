@@ -154,13 +154,8 @@ groups:
         scored: false
 
       - id: 1.1.11
-        text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Automated)"
-        audit: |
-          if [ "$(journalctl -m -u k3s | grep -m1 'Managed etcd cluster' | wc -l)" -gt 0 ]; then
-            stat -c permissions=%a /var/lib/rancher/k3s/server/db/etcd
-          else
-            echo "permissions=700"
-          fi
+        text: "Ensure that the etcd data directory permissions are set to 700 or more restrictive (Manual)"
+        audit: stat -c permissions=%a $etcddatadir
         tests:
           test_items:
             - flag: "permissions"
@@ -168,11 +163,13 @@ groups:
                 op: bitmask
                 value: "700"
         remediation: |
+          Not applicable for the non-etcd cluster. If running master only with no etcd role, this check is not applicable.
+          If controlplane and etcd roles are present on the same nodes but this check is warn then
           On the etcd server node, get the etcd data directory, passed as an argument --data-dir,
           from the command 'ps -ef | grep etcd'.
           Run the below command (based on the etcd data directory found above). For example,
-          chmod 700 /var/lib/etcd
-        scored: true
+          chmod 700 $etcddatadir
+        scored: false
 
       - id: 1.1.12
         text: "Ensure that the etcd data directory ownership is set to etcd:etcd (Automated)"
