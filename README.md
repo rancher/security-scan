@@ -1,6 +1,7 @@
 security-scan
 ========
 NOTE: This repo is currently being merged with the [cis-operator](https://github.com/rancher/cis-operator) repo to track security scanned and CIS related issues. Please submit any new inquiries in the [cis-operator](https://github.com/rancher/cis-operator) repo.
+For the current branch strategy related to the `security-scan`, please refer to  [Branches and Releases](https://github.com/rancher/cis-operator?tab=readme-ov-file#branches-and-releases)
 
 This repo has all the stuff needed for running CIS scan on RKE clusters.
 
