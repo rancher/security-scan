@@ -63,6 +63,8 @@ type Report struct {
 	NotApplicable int                   `json:"notApplicable"`
 	Nodes         map[NodeType][]string `json:"nodes"`
 	Results       []*Group              `json:"results"`
+	// ActualValueMapData stores gzipped compressed avmap data of all checks
+	ActualValueMapData string `json:"actual_value_map_data"`
 }
 
 func nodeTypeMapper(nodeType summarizer.NodeType) NodeType {
@@ -163,7 +165,7 @@ func mapReport(internalReport *summarizer.SummarizedReport) (*Report, error) {
 	externalReport.Warn = internalReport.Warn
 	externalReport.NotApplicable = internalReport.NotApplicable
 	externalReport.Nodes = mapNodes(internalReport.Nodes)
-
+	externalReport.ActualValueMapData = internalReport.ActualValueMapData
 	return externalReport, nil
 }
 
