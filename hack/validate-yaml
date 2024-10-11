@@ -11,10 +11,14 @@ function main(){
     FAILED_CFGS_YML=()
     FAILED_CFGS_KB=()
     FAILED_CHECKS_TYPE=()
+    DEBUG=${DEBUG:-}
 
+    if [ -n "$DEBUG" ]; then
+        set -x
+    fi
     # Loop through all benchmarks
     for cfg in ${CFGS}; do
-    set -x
+
         # yammlint is configured with ../.yamllint.yaml, to catch any liniting errors for a given benchmark. If result isn't empty, FAILED_CFGS_YML is appended with the failing benchmark.
         if [ -n "$(yamllint -s package/cfg/$cfg)" ]; then
             FAILED_CFGS_YML+=("$cfg")
@@ -46,8 +50,10 @@ function main(){
         else
             FAILED_CFGS_KB+=("$cfg")
         fi
-    set +x
     done
+    if [ -n "$DEBUG" ]; then
+        set +x
+    fi
 
     # Test if any profiles have errors, either FAILED_CFGS_YML or FAILED_CFGS_KB or FAILED_CHECKS_TYPE is greater than 0, fails. 
     if [ ${#FAILED_CFGS_YML[@]} -gt 0 ]; then
