@@ -238,10 +238,12 @@ version_mapping:
     - "aks-1.0"
   "v1.20.5+rke2r1":
     - "rke2-cis-1.6-hardened"
-    - "rke2-cis-1.6-permissive"
   "v1.20.5+k3s1":
     - "k3s-cis-1.6-hardened"
-    - "k3s-cis-1.6-permissive"
+  "v1.24.17+k3s1": "k3s-cis-1.24-hardened"
+  "v1.25.16+k3s4": "k3s-cis-1.7-hardened"
+  "v1.26.15+k3s1": "k3s-cis-1.8-hardened"
+  "v1.27.16+k3s1": "k3s-cis-1.9"
 
 target_mapping:
   # EKS
