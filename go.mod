@@ -6,7 +6,7 @@ require (
 	github.com/aquasecurity/kube-bench v0.8.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.19.0
-	github.com/urfave/cli/v2 v2.27.4
+	github.com/urfave/cli/v2 v2.27.5
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -14,7 +14,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.26.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/securityhub v1.37.0 // indirect
 	github.com/aws/smithy-go v1.20.1 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/golang/glog v1.2.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
