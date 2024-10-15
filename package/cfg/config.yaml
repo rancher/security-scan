@@ -234,6 +234,8 @@ version_mapping:
     - "eks-1.2.0"
   "gke-1.2.0":
     - "gke-1.2.0"
+  "gke-1.6.0":
+    - "gke-1.6.0"
   "aks-1.0":
     - "aks-1.0"
   "v1.20.5+rke2r1":
@@ -249,6 +251,8 @@ target_mapping:
     - "node"
   # GKE
   "gke-1.2.0":
+    - "node"
+  "gke-1.6.0":
     - "node"
   # AKS
   "aks-1.0":
