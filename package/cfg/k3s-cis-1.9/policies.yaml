@@ -11,28 +11,24 @@ groups:
       - id: 5.1.1
         text: "Ensure that the cluster-admin role is only used where required (Manual)"
         audit: |
-          kubectl get clusterrolebindings -o=custom-columns=NAME:.metadata.name,ROLE:.roleRef.name,SUBJECT:.subjects[*].name --no-headers | while read -r role_name role_binding subject
-          do
-            if [[ "${role_name}" != "cluster-admin" && "${role_binding}" == "cluster-admin" ]]; then
-              is_compliant="false"
-            else
-              is_compliant="true"
-            fi;
-            echo "**role_name: ${role_name} role_binding: ${role_binding} subject: ${subject} is_compliant: ${is_compliant}"
-          done
+          kubectl get clusterrolebindings -o=custom-columns=ROLE:.roleRef.name,NAME:.metadata.name,SUBJECT:.subjects[*].name --no-headers |  grep cluster-admin
         use_multiple_values: true
         tests:
           test_items:
-            - flag: "is_compliant"
+            - flag: "cluster-admin"
               compare:
-                op: eq
-                value: true
+                op: valid_elements
+                value: cluster-admin, helm-kube-system-traefik, helm-kube-system-traefik-crd
         remediation: |
           Identify all clusterrolebindings to the cluster-admin role. Check if they are used and
-          if they need this role or if they could use a role with fewer privileges.
+          if they need this role or if they could use a role with fewer privileges. K3s gives exceptions
+          to the helm-kube-system-traefik and helm-kube-system-traefik-crd clusterrolebindings
+          as these are required for traefik installation into the kube-system namespace for regular operations.
           Where possible, first bind users to a lower privileged role and then remove the
-          clusterrolebinding to the cluster-admin role :
+          clusterrolebinding to the cluster-admin role:
+          ```
           kubectl delete clusterrolebinding [name]
+          ```
         scored: false
 
       - id: 5.1.2
