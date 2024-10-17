@@ -21,7 +21,9 @@ groups:
                 value: cluster-admin, helm-kube-system-traefik, helm-kube-system-traefik-crd
         remediation: |
           Identify all clusterrolebindings to the cluster-admin role. Check if they are used and
-          if they need this role or if they could use a role with fewer privileges.
+          if they need this role or if they could use a role with fewer privileges. K3s gives exceptions
+          to the helm-kube-system-traefik and helm-kube-system-traefik-crd clusterrolebidnings 
+          as these are required for traefik installation into the kube-system namespace for regular operations.
           Where possible, first bind users to a lower privileged role and then remove the
           clusterrolebinding to the cluster-admin role :
           kubectl delete clusterrolebinding [name]
