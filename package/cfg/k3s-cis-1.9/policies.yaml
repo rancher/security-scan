@@ -11,7 +11,7 @@ groups:
       - id: 5.1.1
         text: "Ensure that the cluster-admin role is only used where required (Manual)"
         audit: |
-          kubectl get clusterrolebindings -o=custom-columns=ROLE:.roleRef.name,NAME:.metadata.name,SUBJECT:.subjects[*].name --no-headers |  grep cluster-admin 
+          kubectl get clusterrolebindings -o=custom-columns=ROLE:.roleRef.name,NAME:.metadata.name,SUBJECT:.subjects[*].name --no-headers |  grep cluster-admin
         use_multiple_values: true
         tests:
           test_items:
@@ -22,7 +22,7 @@ groups:
         remediation: |
           Identify all clusterrolebindings to the cluster-admin role. Check if they are used and
           if they need this role or if they could use a role with fewer privileges. K3s gives exceptions
-          to the helm-kube-system-traefik and helm-kube-system-traefik-crd clusterrolebidnings 
+          to the helm-kube-system-traefik and helm-kube-system-traefik-crd clusterrolebindings
           as these are required for traefik installation into the kube-system namespace for regular operations.
           Where possible, first bind users to a lower privileged role and then remove the
           clusterrolebinding to the cluster-admin role :
