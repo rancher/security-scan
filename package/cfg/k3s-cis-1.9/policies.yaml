@@ -25,8 +25,10 @@ groups:
           to the helm-kube-system-traefik and helm-kube-system-traefik-crd clusterrolebindings
           as these are required for traefik installation into the kube-system namespace for regular operations.
           Where possible, first bind users to a lower privileged role and then remove the
-          clusterrolebinding to the cluster-admin role :
+          clusterrolebinding to the cluster-admin role:
+          ```
           kubectl delete clusterrolebinding [name]
+          ```
         scored: false
 
       - id: 5.1.2
