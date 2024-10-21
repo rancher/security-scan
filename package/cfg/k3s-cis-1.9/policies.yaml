@@ -68,9 +68,24 @@ groups:
               printf "**clusterrole_name: %-50s clusterrole_is_compliant: true\n" "${clusterrole_name}"
             fi;
           done
+        use_multiple_values: true
+        tests:
+          bin_op: or
+          test_items:
+            - flag: "role_is_compliant"
+              compare:
+                op: eq
+                value: true
+              set: true
+            - flag: "clusterrole_is_compliant"
+              compare:
+                op: eq
+                value: true
+              set: true
         remediation: |
-          Where possible replace any use of wildcards in clusterroles and roles with specific
-          objects or actions.
+          Where possible replace any use of wildcards in clusterroles and roles with specific objects or actions.
+          K3s requires exceptions for following cluster roles, whic are required for regular operations:
+          - k3s-cloud-controller-manager, local-path-provisioner-role
         scored: false
 
       - id: 5.1.4
@@ -123,11 +138,16 @@ groups:
           done
         use_multiple_values: true
         tests:
+          bin_op: or
           test_items:
             - flag: "is_compliant"
               compare:
                 op: eq
                 value: true
+            - flag: "service_account"
+              compare:
+                op: valid_elements
+                value: coredns, helm-traefik, helm-traefik-crd, traefik, metrics-server, svclb, local-path-provisioner-service-account
         remediation: |
           Modify the definition of ServiceAccounts and Pods which do not need to mount service
           account tokens to disable it, with `automountServiceAccountToken: false`.
@@ -135,6 +155,8 @@ groups:
           Condition: Pod is_compliant to true when
             - ServiceAccount is automountServiceAccountToken: false and Pod is automountServiceAccountToken: false or notset
             - ServiceAccount is automountServiceAccountToken: true notset and Pod is automountServiceAccountToken: false
+          K3s gives exceptions to the following service-accounts, which are required for regular operations:
+            - coredns, helm-traefik, helm-traefik-crd, traefik, metrics-server, svclb, local-path-provisioner-service-account
         scored: false
 
       - id: 5.1.7
