@@ -9,7 +9,7 @@ groups:
     text: "RBAC and Service Accounts"
     checks:
       - id: 5.1.1
-        text: "Ensure that the cluster-admin role is only used where required (Manual)"
+        text: "Ensure that the cluster-admin role is only used where required (Automated)"
         audit: |
           kubectl get clusterrolebindings -o=custom-columns=ROLE:.roleRef.name,NAME:.metadata.name,SUBJECT:.subjects[*].name --no-headers |  grep cluster-admin
         use_multiple_values: true
@@ -29,7 +29,7 @@ groups:
           ```
           kubectl delete clusterrolebinding [name]
           ```
-        scored: false
+        scored: true
 
       - id: 5.1.2
         text: "Minimize access to secrets (Automated)"
@@ -103,8 +103,10 @@ groups:
         scored: true
 
       - id: 5.1.5
-        text: "Ensure that default service accounts are not actively used. (Manual)"
-        audit: check_for_default_sa.sh
+        text: "Ensure that default service accounts are not actively used. (Automated)"
+        audit: |
+          kubectl get serviceaccount --all-namespaces --field-selector metadata.name=default -o=json | \
+          jq -r '.items[] | " namespace: \(.metadata.namespace), kind: \(.kind), name: \(.metadata.name), automountServiceAccountToken: \(.automountServiceAccountToken | if . == null then "notset" else . end )"' | xargs -L 1
         tests:
           test_items:
             - flag: "true"
@@ -117,10 +119,10 @@ groups:
           to the Kubernetes API server.
           Modify the configuration of each default service account to include this value
           automountServiceAccountToken: false
-        scored: false
+        scored: true
 
       - id: 5.1.6
-        text: "Ensure that Service Account Tokens are only mounted where necessary (Manual)"
+        text: "Ensure that Service Account Tokens are only mounted where necessary (Automated)"
         audit: |
           kubectl get pods --all-namespaces -o custom-columns=POD_NAMESPACE:.metadata.namespace,POD_NAME:.metadata.name,POD_SERVICE_ACCOUNT:.spec.serviceAccount,POD_IS_AUTOMOUNTSERVICEACCOUNTTOKEN:.spec.automountServiceAccountToken --no-headers | while read -r pod_namespace pod_name pod_service_account pod_is_automountserviceaccounttoken
           do
@@ -157,7 +159,7 @@ groups:
             - ServiceAccount is automountServiceAccountToken: true notset and Pod is automountServiceAccountToken: false
           K3s gives exceptions to the following service-accounts, which are required for regular operations:
             - coredns, helm-traefik, helm-traefik-crd, traefik, metrics-server, svclb, local-path-provisioner-service-account
-        scored: false
+        scored: true
 
       - id: 5.1.7
         text: "Avoid use of system:masters group (Manual)"
