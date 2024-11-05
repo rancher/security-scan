@@ -58,15 +58,23 @@ groups:
             fi;
           done
 
-          cr_whitelist="cluster-admin k3s-cloud-controller-manager local-path-provisioner-role"
-          cr_whitelist="$cr_whitelist system:kube-controller-manager system:kubelet-api-admin system:controller:namespace-controller"
-          cr_whitelist="$cr_whitelist system:controller:disruption-controller system:controller:generic-garbage-collector"
-          cr_whitelist="$cr_whitelist system:controller:horizontal-pod-autoscaler system:controller:resourcequota-controller"
+          cr_whitelist=(
+            "cluster-admin"
+            "k3s-cloud-controller-manager"
+            "local-path-provisioner-role"
+            "system:kube-controller-manager"
+            "system:kubelet-api-admin"
+            "system:controller:namespace-controller"
+            "system:controller:disruption-controller"
+            "system:controller:generic-garbage-collector"
+            "system:controller:horizontal-pod-autoscaler"
+            "system:controller:resourcequota-controller"
+          )
           # Check ClusterRoles
           kubectl get clusterroles -o custom-columns=CLUSTERROLE_NAME:.metadata.name --no-headers | while read -r clusterrole_name
           do
             clusterrole_rules=$(kubectl get clusterrole "${clusterrole_name}" -o=json | jq -c '.rules')
-            if echo "${cr_whitelist}" | grep -q "${clusterrole_name}"; then
+            if echo ${cr_whitelist[@]} | grep -q "${clusterrole_name}"; then
               printf "**clusterrole_name: %-50s is_whitelist: true  is_compliant: true\n" "${clusterrole_name}"
             elif echo "${clusterrole_rules}" | grep -q "\[\"\*\"\]"; then
               echo "**clusterrole_name: ${clusterrole_name} clusterrole_rules: ${clusterrole_rules} is_compliant: false"
