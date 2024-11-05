@@ -85,8 +85,8 @@ groups:
           Where possible replace any use of wildcards in clusterroles and roles with specific objects or actions.
           K3s gives exceptions for following cluster roles, which are required for regular operations:
           - k3s-cloud-controller-manager, local-path-provisioner-role, cluster-admin
-          - system:kube-controller-manager, system:kubelet-api-admin, system:controller:namespace-controller, 
-          - system:controller:disruption-controller, system:controller:generic-garbage-collector, 
+          - system:kube-controller-manager, system:kubelet-api-admin, system:controller:namespace-controller,
+          - system:controller:disruption-controller, system:controller:generic-garbage-collector,
           - system:controller:horizontal-pod-autoscaler, system:controller:resourcequota-controller
         scored: true
 
