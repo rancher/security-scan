@@ -111,7 +111,7 @@ groups:
           -o custom-columns=N:.metadata.namespace,SA:.metadata.name,ASA:.automountServiceAccountToken --no-headers \
           | while read -r namespace serviceaccount automountserviceaccounttoken
           do
-            if [ "${automountserviceaccounttoken}" == "<none>" ]; then
+            if [ "${automountserviceaccounttoken}" = "<none>" ]; then
               automountserviceaccounttoken="notset"
             fi
             if [ "${namespace}" != "kube-system" ] && [ "${automountserviceaccounttoken}" != "false" ]; then
