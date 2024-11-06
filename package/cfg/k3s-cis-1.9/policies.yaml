@@ -107,21 +107,34 @@ groups:
       - id: 5.1.5
         text: "Ensure that default service accounts are not actively used. (Automated)"
         audit: |
-          kubectl get serviceaccounts --all-namespaces --field-selector metadata.name=default -o=json | \
-          jq -r '.items[] | " namespace: \(.metadata.namespace), kind: \(.kind), name: \(.metadata.name), automountServiceAccountToken: \(.automountServiceAccountToken | if . == null then "notset" else . end )"' | xargs -L 1
+          kubectl get serviceaccounts --all-namespaces --field-selector metadata.name=default \
+          -o custom-columns=N:.metadata.namespace,SA:.metadata.name,ASA:.automountServiceAccountToken --no-headers \
+          | while read -r namespace serviceaccount automountserviceaccounttoken
+          do
+            if [ "${automountserviceaccounttoken}" == "<none>" ]; then
+              automountserviceaccounttoken="notset"
+            fi
+            if [ "${namespace}" != "kube-system" ] && [ "${automountserviceaccounttoken}" != "false" ]; then
+              printf "**namespace: %-20s service_account: %-10s automountServiceAccountToken: %-6s is_compliant: false\n" "${namespace}" "${serviceaccount}" "${automountserviceaccounttoken}"
+            else
+              printf "**namespace: %-20s service_account: %-10s automountServiceAccountToken: %-6s is_compliant: true\n" "${namespace}" "${serviceaccount}" "${automountserviceaccounttoken}"
+            fi
+          done
+        use_multiple_values: true
         tests:
           test_items:
-            - flag: "automountServiceAccountToken"
+            - flag: "is_compliant"
               compare:
                 op: eq
-                value: false
+                value: true
         remediation: |
           Create explicit service accounts wherever a Kubernetes workload requires specific access
           to the Kubernetes API server.
+          K3s makes an exception for the default service account in the kube-system namespace.
           Modify the configuration of each default service account to include this value
           automountServiceAccountToken: false
           Or using kubectl:
-          kubectl patch serviceaccount default --patch '{"automountServiceAccountToken": false}'
+          kubectl patch serviceaccount --namespace <NAMESPACE> default --patch '{"automountServiceAccountToken": false}'
         scored: true
 
       - id: 5.1.6
