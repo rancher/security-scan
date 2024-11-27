@@ -209,7 +209,7 @@ policies:
 managedservices:
   components: []
 
-# TODO: Clean up in the next refactor
+# Version mapping: Maps k8s versions to a CIS version/profile.
 version_mapping:
   "1.23": "cis-1.23"
   "1.24": "cis-1.24"
@@ -229,6 +229,7 @@ version_mapping:
   "v1.26.15+k3s1": "k3s-cis-1.8-hardened"
   "v1.27.16+k3s1": "k3s-cis-1.9"
 
+# Target mapping: Defines which components (eg. master, node, etcd) should be evaluated for a given CIS profile.
 target_mapping:
   # EKS
   "eks-1.2.0":
