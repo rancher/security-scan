@@ -211,25 +211,13 @@ managedservices:
 
 # TODO: Clean up in the next refactor
 version_mapping:
-  "rke-1.13":
-    - "rke-cis-1.4"
-  "rke-1.14":
-    - "rke-cis-1.4"
-  "rke-1.15":
-    - "rke-cis-1.5-permissive"
-  "rke-1.16":
-    - "rke-cis-1.6-permissive"
-  "rke-1.17":
-    - "rke-cis-1.6-permissive"
-  "rke-1.18":
-    - "rke-cis-1.6-permissive"
-  "rke-1.19":
-    - "rke-cis-1.20-permissive"
-  "rke-1.20":
-    - "rke-cis-1.20-permissive"
-  "v1.18.10+rke2r1":
-    - "rke2-cis-1.5-hardened"
-    - "rke2-cis-1.5-permissive"
+  "1.23": "cis-1.23"
+  "1.24": "cis-1.24"
+  "1.25": "cis-1.7"
+  "1.26": "cis-1.8"
+  "1.27": "cis-1.9"
+  "1.28": "cis-1.9"
+  "1.29": "cis-1.9"
   "eks-1.2.0":
     - "eks-1.2.0"
   "gke-1.2.0":
@@ -238,12 +226,6 @@ version_mapping:
     - "gke-1.6.0"
   "aks-1.0":
     - "aks-1.0"
-  "v1.20.5+rke2r1":
-    - "rke2-cis-1.6-hardened"
-    - "rke2-cis-1.6-permissive"
-  "v1.20.5+k3s1":
-    - "k3s-cis-1.6-hardened"
-    - "k3s-cis-1.6-permissive"
 
 target_mapping:
   # EKS
@@ -259,10 +241,6 @@ target_mapping:
     - "node"
 
   # CIS - Generic profiles
-  "cis-1.4":
-    - "master"
-    - "node"
-    - "etcd"
   "cis-1.5":
     - "master"
     - "node"
@@ -305,32 +283,16 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
+  "cis-1.9":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
 
   # RKE1
   # rke1: Generic
-  "rke-cis-1.4":
-    - "master"
-    - "node"
-    - "etcd"
   # rke1: Permissive
-  "rke-cis-1.5-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke-cis-1.6-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke-cis-1.20-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
   "rke-cis-1.23-permissive":
     - "master"
     - "node"
@@ -356,24 +318,6 @@ target_mapping:
     - "etcd"
     - "policies"
   # rke1 : Hardened
-  "rke-cis-1.5-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke-cis-1.6-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke-cis-1.20-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
   "rke-cis-1.23-hardened":
     - "master"
     - "node"
@@ -402,24 +346,6 @@ target_mapping:
   # RKE2
   # rke2: Generic
   # rke2: Permissive
-  "rke2-cis-1.5-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke2-cis-1.6-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke2-cis-1.20-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
   "rke2-cis-1.23-permissive":
     - "master"
     - "node"
@@ -445,24 +371,6 @@ target_mapping:
     - "etcd"
     - "policies"
   # rke2: Hardened
-  "rke2-cis-1.5-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke2-cis-1.6-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "rke2-cis-1.20-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
   "rke2-cis-1.23-hardened":
     - "master"
     - "node"
@@ -491,18 +399,6 @@ target_mapping:
   # K3S
   # k3s: Generic
   # k3s: Permissive
-  "k3s-cis-1.6-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "k3s-cis-1.20-permissive":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
   "k3s-cis-1.23-permissive":
     - "master"
     - "node"
@@ -528,18 +424,6 @@ target_mapping:
     - "etcd"
     - "policies"
   # k3s: Hardened
-  "k3s-cis-1.6-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
-  "k3s-cis-1.20-hardened":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
-    - "policies"
   "k3s-cis-1.23-hardened":
     - "master"
     - "node"
