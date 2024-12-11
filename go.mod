@@ -5,7 +5,7 @@ go 1.22.0
 toolchain go1.22.9
 
 require (
-	github.com/aquasecurity/kube-bench v0.9.2
+	github.com/aquasecurity/kube-bench v0.9.3
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.10.0
@@ -14,9 +14,9 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.32.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/securityhub v1.54.6 // indirect
-	github.com/aws/smithy-go v1.22.0 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.32.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/securityhub v1.55.0 // indirect
+	github.com/aws/smithy-go v1.22.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
@@ -44,5 +44,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/client-go v0.31.2 // indirect
+	k8s.io/client-go v0.31.3 // indirect
 )
