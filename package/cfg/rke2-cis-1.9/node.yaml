@@ -420,7 +420,7 @@ groups:
           Based on your system, restart the RKE2 service. For example,
           systemctl restart rke2-server.service
         scored: false
-  
+
   - id: 4.3
     text: "kube-proxy"
     checks:
