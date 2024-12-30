@@ -177,7 +177,6 @@ groups:
           Condition: Pod is_compliant to true when
             - ServiceAccount is automountServiceAccountToken: false and Pod is automountServiceAccountToken: false or notset
             - ServiceAccount is automountServiceAccountToken: true/notset and Pod is automountServiceAccountToken: false
-          
         scored: true
 
       - id: 5.1.7
