@@ -32,6 +32,7 @@ groups:
         scored: true
 
       - id: 5.1.2
+        type: manual
         text: "Minimize access to secrets (Automated)"
         audit: "echo \"canGetListWatchSecretsAsSystemAuthenticated: $(kubectl auth can-i get,list,watch secrets --all-namespaces --as=system:authenticated)\""
         tests:
@@ -91,6 +92,7 @@ groups:
         scored: true
 
       - id: 5.1.4
+        type: manual
         text: "Minimize access to create pods (Automated)"
         audit: |
           echo "canCreatePodsAsSystemAuthenticated: $(kubectl auth can-i create pods --all-namespaces --as=system:authenticated)"
