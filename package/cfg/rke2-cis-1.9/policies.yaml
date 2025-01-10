@@ -17,13 +17,12 @@ groups:
           test_items:
             - flag: "cluster-admin"
               compare:
-                op: valid_elements
-                value: cluster-admin, helm-kube-system-traefik, helm-kube-system-traefik-crd
+                op: regex
+                value: cluster-admin|helm-kube-system-rke2-.*
         remediation: |
           Identify all clusterrolebindings to the cluster-admin role. Check if they are used and
-          if they need this role or if they could use a role with fewer privileges. K3s gives exceptions
-          to the helm-kube-system-traefik and helm-kube-system-traefik-crd clusterrolebindings
-          as these are required for traefik installation into the kube-system namespace for regular operations.
+          if they need this role or if they could use a role with fewer privileges. RKE2 gives exceptions
+          to the helm-kube-system-rke2-* clusterrolebindings which handles the installation of all rke2 managed components.
           Where possible, first bind users to a lower privileged role and then remove the
           clusterrolebinding to the cluster-admin role:
           ```
@@ -32,8 +31,8 @@ groups:
         scored: true
 
       - id: 5.1.2
-        type: manual
         text: "Minimize access to secrets (Automated)"
+        type: manual
         audit: "echo \"canGetListWatchSecretsAsSystemAuthenticated: $(kubectl auth can-i get,list,watch secrets --all-namespaces --as=system:authenticated)\""
         tests:
           test_items:
@@ -59,7 +58,7 @@ groups:
             fi;
           done
 
-          cr_whitelist="cluster-admin k3s-cloud-controller-manager local-path-provisioner-role"
+          cr_whitelist="cluster-admin rke2-cloud-controller-manager local-path-provisioner-role"
           cr_whitelist="$cr_whitelist system:kube-controller-manager system:kubelet-api-admin system:controller:namespace-controller"
           cr_whitelist="$cr_whitelist system:controller:disruption-controller system:controller:generic-garbage-collector"
           cr_whitelist="$cr_whitelist system:controller:horizontal-pod-autoscaler system:controller:resourcequota-controller"
@@ -84,8 +83,8 @@ groups:
                 value: true
         remediation: |
           Where possible replace any use of wildcards in clusterroles and roles with specific objects or actions.
-          K3s gives exceptions for following cluster roles, which are required for regular operations:
-          - k3s-cloud-controller-manager, local-path-provisioner-role, cluster-admin
+          RKE2 gives exceptions for following cluster roles, which are required for regular operations:
+          - rke2-cloud-controller-manager, local-path-provisioner-role, cluster-admin
           - system:kube-controller-manager, system:kubelet-api-admin, system:controller:namespace-controller,
           - system:controller:disruption-controller, system:controller:generic-garbage-collector,
           - system:controller:horizontal-pod-autoscaler, system:controller:resourcequota-controller
@@ -107,7 +106,7 @@ groups:
         scored: true
 
       - id: 5.1.5
-        text: "Ensure that default service accounts are not actively used. (Automated)"
+        text: "Ensure that default service accounts are not actively used. (Manual)"
         audit: |
           kubectl get serviceaccounts --all-namespaces --field-selector metadata.name=default \
           -o custom-columns=N:.metadata.namespace,SA:.metadata.name,ASA:.automountServiceAccountToken --no-headers \
@@ -132,18 +131,21 @@ groups:
         remediation: |
           Create explicit service accounts wherever a Kubernetes workload requires specific access
           to the Kubernetes API server.
-          K3s makes an exception for the default service account in the kube-system namespace.
           Modify the configuration of each default service account to include this value
           automountServiceAccountToken: false
           Or using kubectl:
           kubectl patch serviceaccount --namespace <NAMESPACE> default --patch '{"automountServiceAccountToken": false}'
-        scored: true
+        scored: false
 
       - id: 5.1.6
         text: "Ensure that Service Account Tokens are only mounted where necessary (Automated)"
         audit: |
           kubectl get pods --all-namespaces -o custom-columns=POD_NAMESPACE:.metadata.namespace,POD_NAME:.metadata.name,POD_SERVICE_ACCOUNT:.spec.serviceAccount,POD_IS_AUTOMOUNTSERVICEACCOUNTTOKEN:.spec.automountServiceAccountToken --no-headers | while read -r pod_namespace pod_name pod_service_account pod_is_automountserviceaccounttoken
           do
+            # Skip pods with no service account
+            if [ "${pod_service_account}" = "<none>" ]; then
+              continue
+            fi
             # Retrieve automountServiceAccountToken's value for ServiceAccount and Pod, set to notset if null or <none>.
             svacc_is_automountserviceaccounttoken=$(kubectl get serviceaccount -n "${pod_namespace}" "${pod_service_account}" -o json | jq -r '.automountServiceAccountToken' | sed -e 's/<none>/notset/g' -e 's/null/notset/g')
             pod_is_automountserviceaccounttoken=$(echo "${pod_is_automountserviceaccounttoken}" | sed -e 's/<none>/notset/g' -e 's/null/notset/g')
@@ -154,29 +156,29 @@ groups:
             else
               is_compliant="false"
             fi
+            # Whitelist kube-system namespace as these pods are expected to contact the apiserver
+            if [ "${pod_namespace}" = "kube-system" ]; then
+              is_compliant="true"
+            fi
             echo "**namespace: ${pod_namespace} pod_name: ${pod_name} service_account: ${pod_service_account} pod_is_automountserviceaccounttoken: ${pod_is_automountserviceaccounttoken} svacc_is_automountServiceAccountToken: ${svacc_is_automountserviceaccounttoken} is_compliant: ${is_compliant}"
           done
         use_multiple_values: true
         tests:
-          bin_op: or
           test_items:
             - flag: "is_compliant"
               compare:
                 op: eq
                 value: true
-            - flag: "service_account"
-              compare:
-                op: valid_elements
-                value: coredns, helm-traefik, helm-traefik-crd, traefik, metrics-server, svclb, local-path-provisioner-service-account
         remediation: |
           Modify the definition of ServiceAccounts and Pods which do not need to mount service
           account tokens to disable it, with `automountServiceAccountToken: false`.
+          RKE2 gives exceptions to the ServiceAccounts in kube-system namespace, as these are expected contact the apiserver.
+          When in cis mode, RKE2 disables the automountServiceAccountToken for namespaces:
+          - kube-public, default, kube-node-lease
           If both the ServiceAccount and the Pod's .spec specify a value for automountServiceAccountToken, the Pod spec takes precedence.
           Condition: Pod is_compliant to true when
             - ServiceAccount is automountServiceAccountToken: false and Pod is automountServiceAccountToken: false or notset
-            - ServiceAccount is automountServiceAccountToken: true notset and Pod is automountServiceAccountToken: false
-          K3s gives exceptions to the following service-accounts, which are required for regular operations:
-            - coredns, helm-traefik, helm-traefik-crd, traefik, metrics-server, svclb, local-path-provisioner-service-account
+            - ServiceAccount is automountServiceAccountToken: true/notset and Pod is automountServiceAccountToken: false
         scored: true
 
       - id: 5.1.7
@@ -350,6 +352,7 @@ groups:
 
       - id: 5.3.2
         text: "Ensure that all Namespaces have NetworkPolicies defined (Manual)"
+        type: "manual"
         remediation: |
           Follow the documentation and create NetworkPolicy objects as you need them.
         scored: false
@@ -416,6 +419,7 @@ groups:
 
       - id: 5.7.4
         text: "The default namespace should not be used (Manual)"
+        type: "manual"
         remediation: |
           Ensure that namespaces are created to allow for appropriate segregation of Kubernetes
           resources and that all new resources are created in a specific namespace.
