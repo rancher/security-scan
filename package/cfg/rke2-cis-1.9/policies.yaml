@@ -106,7 +106,7 @@ groups:
         scored: true
 
       - id: 5.1.5
-        text: "Ensure that default service accounts are not actively used. (Manual)"
+        text: "Ensure that default service accounts are not actively used. (Automated)"
         audit: |
           kubectl get serviceaccounts --all-namespaces --field-selector metadata.name=default \
           -o custom-columns=N:.metadata.namespace,SA:.metadata.name,ASA:.automountServiceAccountToken --no-headers \
@@ -135,7 +135,7 @@ groups:
           automountServiceAccountToken: false
           Or using kubectl:
           kubectl patch serviceaccount --namespace <NAMESPACE> default --patch '{"automountServiceAccountToken": false}'
-        scored: false
+        scored: true
 
       - id: 5.1.6
         text: "Ensure that Service Account Tokens are only mounted where necessary (Automated)"
