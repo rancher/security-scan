@@ -218,6 +218,8 @@ version_mapping:
   "1.27": "cis-1.9"
   "1.28": "cis-1.9"
   "1.29": "cis-1.9"
+  "eks-1.2.0":
+    - "eks-1.2.0"
   "eks-1.5.0":
     - "eks-1.5.0"
   "gke-1.2.0":
@@ -234,6 +236,8 @@ version_mapping:
 # Target mapping: Defines which components (eg. master, node, etcd) should be evaluated for a given CIS profile.
 target_mapping:
   # EKS
+  "eks-1.2.0":
+    - "node"
   "eks-1.5.0":
     - "node"
   # GKE
