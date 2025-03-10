@@ -4,9 +4,9 @@ GOIMPORTS = $(TOOLS_BIN)/goimports
 $(GOIMPORTS): ## Download goimports if not yet downloaded.
 	$(call go-install-tool,$(GOIMPORTS),golang.org/x/tools/cmd/goimports@latest)
 	
-GOLINT = $(TOOLS_BIN)/golint
-$(GOLINT): ## Download golint locally if not yet downloaded.
-	$(call go-install-tool,$(GOLINT),golang.org/x/lint/golint@latest)
+GOLANGCI_LINT = $(TOOLS_BIN)/golangci-lint
+$(GOLANGCI_LINT): ## Download golangci-lint locally if not yet downloaded.
+	$(call go-install-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint@latest)
 
 KUBE_BENCH = $(TOOLS_BIN)/kube-bench
 $(KUBE_BENCH): ## Download kube-bench locally if not yet downloaded.
