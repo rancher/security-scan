@@ -8,9 +8,9 @@ function main(){
     PACKAGES="$(go list ./... | grep 'rancher/security-scan')"
     go vet ${PACKAGES}
 
-    echo "Running: golint"
+    echo "Running: golangci-lint"
     for i in ${PACKAGES}; do
-        if [ -n "$(golint $i | grep -v 'should have comment.*or be unexported' | tee /dev/stderr)" ]; then
+        if [ -n "$(golangci-lint run $i)" ]; then
             failed=true
         fi
     done
