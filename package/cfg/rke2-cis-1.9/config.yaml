@@ -51,6 +51,8 @@ node:
     - kubelet
     - proxy
   kubelet:
+    confs:
+      - /var/lib/rancher/rke2/agent/etc/kubelet.conf.d/00-rke2-defaults.conf
     defaultkubeconfig: /var/lib/rancher/rke2/agent/kubelet.kubeconfig
     defaultcafile: /var/lib/rancher/rke2/agent/client-ca.crt
   proxy:
