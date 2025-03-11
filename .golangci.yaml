@@ -1,0 +1,13 @@
+linters:
+  disable-all: true
+  enable:
+     - asasalint
+     - asciicheck
+     - bidichk
+     - errcheck
+     - gofmt
+     - gosimple
+     - gosec
+     - govet
+     - misspell
+     - unused  
