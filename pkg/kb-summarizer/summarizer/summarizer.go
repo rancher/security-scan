@@ -143,10 +143,6 @@ type skipConfig struct {
 	Skip map[string][]string `json:"skip"`
 }
 
-var controlFilesToIgnore = map[string]bool{
-	"config.yaml": true,
-}
-
 func NewSummarizer(
 	k8sVersion,
 	benchmarkVersion,
@@ -540,24 +536,6 @@ func getGroupWrapper(group *kb.Group) *GroupWrapper {
 		Text:          group.Text,
 		CheckWrappers: []*CheckWrapper{},
 	}
-}
-
-func getMappedState(state kb.State) State {
-	switch state {
-	case kb.PASS:
-		return Pass
-	case kb.FAIL:
-		return Fail
-	case kb.WARN:
-		return Warn
-	case kb.INFO:
-		return NotApplicable
-	case SKIP:
-		return Skip
-	case NA:
-		return NotApplicable
-	}
-	return Fail
 }
 
 func getCheckWrapper(check *kb.Check) *CheckWrapper {
