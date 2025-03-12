@@ -95,49 +95,49 @@ func TestMapGroupWrappersToActualValueGroups(t *testing.T) {
 
 func getGroupWrappersTestData() ([]*GroupWrapper, error) {
 	groupWrappersTestData := []*GroupWrapper{
-		&GroupWrapper{
+		{
 			ID:   "1.1",
 			Text: "Checks for group 1.1",
 			CheckWrappers: []*CheckWrapper{
-				&CheckWrapper{
+				{
 					ID:                 "1.1.1",
 					Text:               "Check 1.1.1",
 					ActualValueNodeMap: testAvNodeMap1,
 				},
-				&CheckWrapper{
+				{
 					ID:                 "1.1.2",
 					Text:               "Check 1.1.2",
 					ActualValueNodeMap: testAvNodeMap2,
 				},
 			},
 		},
-		&GroupWrapper{
+		{
 			ID:   "1.2",
 			Text: "Checks for group 1.2",
 			CheckWrappers: []*CheckWrapper{
-				&CheckWrapper{
+				{
 					ID:                 "1.2.1",
 					Text:               "Check 1.2.1",
 					ActualValueNodeMap: testAvNodeMap2,
 				},
 			},
 		},
-		&GroupWrapper{
+		{
 			ID:   "2.1",
 			Text: "Checks for group 2.1",
 			CheckWrappers: []*CheckWrapper{
-				&CheckWrapper{
+				{
 					ID:                 "2.1.1",
 					Text:               "Check 2.1.1",
 					ActualValueNodeMap: testAvNodeMap2,
 				},
 			},
 		},
-		&GroupWrapper{
+		{
 			ID:   "3.1",
 			Text: "Checks for group 2.2",
 			CheckWrappers: []*CheckWrapper{
-				&CheckWrapper{
+				{
 					ID:                 "3.2",
 					Text:               "Check 3.1",
 					ActualValueNodeMap: testAvNodeMap3,
@@ -163,49 +163,49 @@ func getGroupWrappersTestData() ([]*GroupWrapper, error) {
 
 func getAvGroupTestData() ([]*ActualValueGroup, error) {
 	avGroupsTestData := []*ActualValueGroup{
-		&ActualValueGroup{
+		{
 			ID:   "1.1",
 			Text: "Checks for group 1.1",
 			ActualValueChecks: []*ActualValueCheck{
-				&ActualValueCheck{
+				{
 					ID:                 "1.1.1",
 					Text:               "Check 1.1.1",
 					ActualValueNodeMap: testAvNodeMap1,
 				},
-				&ActualValueCheck{
+				{
 					ID:                 "1.1.2",
 					Text:               "Check 1.1.2",
 					ActualValueNodeMap: testAvNodeMap2,
 				},
 			},
 		},
-		&ActualValueGroup{
+		{
 			ID:   "1.2",
 			Text: "Checks for group 1.2",
 			ActualValueChecks: []*ActualValueCheck{
-				&ActualValueCheck{
+				{
 					ID:                 "1.2.1",
 					Text:               "Check 1.2.1",
 					ActualValueNodeMap: testAvNodeMap2,
 				},
 			},
 		},
-		&ActualValueGroup{
+		{
 			ID:   "2.1",
 			Text: "Checks for group 2.1",
 			ActualValueChecks: []*ActualValueCheck{
-				&ActualValueCheck{
+				{
 					ID:                 "2.1.1",
 					Text:               "Check 2.1.1",
 					ActualValueNodeMap: testAvNodeMap2,
 				},
 			},
 		},
-		&ActualValueGroup{
+		{
 			ID:   "3.1",
 			Text: "Checks for group 2.2",
 			ActualValueChecks: []*ActualValueCheck{
-				&ActualValueCheck{
+				{
 					ID:                 "3.2",
 					Text:               "Check 3.1",
 					ActualValueNodeMap: testAvNodeMap3,
