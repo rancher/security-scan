@@ -12,9 +12,9 @@ on:
         required: false
         default: "false"
         type: string
-  # Run twice in the early morning (UTC) for initial and follow up steps (create pull request and merge)
   schedule:
-    - cron: '30 4,6 * * *'
+    # Runs twice on Tuesdays to Thursdays.
+    - cron: '30 4,6 * * 2-4'
 
 permissions:
   contents: read
