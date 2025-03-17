@@ -3,10 +3,12 @@ TOOLS_BIN := $(shell mkdir -p build/tools && realpath build/tools)
 GOIMPORTS = $(TOOLS_BIN)/goimports
 $(GOIMPORTS): ## Download goimports if not yet downloaded.
 	$(call go-install-tool,$(GOIMPORTS),golang.org/x/tools/cmd/goimports@latest)
-	
-GOLANGCI_LINT = $(TOOLS_BIN)/golangci-lint
-$(GOLANGCI_LINT): ## Download golangci-lint locally if not yet downloaded.
-	$(call go-install-tool,$(GOLANGCI_LINT),github.com/golangci/golangci-lint/cmd/golangci-lint@latest)
+
+GOLANGCI = $(TOOLS_BIN)/golangci-lint-$(GOLANGCI_VERSION)
+$(GOLANGCI):
+	rm -f $(TOOLS_BIN)/golangci-lint*
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(TOOLS_BIN) $(GOLANGCI_VERSION)
+	mv $(TOOLS_BIN)/golangci-lint $(TOOLS_BIN)/golangci-lint-$(GOLANGCI_VERSION)
 
 KUBE_BENCH = $(TOOLS_BIN)/kube-bench
 $(KUBE_BENCH): ## Download kube-bench locally if not yet downloaded.
