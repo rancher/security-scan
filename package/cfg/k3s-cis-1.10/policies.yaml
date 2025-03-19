@@ -425,20 +425,29 @@ groups:
               container_caps_add=$(echo ${container} | jq -r '.securityContext.capabilities.add' | sed -e 's/null/notset/g')
               # Set is_compliant to true by default.
               is_compliant=true
+              is_whitelist=false
               caps_list=""
-              if [ "${container_caps_add}" != "notset" ]; then
+
+              # Check if pod is in whitelist
+              if echo "${pod_name}" | grep -q -E "^(coredns|svclb-traefik)"; then
+                is_whitelist=true
+                is_compliant=true
+              elif [ "${container_caps_add}" != "notset" ]; then
                 # Loop through all caps and append caps_list, then set is_compliant to false.
                 for cap in $(echo "${container_caps_add}" | jq -r '.[]'); do
-                caps_list+="${cap},"
-                is_compliant=false
+                  caps_list+="${cap},"
+                  is_compliant=false
                 done
                 # Remove trailing comma for the last list member.
                 caps_list=${caps_list%,}
               fi
-              if [ "${is_compliant}" = true ]; then
-                echo "***pod_name: ${pod_name} container_name: ${container_name} pod_namespace: ${pod_namespace} container_caps_add: ${container_caps_add} is_compliant: true"
+
+              if [ "${is_whitelist}" = true ]; then
+                printf "***pod_name: %-30s container_name: %-30s pod_namespace: %-20s is_whitelist: %-5s is_compliant: true\n" "${pod_name}" "${container_name}" "${pod_namespace}" "${is_whitelist}"
+              elif [ "${is_compliant}" = true ]; then
+                printf "***pod_name: %-30s container_name: %-30s pod_namespace: %-20s container_caps_add: %-15s is_compliant: true\n" "${pod_name}" "${container_name}" "${pod_namespace}" "${container_caps_add}"
               else
-                echo "***pod_name: ${pod_name} container_name: ${container_name} pod_namespace: ${pod_namespace} container_caps_add: ${caps_list} is_compliant: false"
+                printf "***pod_name: %-30s container_name: %-30s pod_namespace: %-20s container_caps_add: %-15s is_compliant: false\n" "${pod_name}" "${container_name}" "${pod_namespace}" "${caps_list}"
               fi
             done
           done
@@ -455,6 +464,8 @@ groups:
           Audit: the audit retrieves each Pod's container(s) added capabilities.
           Condition: is_compliant is false if added capabilities are added for a given container.
           Default: Containers run with a default set of capabilities as assigned by the Container Runtime.
+          K3s gives exceptions to the following pods, which are required for regular operations:
+            - coredns, svclb-traefik
         scored: false
 
       - id: 5.2.10
