@@ -3,7 +3,7 @@ module github.com/rancher/security-scan
 go 1.23.6
 
 require (
-	github.com/aquasecurity/kube-bench v0.10.2
+	github.com/aquasecurity/kube-bench v0.10.4
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.20.0
 	github.com/stretchr/testify v1.10.0
@@ -12,8 +12,8 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.36.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/securityhub v1.55.8 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.36.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/securityhub v1.57.0 // indirect
 	github.com/aws/smithy-go v1.22.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -37,5 +37,5 @@ require (
 	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/client-go v0.32.1 // indirect
+	k8s.io/client-go v0.32.2 // indirect
 )
