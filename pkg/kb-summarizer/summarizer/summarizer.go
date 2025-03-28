@@ -360,7 +360,7 @@ func (s *Summarizer) summarizeForHost(hostname string) error {
 
 func (s *Summarizer) save() error {
 	if _, err := os.Stat(s.OutputDirectory); os.IsNotExist(err) {
-		if err2 := os.Mkdir(s.OutputDirectory, 0755); err2 != nil {
+		if err2 := os.Mkdir(s.OutputDirectory, 0750); err2 != nil {
 			return fmt.Errorf("error creating output directory: %v", err)
 		}
 	}
