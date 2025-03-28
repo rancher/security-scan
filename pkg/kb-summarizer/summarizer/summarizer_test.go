@@ -57,7 +57,11 @@ func TestSummarizer_handleAvMapData(t *testing.T) {
 
 	r, err := gzip.NewReader(bytes.NewBuffer(compressedAvMapData))
 	require.Nil(t, err, "error while reading compressed avMapData")
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			t.Errorf("failed to close gzip reader: %v", err)
+		}
+	}()
 
 	avgroupsJSON, err := io.ReadAll(r)
 	require.Nil(t, err, "error while reading avMapData json")
