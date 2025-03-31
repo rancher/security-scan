@@ -217,6 +217,7 @@ func GetUserSkipInfo(benchmark, skipConfigFile string) (map[string]bool, error) 
 	if skipConfigFile == "" {
 		return skipMap, nil
 	}
+	skipConfigFile = filepath.Clean(skipConfigFile)
 	data, err := os.ReadFile(skipConfigFile)
 	if err != nil {
 		return skipMap, fmt.Errorf("error reading file %v: %v", skipConfigFile, err)
@@ -244,6 +245,7 @@ func GetChecksMapFromConfigFile(configFile string) (map[string]string, error) {
 	if configFile == "" {
 		return checksMap, nil
 	}
+	configFile = filepath.Clean(configFile)
 	logrus.Infof("loading checks from config file: %v", configFile)
 	data, err := os.ReadFile(configFile)
 	if err != nil {
@@ -360,11 +362,12 @@ func (s *Summarizer) summarizeForHost(hostname string) error {
 
 func (s *Summarizer) save() error {
 	if _, err := os.Stat(s.OutputDirectory); os.IsNotExist(err) {
-		if err2 := os.Mkdir(s.OutputDirectory, 0755); err2 != nil {
+		if err2 := os.Mkdir(s.OutputDirectory, 0750); err2 != nil {
 			return fmt.Errorf("error creating output directory: %v", err)
 		}
 	}
 	outputFilePath := fmt.Sprintf("%s/%s", s.OutputDirectory, s.OutputFilename)
+	outputFilePath = filepath.Clean(outputFilePath)
 	jsonFile, err := os.Create(outputFilePath)
 	if err != nil {
 		return fmt.Errorf("error creating file %v: %v", outputFilePath, err)
@@ -427,6 +430,7 @@ func (s *Summarizer) loadTargetMapping() error {
 
 func (s *Summarizer) loadControlsFromFile(filePath string) (*kb.Controls, error) {
 	controls := &kb.Controls{}
+	filePath = filepath.Clean(filePath)
 	fileContents, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading file %+v: %v", filePath, err)
@@ -724,6 +728,7 @@ func (s *Summarizer) Summarize() error {
 
 		// Check for errors before proceeding
 		errorLogFile := fmt.Sprintf("%s/%s/%s", s.InputDirectory, hostname, DefaultErrorLogFileName)
+		errorLogFile = filepath.Clean(errorLogFile)
 		if _, err := os.Stat(errorLogFile); err == nil {
 			data, err := os.ReadFile(errorLogFile)
 			if err != nil {
