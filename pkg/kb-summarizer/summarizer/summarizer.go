@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -144,10 +143,6 @@ type skipConfig struct {
 	Skip map[string][]string `json:"skip"`
 }
 
-var controlFilesToIgnore = map[string]bool{
-	"config.yaml": true,
-}
-
 func NewSummarizer(
 	k8sVersion,
 	benchmarkVersion,
@@ -222,7 +217,8 @@ func GetUserSkipInfo(benchmark, skipConfigFile string) (map[string]bool, error) 
 	if skipConfigFile == "" {
 		return skipMap, nil
 	}
-	data, err := ioutil.ReadFile(skipConfigFile)
+	skipConfigFile = filepath.Clean(skipConfigFile)
+	data, err := os.ReadFile(skipConfigFile)
 	if err != nil {
 		return skipMap, fmt.Errorf("error reading file %v: %v", skipConfigFile, err)
 	}
@@ -249,8 +245,9 @@ func GetChecksMapFromConfigFile(configFile string) (map[string]string, error) {
 	if configFile == "" {
 		return checksMap, nil
 	}
+	configFile = filepath.Clean(configFile)
 	logrus.Infof("loading checks from config file: %v", configFile)
-	data, err := ioutil.ReadFile(configFile)
+	data, err := os.ReadFile(configFile)
 	if err != nil {
 		return checksMap, fmt.Errorf("error reading file %v: %v", configFile, err)
 	}
@@ -347,7 +344,7 @@ func (s *Summarizer) summarizeForHost(hostname string) error {
 		logrus.Debugf("host: %s resultFile: %s", hostname, resultFile)
 		// Load one result file
 		// Marshal it into the results
-		contents, err := ioutil.ReadFile(filepath.Clean(resultFilePath))
+		contents, err := os.ReadFile(filepath.Clean(resultFilePath))
 		if err != nil {
 			return fmt.Errorf("error reading file %+s: %v", resultFilePath, err)
 		}
@@ -365,11 +362,12 @@ func (s *Summarizer) summarizeForHost(hostname string) error {
 
 func (s *Summarizer) save() error {
 	if _, err := os.Stat(s.OutputDirectory); os.IsNotExist(err) {
-		if err2 := os.Mkdir(s.OutputDirectory, 0755); err2 != nil {
+		if err2 := os.Mkdir(s.OutputDirectory, 0750); err2 != nil {
 			return fmt.Errorf("error creating output directory: %v", err)
 		}
 	}
 	outputFilePath := fmt.Sprintf("%s/%s", s.OutputDirectory, s.OutputFilename)
+	outputFilePath = filepath.Clean(outputFilePath)
 	jsonFile, err := os.Create(outputFilePath)
 	if err != nil {
 		return fmt.Errorf("error creating file %v: %v", outputFilePath, err)
@@ -432,7 +430,8 @@ func (s *Summarizer) loadTargetMapping() error {
 
 func (s *Summarizer) loadControlsFromFile(filePath string) (*kb.Controls, error) {
 	controls := &kb.Controls{}
-	fileContents, err := ioutil.ReadFile(filePath)
+	filePath = filepath.Clean(filePath)
+	fileContents, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading file %+v: %v", filePath, err)
 	}
@@ -541,24 +540,6 @@ func getGroupWrapper(group *kb.Group) *GroupWrapper {
 		Text:          group.Text,
 		CheckWrappers: []*CheckWrapper{},
 	}
-}
-
-func getMappedState(state kb.State) State {
-	switch state {
-	case kb.PASS:
-		return Pass
-	case kb.FAIL:
-		return Fail
-	case kb.WARN:
-		return Warn
-	case kb.INFO:
-		return NotApplicable
-	case SKIP:
-		return Skip
-	case NA:
-		return NotApplicable
-	}
-	return Fail
 }
 
 func getCheckWrapper(check *kb.Check) *CheckWrapper {
@@ -733,7 +714,7 @@ func (s *Summarizer) Summarize() error {
 	logrus.Infof("summarize")
 
 	// Walk through the host folders
-	hostsDir, err := ioutil.ReadDir(s.InputDirectory)
+	hostsDir, err := os.ReadDir(s.InputDirectory)
 	if err != nil {
 		return fmt.Errorf("error listing directory: %v", err)
 	}
@@ -747,8 +728,9 @@ func (s *Summarizer) Summarize() error {
 
 		// Check for errors before proceeding
 		errorLogFile := fmt.Sprintf("%s/%s/%s", s.InputDirectory, hostname, DefaultErrorLogFileName)
+		errorLogFile = filepath.Clean(errorLogFile)
 		if _, err := os.Stat(errorLogFile); err == nil {
-			data, err := ioutil.ReadFile(errorLogFile)
+			data, err := os.ReadFile(errorLogFile)
 			if err != nil {
 				return fmt.Errorf("error reading file %v: %v", errorLogFile, err)
 			}
