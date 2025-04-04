@@ -61,6 +61,6 @@ validate-yaml: yamllint $(KUBE_BENCH)
 	@PATH=$(PATH):$(TOOLS_BIN) \
 	./hack/validate-yaml
 
-validate-go: $(GOIMPORTS) $(GOLINT)
-	@PATH=$(PATH):$(TOOLS_BIN) \
-	./hack/validate-go
+validate-go: $(GOLANGCI)
+	$(GOLANGCI) version
+	$(GOLANGCI) run --timeout=2m
