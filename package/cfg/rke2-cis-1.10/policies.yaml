@@ -439,6 +439,7 @@ groups:
       - id: 5.2.9
         text: "Minimize the admission of containers with added capabilities (Manual)"
         audit: |
+          whitelist="rke2-ingress-nginx-controller coredns"
           kubectl get pods --all-namespaces -o custom-columns=POD_NAME:.metadata.name,POD_NAMESPACE:.metadata.namespace --no-headers | while read -r pod_name pod_namespace
           do
             # Retrieve container(s) for each Pod.
@@ -450,17 +451,22 @@ groups:
               container_caps_add=$(echo ${container} | jq -r '.securityContext.capabilities.add' | sed -e 's/null/notset/g')
               # Set is_compliant to true by default.
               is_compliant=true
+              is_whitelist=false
               caps_list=""
               if [ "${container_caps_add}" != "notset" ]; then
                 # Loop through all caps and append caps_list, then set is_compliant to false.
                 for cap in $(echo "${container_caps_add}" | jq -r '.[]'); do
-                caps_list+="${cap},"
-                is_compliant=false
+                  caps_list="${caps_list}${cap},"
+                  is_compliant=false
                 done
                 # Remove trailing comma for the last list member.
                 caps_list=${caps_list%,}
               fi
-              if [ "${is_compliant}" = true ]; then
+              # Remove newline from container_caps_add for final output.
+              container_caps_add=$(echo "${container_caps_add}" | tr -d '\n')
+              if [ "${pod_namespace}" = "kube-system" ] && echo "${whitelist}" | grep -q "${container_name}"; then
+                echo "***pod_name: ${pod_name} container_name: ${container_name} pod_namespace: ${pod_namespace} container_caps_add: ${container_caps_add} is_whitelist: true is_compliant: true"
+              elif [ "${is_compliant}" = true ]; then
                 echo "***pod_name: ${pod_name} container_name: ${container_name} pod_namespace: ${pod_namespace} container_caps_add: ${container_caps_add} is_compliant: true"
               else
                 echo "***pod_name: ${pod_name} container_name: ${container_name} pod_namespace: ${pod_namespace} container_caps_add: ${caps_list} is_compliant: false"
@@ -477,6 +483,8 @@ groups:
         remediation: |
           Ensure that `allowedCapabilities` is not present in policies for the cluster unless
           it is set to an empty array.
+          RKE2 gives exceptions to the following pods in the kube-system namespace, which are required for regular operations:
+          - rke2-ingress-ngninx-controller, coredns
           Audit: the audit retrieves each Pod's container(s) added capabilities.
           Condition: is_compliant is false if added capabilities are added for a given container.
           Default: Containers run with a default set of capabilities as assigned by the Container Runtime.
