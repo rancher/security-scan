@@ -342,11 +342,25 @@ groups:
       - id: 5.2.5
         text: "Minimize the admission of containers wishing to share the host network namespace (Manual)"
         audit: |
+          whitelist="cloud-controller-manager etcd rke2-canal rke2-coredns kube-apiserver kube-scheduler kube-proxy kube-controller-manager"
+          is_in_whitelist() {
+            for entry in $whitelist; do
+              case "${pod_name}" in
+                *"${entry}"*)
+                  return 0
+                  ;;
+              esac
+            done
+            return 1
+          }
           kubectl get pods --all-namespaces -o custom-columns=POD_NAME:.metadata.name,POD_NAMESPACE:.metadata.namespace --no-headers | while read -r pod_name pod_namespace
           do
             # Retrieve spec.hostNetwork for each pod.
             pod_hostnetwork=$(kubectl get pod "${pod_name}" --namespace "${pod_namespace}" -o jsonpath='{.spec.hostNetwork}' 2>/dev/null)
-            if [ -z "${pod_hostnetwork}" ]; then
+            echo "${whitelist}" | grep -q "${pod_name}"
+            if [ "${pod_namespace}" = 'kube-system' ] && is_in_whitelist; then
+              echo "***pod_name: ${pod_name} pod_namespace: ${pod_namespace} is_pod_hostnetwork: ${pod_hostnetwork} is_whitelist: true is_compliant: true"
+            elif [ -z "${pod_hostnetwork}" ]; then
               pod_hostnetwork="false"
               echo "***pod_name: ${pod_name} pod_namespace: ${pod_namespace} is_pod_hostnetwork: ${pod_hostnetwork} is_compliant: true"
             else
@@ -363,6 +377,9 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of `hostNetwork` containers.
+          RKE2 gives exceptions to the following pods in the kube-system namespace, which are required for regular operations:
+          - cloud-controller-manager, etcd, rke2-canal, rke2-coredns, kube-apiserver,
+          - kube-scheduler, kube-proxy, kube-controller-manager
           Audit: the audit retrieves each Pod' spec.hostNetwork.
           Condition: is_compliant is false if Pod's spec.hostNetwork is set to `true`.
           Default: by default, there are no restrictions on the creation of hostNetwork containers.
