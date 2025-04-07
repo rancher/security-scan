@@ -435,13 +435,14 @@ groups:
               elif [ "${container_caps_add}" != "notset" ]; then
                 # Loop through all caps and append caps_list, then set is_compliant to false.
                 for cap in $(echo "${container_caps_add}" | jq -r '.[]'); do
-                  caps_list+="${cap},"
+                  caps_list="${caps_list}${cap},"
                   is_compliant=false
                 done
                 # Remove trailing comma for the last list member.
                 caps_list=${caps_list%,}
               fi
-
+              # Remove newlines from final output.
+              continaer_caps_add=$(echo "${container_caps_add}" | tr -d '\n')
               if [ "${is_whitelist}" = true ]; then
                 printf "***pod_name: %-30s container_name: %-30s pod_namespace: %-20s is_whitelist: %-5s is_compliant: true\n" "${pod_name}" "${container_name}" "${pod_namespace}" "${is_whitelist}"
               elif [ "${is_compliant}" = true ]; then
