@@ -244,6 +244,7 @@ groups:
       - id: 5.2.2
         text: "Minimize the admission of privileged containers (Manual)"
         audit: |
+          whitelist="kube-flannel calico-node kube-proxy"
           kubectl get pods --all-namespaces -o custom-columns=POD_NAME:.metadata.name,POD_NAMESPACE:.metadata.namespace --no-headers | while read -r pod_name pod_namespace
           do
             # Retrieve container(s) for each Pod.
@@ -253,7 +254,10 @@ groups:
               container_name=$(echo ${container} | jq -r '.name')
               # Retrieve container's .securityContext.privileged value.
               container_privileged=$(echo ${container} | jq -r '.securityContext.privileged' | sed -e 's/null/notset/g')
-              if [ "${container_privileged}" = "false" ] || [ "${container_privileged}" = "notset" ] ; then
+              # Check if container name is in whitelist.
+              if echo "${whitelist}" | grep -q "${container_name}"; then
+                echo "***pod_name: ${pod_name} container_name: ${container_name} pod_namespace: ${pod_namespace} is_container_privileged: ${container_privileged} is_whitelist: true is_compliant: true"
+              elif [ "${container_privileged}" = "false" ] || [ "${container_privileged}" = "notset" ] ; then
                 echo "***pod_name: ${pod_name} container_name: ${container_name} pod_namespace: ${pod_namespace} is_container_privileged: ${container_privileged} is_compliant: true"
               else
                 echo "***pod_name: ${pod_name} container_name: ${container_name} pod_namespace: ${pod_namespace} is_container_privileged: ${container_privileged} is_compliant: false"
@@ -270,6 +274,8 @@ groups:
         remediation: |
           Add policies to each namespace in the cluster which has user workloads to restrict the
           admission of privileged containers.
+          RKE2 gives exceptions to the following pods, which are required for regular operations:
+          - kube-flannel, calico-node, kube-proxy
           Audit: the audit list all pods' containers to retrieve their .securityContext.privileged value.
           Condition: is_compliant is false if container's `.securityContext.privileged` is set to `true`.
           Default: by default, there are no restrictions on the creation of privileged containers.
