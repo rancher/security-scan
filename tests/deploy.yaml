@@ -262,6 +262,8 @@ spec:
           value: rcscan-rancher-compliance
         - name: OUTPUT_CONFIGMAPNAME
           value: rcscan-output-for-scan-vk6d4
+        - name: VERBOSE
+          value: "true"
       image: $IMAGE
       imagePullPolicy: Never
       command: ["bash"]
