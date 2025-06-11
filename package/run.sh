@@ -3,7 +3,7 @@
 set -x
 set -eE
 
-defaultCMName=cis-$(date +"%Y-%m-%d-%H-%M-%S-%N")
+defaultCMName=rc-$(date +"%Y-%m-%d-%H-%M-%S-%N")
 OUTPUT_CONFIGMAPNAME=${OUTPUT_CONFIGMAPNAME:-${defaultCMName}}
 
 SONOBUOY_NS=${SONOBUOY_NS:-sonobuoy}
@@ -48,7 +48,7 @@ handle_error() {
 
 trap 'handle_error' ERR
 
-echo "Rancher: Running CIS Benchmarks"
+echo "Rancher: Running Compliance Checks"
 
 # Clean up the output directory, just in case
 rm -rf "${SONOBUOY_OUTPUT_DIR}"/*.tar.gz

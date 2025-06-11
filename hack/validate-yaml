@@ -5,7 +5,7 @@ function main(){
     ## validation: Benchmarks (cfgs) with yamllint and kube-bench (dry-run) 
     echo "Running: yamllint against security-scan cfgs"
 
-    # CFGS lists all benchmark directories such as cis-1.7
+    # CFGS lists all benchmark directories
     CFGS="$(find package/cfg/ -mindepth 1 -type d -printf "%f\n")"
 
     FAILED_CFGS_YML=()
