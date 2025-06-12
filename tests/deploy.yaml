@@ -197,7 +197,7 @@ data:
       - name: CHROOT_DIR
         value: /node
       - name: OVERRIDE_BENCHMARK_VERSION
-        value: cis-1.23
+        value: test-1
       imagePullPolicy: Always
       securityContext:
         privileged: true
@@ -236,7 +236,7 @@ metadata:
   labels:
     app.kubernetes.io/instance: security-scan-runner-scan-6fjs5
     app.kubernetes.io/name: rancher-compliance
-    rc.cattle.io/clusterscanprofile: cis-1.23-profile
+    rc.cattle.io/clusterscanprofile: test-profile
     rc.cattle.io/controller: compliance-operator
     rc.cattle.io/scan: scan-6fjs5
     controller-uid: d1c0f186-f321-481f-8cdb-8c052e5cd738
@@ -250,7 +250,7 @@ spec:
   containers:
     - env:
         - name: OVERRIDE_BENCHMARK_VERSION
-          value: rke2-cis-1.23-hardened
+          value: test-1
         - name: SONOBUOY_NS
           value: rancher-compliance-system
         - name: SONOBUOY_POD_NAME
