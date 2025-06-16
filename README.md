@@ -1,12 +1,12 @@
 security-scan
 ========
-NOTE: This repo is currently being merged with the [cis-operator](https://github.com/rancher/cis-operator) repo to track security scanned and CIS related issues. Please submit any new inquiries in the [cis-operator](https://github.com/rancher/cis-operator) repo.
-For the current branch strategy related to the `security-scan`, please refer to  [Branches and Releases](https://github.com/rancher/cis-operator?tab=readme-ov-file#branches-and-releases)
+Please submit any new inquiries in the [compliance-operator](https://github.com/rancher/compliance-operator) repo.
+For the current branch strategy related to the `security-scan`, please refer to  [Branches and Releases](https://github.com/rancher/compliance-operator?tab=readme-ov-file#branches-and-releases)
 
-This repo has all the stuff needed for running CIS scan on RKE clusters.
+This repo has all the stuff needed for running compliance scans in Rancher Manager.
 
 Multi-purpose repo:
-- Packaging for all the components needed for CIS scan (sonobuoy, kube-bench)
+- Packaging for all the components needed for compliance scans (sonobuoy, kube-bench)
 - kube-bench-summarizer
 - plugin script for sonobuoy tool (a different script is passed using command)
 
@@ -23,7 +23,7 @@ Push docker tag
 
 `docker push <DOCKER_HUB_USER>/security-scan:dev`
 
-On Rancher install CIS Benchmark app, changing the Values YAML to point to your image
+On Rancher install the Compliance app, changing the Values YAML to point to your image
 ```
 image:
 ...
@@ -34,7 +34,7 @@ image:
 
 
 ## License
-Copyright (c) 2019 [Rancher Labs, Inc.](http://rancher.com)
+Copyright (c) 2025 SUSE LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

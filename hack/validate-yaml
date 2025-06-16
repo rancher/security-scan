@@ -5,7 +5,7 @@ function main(){
     ## validation: Benchmarks (cfgs) with yamllint and kube-bench (dry-run) 
     echo "Running: yamllint against security-scan cfgs"
 
-    # CFGS lists all benchmark directories such as cis-1.7
+    # CFGS lists all benchmark directories
     CFGS="$(find package/cfg/ -mindepth 1 -type d -printf "%f\n")"
 
     FAILED_CFGS_YML=()
@@ -30,16 +30,9 @@ function main(){
                 id=$(echo $check | yq '.id')
                 text=$(echo $check | yq '.text')
                 scored=$(echo $check | yq '.scored')
-                type=$(echo $text | sed -n 's/.*(\(.*\)).*/\1/p')
                 # check if type is present and spelled correctly.
-                if [[ "$type" == "Automated" || "$type" == "Manual" ]]; then
-                        # check if type is Automated with scored to true or type is Manual with scored to false.
-                        if [[ "$type" == "Automated" && "$scored" != "true" ]] || [[ "$type" == "Manual" && "$scored" != "false" ]] ; then
-                            echo "Error mismatch found in $id: $text - 'type' is $type but 'scored' is $scored."
-                            FAILED_CHECKS_TYPE+=("$cfg:$id")
-                        fi
-                else
-                    echo "Error in $id: $text - type is misspelled or not recognized. Make sure to set title type to Manual/Automated."
+                if [[ "$scored" != "true" && "$scored" != "false" ]]; then
+                    echo "Error in $id: $text - scored must be set to either true or false. Actual value: $scored."
                     FAILED_CHECKS_TYPE+=("$cfg:$id")
                 fi
             done
