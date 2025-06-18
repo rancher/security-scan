@@ -1,11 +1,9 @@
 module github.com/rancher/security-scan
 
-go 1.24.2
-
-toolchain go1.24.4
+go 1.24.4
 
 require (
-	github.com/aquasecurity/kube-bench v0.10.7
+	github.com/aquasecurity/kube-bench v0.11.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
@@ -14,8 +12,8 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.36.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/securityhub v1.57.4 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.36.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/securityhub v1.57.5 // indirect
 	github.com/aws/smithy-go v1.22.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
