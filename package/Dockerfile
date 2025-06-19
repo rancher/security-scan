@@ -3,7 +3,7 @@ FROM registry.suse.com/bci/bci-micro:15.6 AS final
 FROM registry.suse.com/bci/golang:1.24 AS golang
 
 # Builder and xx only need to support the host architecture.
-FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.5.0 AS xx
+FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.6.1 AS xx
 FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.24 AS builder
 
 # Bring xx supporting tools to the builder layer, but as it is at / it
