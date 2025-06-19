@@ -6,7 +6,7 @@ import (
 
 	"github.com/rancher/security-scan/pkg/kb-summarizer/summarizer"
 	"github.com/sirupsen/logrus"
-	cli "github.com/urfave/cli/v2"
+	cli "github.com/urfave/cli/v3"
 )
 
 const (
