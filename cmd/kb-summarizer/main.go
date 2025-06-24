@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	"github.com/rancher/security-scan/pkg/kb-summarizer/summarizer"
 	"github.com/sirupsen/logrus"
-	cli "github.com/urfave/cli/v2"
+	cli "github.com/urfave/cli/v3"
 )
 
 const (
@@ -32,61 +33,62 @@ var (
 func main() {
 	logrus.SetLevel(logrus.DebugLevel)
 
-	app := cli.NewApp()
-	app.Name = "kb-summarizer"
-	app.Version = VERSION
-	app.Flags = []cli.Flag{
-		&cli.StringFlag{
-			Name:  K8SVersionFlag,
-			Value: "",
+	app := &cli.Command{
+		Name:    "kb-summarizer",
+		Version: VERSION,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  K8SVersionFlag,
+				Value: "",
+			},
+			&cli.StringFlag{
+				Name:  BenchmarkVersionFlag,
+				Value: "",
+			},
+			&cli.StringFlag{
+				Name:  ControlsDirFlag,
+				Value: summarizer.DefaultControlsDirectory,
+			},
+			&cli.StringFlag{
+				Name:  InputDirFlag,
+				Value: "",
+			},
+			&cli.StringFlag{
+				Name:  OutputDirFlag,
+				Value: "",
+			},
+			&cli.StringFlag{
+				Name:  OutputFileNameFlag,
+				Value: summarizer.DefaultOutputFileName,
+			},
+			&cli.StringFlag{
+				Name:    UserSkipConfigFileFlag,
+				Sources: cli.EnvVars(UserSkipConfigFileEnvVar),
+				Value:   "",
+			},
+			&cli.StringFlag{
+				Name:    DefaultSkipConfigFileFlag,
+				Sources: cli.EnvVars(DefaultSkipConfigFileEnvVar),
+				Value:   "",
+			},
+			&cli.StringFlag{
+				Name:    NotApplicableConfigFileFlag,
+				Sources: cli.EnvVars(NotApplicableConfigFileEnvVar),
+				Value:   "",
+			},
+			&cli.BoolFlag{
+				Name: FailuresOnlyFlag,
+			},
 		},
-		&cli.StringFlag{
-			Name:  BenchmarkVersionFlag,
-			Value: "",
-		},
-		&cli.StringFlag{
-			Name:  ControlsDirFlag,
-			Value: summarizer.DefaultControlsDirectory,
-		},
-		&cli.StringFlag{
-			Name:  InputDirFlag,
-			Value: "",
-		},
-		&cli.StringFlag{
-			Name:  OutputDirFlag,
-			Value: "",
-		},
-		&cli.StringFlag{
-			Name:  OutputFileNameFlag,
-			Value: summarizer.DefaultOutputFileName,
-		},
-		&cli.StringFlag{
-			Name:    UserSkipConfigFileFlag,
-			EnvVars: []string{UserSkipConfigFileEnvVar},
-			Value:   "",
-		},
-		&cli.StringFlag{
-			Name:    DefaultSkipConfigFileFlag,
-			EnvVars: []string{DefaultSkipConfigFileEnvVar},
-			Value:   "",
-		},
-		&cli.StringFlag{
-			Name:    NotApplicableConfigFileFlag,
-			EnvVars: []string{NotApplicableConfigFileEnvVar},
-			Value:   "",
-		},
-		&cli.BoolFlag{
-			Name: FailuresOnlyFlag,
-		},
+		Action: run,
 	}
-	app.Action = run
 
-	if err := app.Run(os.Args); err != nil {
+	if err := app.Run(context.TODO(), os.Args); err != nil {
 		logrus.Fatal(err)
 	}
 }
 
-func run(c *cli.Context) error {
+func run(ctx context.Context, c *cli.Command) error {
 	logrus.Info("Running Summarizer")
 	k8sversion := c.String(K8SVersionFlag)
 	benchmarkVersion := c.String(BenchmarkVersionFlag)
