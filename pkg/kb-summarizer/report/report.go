@@ -3,11 +3,11 @@ package report
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os/exec"
 	"sort"
 
 	"github.com/rancher/security-scan/pkg/kb-summarizer/summarizer"
-	"github.com/sirupsen/logrus"
 )
 
 type NodeType string
@@ -173,15 +173,18 @@ func GetJSONBytes(data []byte) ([]byte, error) {
 	internalReport := &summarizer.SummarizedReport{}
 	err := json.Unmarshal(data, &internalReport)
 	if err != nil {
-		return nil, fmt.Errorf("error unmarshalling data into internal report: %v", err)
+		return nil, fmt.Errorf("error unmarshalling data into internal report: %w", err)
 	}
-	logrus.Debugf("internalReport: %+v", internalReport)
+	slog.Debug("internal report", "data", internalReport)
 	report, err := mapReport(internalReport)
-	logrus.Debugf("report: %v", report)
+	if err != nil {
+		return nil, fmt.Errorf("error mapping report: %w", err)
+	}
 
+	slog.Debug("mapped report", "data", report)
 	extData, err := json.Marshal(report)
 	if err != nil {
-		return nil, fmt.Errorf("error marshalling internal report struct: %v", err)
+		return nil, fmt.Errorf("error marshalling internal report struct: %w", err)
 	}
 
 	return extData, nil
@@ -191,7 +194,7 @@ func Get(data []byte) (*Report, error) {
 	internalReport := &summarizer.SummarizedReport{}
 	err := json.Unmarshal(data, &internalReport)
 	if err != nil {
-		return nil, fmt.Errorf("error unmarshalling data into internal report: %v", err)
+		return nil, fmt.Errorf("error unmarshalling data into internal report: %w", err)
 	}
 	return mapReport(internalReport)
 }

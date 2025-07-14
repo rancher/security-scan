@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/rancher/security-scan/pkg/kb-summarizer/summarizer"
-	"github.com/sirupsen/logrus"
 	cli "github.com/urfave/cli/v3"
 )
 
@@ -31,7 +31,7 @@ var (
 )
 
 func main() {
-	logrus.SetLevel(logrus.DebugLevel)
+	slog.SetLogLoggerLevel(slog.LevelDebug)
 
 	app := &cli.Command{
 		Name:    "kb-summarizer",
@@ -84,12 +84,15 @@ func main() {
 	}
 
 	if err := app.Run(context.TODO(), os.Args); err != nil {
-		logrus.Fatal(err)
+		slog.Error("fatal error running application",
+			slog.String("error", err.Error()),
+		)
+		os.Exit(1)
 	}
 }
 
 func run(ctx context.Context, c *cli.Command) error {
-	logrus.Info("Running Summarizer")
+	slog.Info("Running Summarizer")
 	k8sversion := c.String(K8SVersionFlag)
 	benchmarkVersion := c.String(BenchmarkVersionFlag)
 	controlsDir := c.String(ControlsDirFlag)
@@ -128,10 +131,10 @@ func run(ctx context.Context, c *cli.Command) error {
 		failuresOnly,
 	)
 	if err != nil {
-		return fmt.Errorf("error creating summarizer: %v", err)
+		return fmt.Errorf("error creating summarizer: %w", err)
 	}
 	if err := s.Summarize(); err != nil {
-		return fmt.Errorf("error summarizing: %v", err)
+		return fmt.Errorf("error summarizing: %w", err)
 	}
 	return nil
 }
