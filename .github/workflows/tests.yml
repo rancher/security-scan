@@ -41,6 +41,10 @@ jobs:
         go-version: 'stable'
   
     - run: make test
+    - name: Verify licenses
+      run: |
+        go install github.com/google/go-licenses@latest
+        go-licenses check ./... --allowed_licenses=Apache-2.0,MIT,BSD-3-Clause
 
   e2e:
     strategy:
