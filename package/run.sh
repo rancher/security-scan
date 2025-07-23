@@ -3,7 +3,7 @@
 set -x
 set -eE
 
-defaultCMName=rc-$(date +"%Y-%m-%d-%H-%M-%S-%N")
+defaultCMName=cis-$(date +"%Y-%m-%d-%H-%M-%S-%N")
 OUTPUT_CONFIGMAPNAME=${OUTPUT_CONFIGMAPNAME:-${defaultCMName}}
 
 SONOBUOY_NS=${SONOBUOY_NS:-sonobuoy}
@@ -48,7 +48,7 @@ handle_error() {
 
 trap 'handle_error' ERR
 
-echo "Rancher: Running Compliance Checks"
+echo "Rancher: Running CIS Benchmarks"
 
 # Clean up the output directory, just in case
 rm -rf "${SONOBUOY_OUTPUT_DIR}"/*.tar.gz
@@ -137,9 +137,6 @@ if [[ "${OVERRIDE_BENCHMARK_VERSION}" != "" ]]; then
         --output-filename "${KBS_OUTPUT_FILENAME}" 2> "${ERROR_LOG_FILE}"
   then
     echo "error running kb-summarizer using override benchmark version" | tee -a "${ERROR_LOG_FILE}"
-    if [[ "${VERBOSE}" == "true" ]]; then
-      cat "${ERROR_LOG_FILE}"
-    fi
     exit 1
   fi
 else
@@ -150,9 +147,6 @@ else
         --output-filename "${KBS_OUTPUT_FILENAME}" 2> "${ERROR_LOG_FILE}"
   then
     echo "error running kb-summarizer" | tee -a "${ERROR_LOG_FILE}"
-    if [[ "${VERBOSE}" == "true" ]]; then
-      cat "${ERROR_LOG_FILE}"
-    fi
     exit 1
   fi
 fi
@@ -163,9 +157,6 @@ if ! kubectl -n "${SONOBUOY_NS}" \
   --from-file "${KBS_OUTPUT_DIR}"/${KBS_OUTPUT_FILENAME} 2> ${ERROR_LOG_FILE}
 then
   echo "error creating configmap for storing the report" | tee -a ${ERROR_LOG_FILE}
-  if [[ "${VERBOSE}" == "true" ]]; then
-    cat "${ERROR_LOG_FILE}"
-  fi
   exit 1
 fi
 
@@ -179,9 +170,6 @@ if ! kubectl -n "${SONOBUOY_NS}" \
   ${DONE_ANNOTATION_KEY}=${DONE_ANNOTATION_VALUE} 2> ${ERROR_LOG_FILE}
 then
   echo "error annotating self pod" | tee -a ${ERROR_LOG_FILE}
-  if [[ "${VERBOSE}" == "true" ]]; then
-    cat "${ERROR_LOG_FILE}"
-  fi
   exit 1
 fi
 

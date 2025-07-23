@@ -47,9 +47,8 @@ COPY --from=golang /etc/products.d/ /etc/products.d/
 COPY --from=golang /etc/zypp/ /chroot/etc/zypp/
 
 # OS binaries to run kube-bench audit commands.
-# Before removing dependencies here, ensure they are not needed by
-# the compliance-operator, security-scan or any of the existing kube-bench
-# tests.
+# Before removing dependencies here, ensure they are not needed by cis-operator,
+# security-scan or any of the existing kube-bench tests.
 RUN zypper --non-interactive --releasever=15.6 refresh && \
     zypper --installroot /chroot -n in --no-recommends findutils tar jq gawk diffutils procps systemd gzip curl && \
     zypper --installroot /chroot clean -a && \
@@ -80,6 +79,11 @@ ENV KUBE_BENCH_SUM="KUBE_BENCH_SUM_${TARGETARCH}"
 RUN curl --output /tmp/kubebench.tar.gz -sLf "https://github.com/aquasecurity/kube-bench/releases/download/${KUBE_BENCH_VERSION}/kube-bench_${KUBE_BENCH_VERSION#v}_linux_${TARGETARCH}.tar.gz" && \
     echo "${!KUBE_BENCH_SUM}  /tmp/kubebench.tar.gz" | sha256sum -c - && \
     tar -xvzf /tmp/kubebench.tar.gz -C /chroot/usr/bin
+
+# Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
+RUN mkdir -p /chroot/etc/kube-bench/ && \
+    curl --output - -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/${KUBE_BENCH_VERSION}.tar.gz" | \
+    tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${KUBE_BENCH_VERSION#v}/cfg"
 
 WORKDIR /src
 COPY go.sum \

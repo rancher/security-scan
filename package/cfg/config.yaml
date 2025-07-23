@@ -209,14 +209,252 @@ policies:
 managedservices:
   components: []
 
-# Version mapping: Maps k8s versions to a profile.
+# Version mapping: Maps k8s versions to a CIS version/profile.
 version_mapping:
-  "1.31": "test-1"
+  "1.23": "cis-1.23"
+  "1.24": "cis-1.24"
+  "1.25": "cis-1.7"
+  "1.26": "cis-1.8"
+  "1.27": "cis-1.9"
+  "1.28": "cis-1.9"
+  "1.29": "cis-1.9"
+  "eks-1.2.0":
+    - "eks-1.2.0"
+  "eks-1.5.0":
+    - "eks-1.5.0"
+  "gke-1.2.0":
+    - "gke-1.2.0"
+  "gke-1.6.0":
+    - "gke-1.6.0"
+  "aks-1.0":
+    - "aks-1.0"
+  "v1.24.17+k3s1": "k3s-cis-1.24-hardened"
+  "v1.25.16+k3s4": "k3s-cis-1.7-hardened"
+  "v1.26.15+k3s1": "k3s-cis-1.8-hardened"
+  "v1.27.16+k3s1": "k3s-cis-1.9"
+  "v1.28.15+k3s1": "k3s-cis-1.10"
 
-# Target mapping: Defines which components (eg. master, node, etcd) should be evaluated for a given profile.
+# Target mapping: Defines which components (eg. master, node, etcd) should be evaluated for a given CIS profile.
 target_mapping:
-  "test-1":
+  # EKS
+  "eks-1.2.0":
+    - "node"
+  "eks-1.5.0":
+    - "node"
+  # GKE
+  "gke-1.2.0":
+    - "node"
+  "gke-1.6.0":
+    - "node"
+  # AKS
+  "aks-1.0":
+    - "node"
+
+  # CIS - Generic profiles
+  "cis-1.23":
     - "master"
     - "node"
     - "controlplane"
     - "etcd"
+    - "policies"
+  "cis-1.24":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "cis-1.7":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "cis-1.8":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "cis-1.9":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+
+  # RKE1
+  # rke1: Generic
+  # rke1: Permissive
+  "rke-cis-1.23-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke-cis-1.24-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke-cis-1.7-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke-cis-1.8-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  # rke1 : Hardened
+  "rke-cis-1.23-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke-cis-1.24-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke-cis-1.7-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke-cis-1.8-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+
+  # RKE2
+  # rke2: Generic
+  # rke2: Permissive
+  "rke2-cis-1.23-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.24-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.7-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.8-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  # rke2: Hardened
+  "rke2-cis-1.23-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.24-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.7-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.8-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "rke2-cis-1.9":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+
+  # K3S
+  # k3s: Generic
+  # k3s: Permissive
+  "k3s-cis-1.23-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.24-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.7-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.8-permissive":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  # k3s: Hardened
+  "k3s-cis-1.23-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.24-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.7-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.8-hardened":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.9":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.10":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"

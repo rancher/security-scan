@@ -53,7 +53,6 @@ push-image: buildx-machine ## build the container image targeting all platforms 
 e2e: $(KIND) build-image ## run E2E tests.
 	@KUBERNETES_VERSION=$(KUBERNETES_VERSION) IMAGE=$(IMAGE) \
 	SONOBUOY_IMAGE=$(SONOBUOY_IMAGE) ARCH=$(ARCH) \
-	PATH=$(PATH):$(TOOLS_BIN) \
 	./hack/e2e
 
 validate: validate-go validate-yaml ## run validation checks.

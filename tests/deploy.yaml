@@ -1,20 +1,20 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: rancher-compliance-system
+  name: cis-operator-system
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: rc-serviceaccount
-  namespace: rancher-compliance-system
+  name: cis-serviceaccount
+  namespace: cis-operator-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-    app.kubernetes.io/name: rancher-compliance
-  name: rc-scan
+    app.kubernetes.io/name: rancher-cis-benchmark
+  name: cis-scan-ns
 rules:
 - apiGroups:
   - '*'
@@ -34,7 +34,7 @@ rules:
   - get
   - list
   - watch
-# Permissions from here onwards are not part of the original rc-scan
+# Permissions from here onwards are not part of the original cis-scan-ns
 # and were given to ensure the test can work.
 - apiGroups:
   - ""
@@ -64,30 +64,30 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: rc-scan
+  name: cis-scan-ns
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: rc-scan
+  name: cis-scan-ns
 subjects:
 - kind: ServiceAccount
-  name: rc-serviceaccount
-  namespace: rancher-compliance-system
+  name: cis-serviceaccount
+  namespace: cis-operator-system
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: rc-s-config-cm-scan-vk6d4
-  namespace: rancher-compliance-system
+  name: cis-s-config-cm-scan-vk6d4
+  namespace: cis-operator-system
 data:
   config.json: |
     {
-        "Description": "kube-bench plugin for Rancher Compliance",
+        "Description": "kube-bench plugin for CIS benchmarks",
         "Filters": {
             "LabelSelector": "",
             "Namespaces": "[^\\w-.]+"
         },
-        "PluginNamespace": "rancher-compliance-system",
+        "PluginNamespace": "cis-operator-system",
         "Plugins": [
             {
                 "name": "rancher-kube-bench"
@@ -99,12 +99,12 @@ data:
         "Resources": [],
         "ResultsDir": "/tmp/sonobuoy",
         "Server": {
-            "advertiseaddress": "service-rancher-compliance",
+            "advertiseaddress": "service-rancher-cis-benchmark",
             "bindaddress": "0.0.0.0",
             "bindport": 443,
             "timeoutseconds": 5400
         },
-        "Namespace": "rancher-compliance-system",
+        "Namespace": "cis-operator-system",
         "WorkerImage": "${SONOBUOY_IMAGE}",
         "Version": "v0.56.7"
     }
@@ -112,8 +112,8 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: service-rancher-compliance
-  namespace: rancher-compliance-system
+  name: service-rancher-cis-benchmark
+  namespace: cis-operator-system
 spec:
   ports:
   - name: http
@@ -127,8 +127,8 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: rc-s-plugins-cm-scan-vk6d4
-  namespace: rancher-compliance-system
+  name: cis-s-plugins-cm-scan-vk6d4
+  namespace: cis-operator-system
 data:
   rancher-kube-bench.yaml: |
     podSpec:
@@ -137,7 +137,7 @@ data:
       hostIPC: true
       hostNetwork: true
       hostPID: true
-      serviceAccountName: rc-serviceaccount
+      serviceAccountName: cis-serviceaccount
       tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/controlplane
@@ -187,7 +187,7 @@ data:
       command: ["/bin/bash", "-c", "run_sonobuoy_plugin.sh && sleep 3600"]
       env:
       - name: SONOBUOY_NS
-        value: rancher-compliance-system
+        value: cis-operator-system
       - name: NODE_NAME
         valueFrom:
           fieldRef:
@@ -197,7 +197,7 @@ data:
       - name: CHROOT_DIR
         value: /node
       - name: OVERRIDE_BENCHMARK_VERSION
-        value: test-1
+        value: cis-1.23
       imagePullPolicy: Always
       securityContext:
         privileged: true
@@ -235,40 +235,38 @@ kind: Pod
 metadata:
   labels:
     app.kubernetes.io/instance: security-scan-runner-scan-6fjs5
-    app.kubernetes.io/name: rancher-compliance
-    rc.cattle.io/clusterscanprofile: test-profile
-    rc.cattle.io/controller: compliance-operator
-    rc.cattle.io/scan: scan-6fjs5
+    app.kubernetes.io/name: rancher-cis-benchmark
+    cis.cattle.io/clusterscanprofile: cis-1.23-profile
+    cis.cattle.io/controller: cis-operator
+    cis.cattle.io/scan: scan-6fjs5
     controller-uid: d1c0f186-f321-481f-8cdb-8c052e5cd738
     job-name: security-scan-runner-scan-6fjs5
     run: sonobuoy-master
   annotations:
     sonobuoy.hept.io/status: "{}"
   name: security-scan-runner-scan-test
-  namespace: rancher-compliance-system
+  namespace: cis-operator-system
 spec:
   containers:
     - env:
         - name: OVERRIDE_BENCHMARK_VERSION
-          value: test-1
+          value: rke2-cis-1.23-hardened
         - name: SONOBUOY_NS
-          value: rancher-compliance-system
+          value: cis-operator-system
         - name: SONOBUOY_POD_NAME
           valueFrom:
             fieldRef:
               apiVersion: v1
               fieldPath: metadata.name
         - name: SONOBUOY_ADVERTISE_IP
-          value: rcscan-rancher-compliance
+          value: cisscan-rancher-cis-benchmark
         - name: OUTPUT_CONFIGMAPNAME
-          value: rcscan-output-for-scan-vk6d4
-        - name: VERBOSE
-          value: "true"
+          value: cisscan-output-for-scan-vk6d4
       image: $IMAGE
       imagePullPolicy: Never
       command: ["bash"]
       args: ["-c", "while true; do echo hello; sleep 10;done"]
-      name: rancher-compliance
+      name: rancher-cis-benchmark
       ports:
         - containerPort: 8080
           protocol: TCP
@@ -305,16 +303,16 @@ spec:
   hostPID: true
   nodeSelector:
     kubernetes.io/os: linux
-  serviceAccount: rc-serviceaccount
-  serviceAccountName: rc-serviceaccount
+  serviceAccount: cis-serviceaccount
+  serviceAccountName: cis-serviceaccount
   volumes:
     - configMap:
         defaultMode: 420
-        name: rc-s-config-cm-scan-vk6d4
+        name: cis-s-config-cm-scan-vk6d4
       name: s-config-volume
     - configMap:
         defaultMode: 420
-        name: rc-s-plugins-cm-scan-vk6d4
+        name: cis-s-plugins-cm-scan-vk6d4
       name: s-plugins-volume
     - emptyDir: {}
       name: output-volume
