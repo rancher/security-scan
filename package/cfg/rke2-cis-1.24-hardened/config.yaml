@@ -1,11 +1,5 @@
-# test-1 is a sample profile that can be used as template.
 ---
-target_mapping:
-  "test-1":
-    - "master"
-    - "node"
-    - "controlplane"
-    - "etcd"
+## Version-specific settings that override the values in cfg/config.yaml
 
 master:
   components:
@@ -13,6 +7,7 @@ master:
     - scheduler
     - controllermanager
     - etcd
+    - policies
 
   apiserver:
     bins:
@@ -37,7 +32,6 @@ master:
       - /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
     kubeconfig:
       - /var/lib/rancher/rke2/server/cred/controller.kubeconfig
-    # yamllint disable-line
     defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/kube-controller-manager.yaml
 
   etcd:
@@ -47,18 +41,27 @@ master:
       - /var/lib/rancher/rke2/server/db/etcd
     defaultconf: /var/lib/rancher/rke2/agent/pod-manifests/etcd.yaml
 
-  node:
-    components:
-      - kubelet
-      - proxy
+etcd:
+  components:
+    - etcd
 
-    kubelet:
-      defaultkubeconfig: /var/lib/rancher/rke2/agent/kubelet.kubeconfig
-      defaultcafile: /var/lib/rancher/rke2/agent/client-ca.crt
+  etcd:
+    bins:
+      - etcd
+    defaultconf: /var/lib/rancher/rke2/server/db/etcd/config
 
-    proxy:
-      defaultkubeconfig: /var/lib/rancher/rke2/agent/kubeproxy.kubeconfig
+node:
+  components:
+    - kubelet
+    - proxy
 
-  policies:
-    components:
-      - policies
+  kubelet:
+    defaultkubeconfig: /var/lib/rancher/rke2/agent/kubelet.kubeconfig
+    defaultcafile: /var/lib/rancher/rke2/agent/client-ca.crt
+
+  proxy:
+    defaultkubeconfig: /var/lib/rancher/rke2/agent/kubeproxy.kubeconfig
+
+policies:
+  components:
+    - policies
