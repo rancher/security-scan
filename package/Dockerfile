@@ -81,6 +81,11 @@ RUN curl --output /tmp/kubebench.tar.gz -sLf "https://github.com/aquasecurity/ku
     echo "${!KUBE_BENCH_SUM}  /tmp/kubebench.tar.gz" | sha256sum -c - && \
     tar -xvzf /tmp/kubebench.tar.gz -C /chroot/usr/bin
 
+# Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
+RUN mkdir -p /chroot/etc/kube-bench/ && \
+    curl --output - -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/${KUBE_BENCH_VERSION}.tar.gz" | \
+    tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${KUBE_BENCH_VERSION#v}/cfg"
+
 WORKDIR /src
 COPY go.sum \
      go.mod \
