@@ -7,13 +7,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"sort"
 
 	kb "github.com/aquasecurity/kube-bench/check"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
 )
@@ -171,11 +171,11 @@ func NewSummarizer(
 		nodeSeen:          map[NodeType]map[string]bool{},
 	}
 	if err := s.loadVersionMapping(); err != nil {
-		return nil, fmt.Errorf("error loading version mapping: %v", err)
+		return nil, fmt.Errorf("error loading version mapping: %w", err)
 	}
 
 	if err := s.loadTargetMapping(); err != nil {
-		return nil, fmt.Errorf("error loading target mapping: %v", err)
+		return nil, fmt.Errorf("error loading target mapping: %w", err)
 	}
 
 	if benchmarkVersion != "" {
@@ -189,24 +189,24 @@ func NewSummarizer(
 
 	userSkip, err := GetUserSkipInfo(s.BenchmarkVersion, userSkipConfigFile)
 	if err != nil {
-		return nil, fmt.Errorf("error getting user skip info: %v", err)
+		return nil, fmt.Errorf("error getting user skip info: %w", err)
 	}
 	s.userSkip = userSkip
 
 	defaultSkip, err := GetChecksMapFromConfigFile(defaultSkipConfigFile)
 	if err != nil {
-		return nil, fmt.Errorf("error getting default skip info: %v", err)
+		return nil, fmt.Errorf("error getting default skip info: %w", err)
 	}
 	s.defaultSkip = defaultSkip
 
 	notApplicable, err := GetChecksMapFromConfigFile(notApplicableConfigFile)
 	if err != nil {
-		return nil, fmt.Errorf("error getting default skip info: %v", err)
+		return nil, fmt.Errorf("error getting default skip info: %w", err)
 	}
 	s.notApplicable = notApplicable
 
 	if err := s.loadControls(); err != nil {
-		return nil, fmt.Errorf("error loading controls: %v", err)
+		return nil, fmt.Errorf("error loading controls: %w", err)
 	}
 	return s, nil
 }
@@ -224,7 +224,7 @@ func GetUserSkipInfo(benchmark, skipConfigFile string) (map[string]bool, error) 
 	}
 	err = json.Unmarshal(data, sc)
 	if err != nil {
-		return skipMap, fmt.Errorf("error unmarshalling skip str: %v", err)
+		return skipMap, fmt.Errorf("error unmarshalling skip str: %w", err)
 	}
 	skipArr, ok := sc.Skip[benchmark]
 	if !ok {
@@ -236,7 +236,7 @@ func GetUserSkipInfo(benchmark, skipConfigFile string) (map[string]bool, error) 
 	for _, v := range skipArr {
 		skipMap[v] = true
 	}
-	logrus.Debugf("skipMap: %+v", skipMap)
+	slog.Debug("skipMap", "data", skipMap)
 	return skipMap, nil
 }
 
@@ -246,7 +246,7 @@ func GetChecksMapFromConfigFile(configFile string) (map[string]string, error) {
 		return checksMap, nil
 	}
 	configFile = filepath.Clean(configFile)
-	logrus.Infof("loading checks from config file: %v", configFile)
+	slog.Info("loading checks from config file", "path", configFile)
 	data, err := os.ReadFile(configFile)
 	if err != nil {
 		return checksMap, fmt.Errorf("error reading file %v: %v", configFile, err)
@@ -274,11 +274,11 @@ func (s *Summarizer) getBenchmarkFor(k8sVersion string) (string, error) {
 func (s *Summarizer) processOneResultFileForHost(results *kb.Controls, hostname string) {
 	for _, group := range results.Groups {
 		for _, check := range group.Checks {
-			logrus.Infof("host:%s id: %s %v", hostname, check.ID, check.State)
-			printCheck(check)
+			slog.Info("process result file for host", "host", hostname, "id", check.ID, "state", check.State)
+			slog.Debug("KB check", "data", check)
 			cw := s.checkWrappersMaps[check.ID]
 			if cw == nil {
-				logrus.Errorf("check %s found in results but not in spec", check.ID)
+				slog.Error("check found in results but not in spec", "checkID", check.ID)
 				continue
 			}
 			if check.Type == CheckTypeSkip {
@@ -322,13 +322,13 @@ func (s *Summarizer) addNode(nodeType NodeType, hostname string) {
 }
 
 func (s *Summarizer) summarizeForHost(hostname string) error {
-	logrus.Debugf("summarizeForHost: %s", hostname)
+	slog.Debug("summarizeForHost", "hostname", hostname)
 
 	hostDir := fmt.Sprintf("%s/%s", s.InputDirectory, hostname)
 
 	resultFilesPaths, err := filepath.Glob(fmt.Sprintf("%s/*.json", hostDir))
 	if err != nil {
-		return fmt.Errorf("error globing files: %v", err)
+		return fmt.Errorf("error globing files: %w", err)
 	}
 
 	nodeTypeMapping := getResultsFileNodeTypeMapping()
@@ -337,11 +337,11 @@ func (s *Summarizer) summarizeForHost(hostname string) error {
 		resultFile := filepath.Base(resultFilePath)
 		nodeType, ok := nodeTypeMapping[resultFile]
 		if !ok {
-			logrus.Errorf("unknown result file found: %s", resultFilePath)
+			slog.Error("unknown result file found", "filePath", resultFilePath)
 			continue
 		}
 		s.addNode(nodeType, hostname)
-		logrus.Debugf("host: %s resultFile: %s", hostname, resultFile)
+		slog.Debug("host summary", "host", hostname, "resultFile", resultFile)
 		// Load one result file
 		// Marshal it into the results
 		contents, err := os.ReadFile(filepath.Clean(resultFilePath))
@@ -351,9 +351,9 @@ func (s *Summarizer) summarizeForHost(hostname string) error {
 
 		results := &kb.OverallControls{}
 		if err := json.Unmarshal(contents, results); err != nil {
-			return fmt.Errorf("error unmarshalling: %v", err)
+			return fmt.Errorf("error unmarshalling: %w", err)
 		}
-		logrus.Debugf("results: %+v", results.Controls[0])
+		slog.Debug("unmarshaled results", "data", results.Controls[0])
 
 		s.processOneResultFileForHost(results.Controls[0], hostname)
 	}
@@ -363,7 +363,7 @@ func (s *Summarizer) summarizeForHost(hostname string) error {
 func (s *Summarizer) save() error {
 	if _, err := os.Stat(s.OutputDirectory); os.IsNotExist(err) {
 		if err2 := os.Mkdir(s.OutputDirectory, 0750); err2 != nil {
-			return fmt.Errorf("error creating output directory: %v", err)
+			return fmt.Errorf("error creating output directory: %w", err)
 		}
 	}
 	outputFilePath := fmt.Sprintf("%s/%s", s.OutputDirectory, s.OutputFilename)
@@ -383,10 +383,10 @@ func (s *Summarizer) save() error {
 
 	err = encoder.Encode(s.fullReport)
 	if err != nil {
-		return fmt.Errorf("error encoding: %v", err)
+		return fmt.Errorf("error encoding: %w", err)
 	}
 
-	logrus.Infof("successfully saved report file: %v", outputFilePath)
+	slog.Info("successfully saved report file", "outputFile", outputFilePath)
 	return nil
 }
 
@@ -395,16 +395,16 @@ func (s *Summarizer) loadVersionMapping() error {
 	v := viper.New()
 	v.SetConfigFile(configFileName)
 	if err := v.ReadInConfig(); err != nil {
-		return fmt.Errorf("error reading in config file: %v", err)
+		return fmt.Errorf("error reading in config file: %w", err)
 	}
 
 	kubeToBenchmarkMap := v.GetStringMapString(VersionMappingKey)
 	if len(kubeToBenchmarkMap) == 0 {
 		return fmt.Errorf("config file is missing '%v' section", VersionMappingKey)
 	}
-	logrus.Debugf("%v: %v", VersionMappingKey, kubeToBenchmarkMap)
+	slog.Debug("version mapping key-values", VersionMappingKey, kubeToBenchmarkMap)
 	s.kubeToBenchmarkMap = kubeToBenchmarkMap
-	logrus.Infof("CONFIG: %+v\n", kubeToBenchmarkMap)
+	slog.Info("Version mapping CONFIG", "map", kubeToBenchmarkMap)
 	return nil
 }
 
@@ -414,7 +414,7 @@ func (s *Summarizer) loadTargetMapping() error {
 	v := viper.New()
 	v.SetConfigFile(configFileName)
 	if err := v.ReadInConfig(); err != nil {
-		return fmt.Errorf("error reading in config file: %v", err)
+		return fmt.Errorf("error reading in config file: %w", err)
 	}
 
 	BenchmarkToConfigMap := v.GetStringMapStringSlice(TargetMappingKey)
@@ -422,9 +422,9 @@ func (s *Summarizer) loadTargetMapping() error {
 		return fmt.Errorf("config file is missing '%v' section", TargetMappingKey)
 	}
 
-	logrus.Debugf("%v: %v", TargetMappingKey, BenchmarkToConfigMap)
+	slog.Debug("Target mapping", TargetMappingKey, BenchmarkToConfigMap)
 	s.BenchmarkToConfigMap = BenchmarkToConfigMap
-	logrus.Infof("CONFIG: %+v\n", BenchmarkToConfigMap)
+	slog.Info("Target mapping CONFIG", "map", BenchmarkToConfigMap)
 	return nil
 }
 
@@ -436,9 +436,9 @@ func (s *Summarizer) loadControlsFromFile(filePath string) (*kb.Controls, error)
 		return nil, fmt.Errorf("error reading file %+v: %v", filePath, err)
 	}
 	if err := yaml.Unmarshal(fileContents, controls); err != nil {
-		return nil, fmt.Errorf("error unmarshalling master controls file: %v", err)
+		return nil, fmt.Errorf("error unmarshalling master controls file: %w", err)
 	}
-	logrus.Debugf("filePath: %v, controls: %+v", filePath, controls)
+	slog.Debug("controls from file", "filePath", filePath, "controls", controls)
 	return controls, nil
 }
 
@@ -491,7 +491,7 @@ func (s *Summarizer) loadControls() error {
 		s.nodeSeen[nodeType] = map[string]bool{}
 		controls, err := s.loadControlsFromFile(controlsFile)
 		if err != nil {
-			logrus.Errorf("error loading controls from file %s: %v", controlsFile, err)
+			slog.Error("error loading controls from file %s: %v", controlsFile, err)
 			continue
 		}
 		for _, g := range controls.Groups {
@@ -529,8 +529,9 @@ func (s *Summarizer) loadControls() error {
 		return groupWrappers[i].ID < groupWrappers[j].ID
 	})
 	s.fullReport.GroupWrappers = groupWrappers
-	logrus.Debugf("total groups loaded: %v", len(s.fullReport.GroupWrappers))
-	logrus.Debugf("total controls loaded: %v", s.fullReport.Total)
+	slog.Debug("summary stats",
+		"groups loaded", len(s.fullReport.GroupWrappers),
+		"controls loaded", s.fullReport.Total)
 	return nil
 }
 
@@ -585,7 +586,7 @@ func (s *Summarizer) getMissingNodesMapOfCheckWrapper(check *CheckWrapper, nodes
 	for n := range nodes {
 		delete(allNodes, n)
 	}
-	logrus.Debugf("ID: %v, missing nodes: %v", check.ID, allNodes)
+	slog.Debug("missing nodes", "ID", check.ID, "nodes", allNodes)
 	var missingNodes []string
 	for k := range allNodes {
 		missingNodes = append(missingNodes, k)
@@ -604,7 +605,7 @@ func (s *Summarizer) runFinalPassOnCheckWrapper(cw *CheckWrapper) {
 	s.copyDataFromResults(cw)
 	nodesMap := s.getNodesMapOfCheckWrapper(cw)
 	nodeCount := len(nodesMap)
-	logrus.Debugf("id: %s nodeCount: %d", cw.ID, nodeCount)
+	slog.Debug("final pass on check wrapper", "id", cw.ID, "nodeCount", nodeCount)
 	if len(cw.Result) == 1 {
 		if _, ok := cw.Result[NA]; ok {
 			cw.State = NotApplicable
@@ -694,16 +695,16 @@ func (s *Summarizer) copyDataFromResults(cw *CheckWrapper) {
 }
 
 func (s *Summarizer) runFinalPass() error {
-	logrus.Debugf("running final pass")
+	slog.Debug("running final pass")
 	s.fullReport.Version = s.BenchmarkVersion
 	groups := s.fullReport.GroupWrappers
 	for _, group := range groups {
 		for _, cw := range group.CheckWrappers {
-			logrus.Debugf("before final pass on check")
-			printCheckWrapper(cw)
+			slog.Debug("before final pass on check")
+			slog.Debug("checkWrapper", "data", cw)
 			s.runFinalPassOnCheckWrapper(cw)
-			logrus.Debugf("after final pass on check")
-			printCheckWrapper(cw)
+			slog.Debug("after final pass on check")
+			slog.Debug("checkWrapper", "data", cw)
 		}
 	}
 
@@ -711,12 +712,12 @@ func (s *Summarizer) runFinalPass() error {
 }
 
 func (s *Summarizer) Summarize() error {
-	logrus.Infof("summarize")
+	slog.Info("summarize")
 
 	// Walk through the host folders
 	hostsDir, err := os.ReadDir(s.InputDirectory)
 	if err != nil {
-		return fmt.Errorf("error listing directory: %v", err)
+		return fmt.Errorf("error listing directory: %w", err)
 	}
 
 	for _, hostDir := range hostsDir {
@@ -724,7 +725,7 @@ func (s *Summarizer) Summarize() error {
 			continue
 		}
 		hostname := hostDir.Name()
-		logrus.Debugf("hostDir: %s", hostname)
+		slog.Debug("hostDir loop", "hostname", hostname)
 
 		// Check for errors before proceeding
 		errorLogFile := fmt.Sprintf("%s/%s/%s", s.InputDirectory, hostname, DefaultErrorLogFileName)
@@ -736,10 +737,10 @@ func (s *Summarizer) Summarize() error {
 			}
 			// error.log file gets created due to redirection, hence check if not empty
 			if len(data) > 0 {
-				logrus.Infof("found error file")
+				slog.Info("found error file")
 				return fmt.Errorf("%v", string(data))
 			}
-			logrus.Infof("found empty error log file: %v for host: %v, ignoring", DefaultErrorLogFileName, hostname)
+			slog.Info("found empty error log file: %v for host: %v, ignoring", DefaultErrorLogFileName, hostname)
 		} else if !os.IsNotExist(err) {
 			return fmt.Errorf("unexpected error finding file %v: %v", errorLogFile, err)
 		}
@@ -749,22 +750,22 @@ func (s *Summarizer) Summarize() error {
 		}
 	}
 
-	logrus.Debugf("--- before final pass")
+	slog.Debug("--- before final pass")
 	_ = s.printReport()
 	if err := s.runFinalPass(); err != nil {
-		return fmt.Errorf("error running final pass on the report: %v", err)
+		return fmt.Errorf("error running final pass on the report: %w", err)
 	}
-	logrus.Debugf("--- after final pass")
+	slog.Debug("--- after final pass")
 	_ = s.printReport()
 	return s.save()
 }
 
 func (s *Summarizer) printReport() error {
-	logrus.Debugf("printing report")
+	slog.Debug("printing report")
 
 	for _, gw := range s.fullReport.GroupWrappers {
 		for _, cw := range gw.CheckWrappers {
-			printCheckWrapper(cw)
+			slog.Debug("checkWrapper", "data", cw)
 		}
 	}
 
@@ -773,16 +774,8 @@ func (s *Summarizer) printReport() error {
 		return fmt.Errorf("error marshalling report: %s", err.Error())
 	}
 
-	logrus.Debugf("json txt: %s", b)
+	slog.Debug("json txt", "data", b)
 	return nil
-}
-
-func printCheck(check *kb.Check) {
-	logrus.Debugf("KB check: %+v", check)
-}
-
-func printCheckWrapper(cw *CheckWrapper) {
-	logrus.Debugf("checkWrapper: %+v", cw)
 }
 
 // handleAvMapData sets ActualValueMapData field for the fullReport and also set ActualValueNodeMap to nil for each CheckWrapper
