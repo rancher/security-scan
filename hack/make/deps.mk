@@ -3,7 +3,7 @@ KIND_VERSION ?= 0.29.0
 KUBERNETES_VERSION ?= v$(KUBECTL_VERSION)
 
 # renovate: datasource=github-release-attachments depName=golangci/golangci-lint
-GOLANGCI_VERSION = v2.3.1
+GOLANGCI_VERSION = v2.4.0
 
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench
 KUBE_BENCH_VERSION ?= v0.11.2
