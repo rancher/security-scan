@@ -1,5 +1,5 @@
 # renovate: datasource=github-release-attachments depName=kubernetes-sigs/kind
-KIND_VERSION ?= 0.29.0
+KIND_VERSION ?= 0.30.0
 KUBERNETES_VERSION ?= v$(KUBECTL_VERSION)
 
 # renovate: datasource=github-release-attachments depName=golangci/golangci-lint
