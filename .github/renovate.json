@@ -1,14 +1,9 @@
 {
   "extends": [
-    "github>rancher/renovate-config#release"
+    "github>rancher/renovate-config//rancher-main#release"
   ],
   "baseBranchPatterns": [
-    "main",
-    "release/v0.3",
-    "release/v0.4",
-    "release/v0.5",
-    "release/v0.6",
-    "release/v0.7"
+    "main"
   ],
   "prHourlyLimit": 4,
   "packageRules": [
@@ -16,11 +11,7 @@
       "description": "Disable non-security bumps for backporting branches",
       "enabled": false,
       "matchBaseBranches": [
-        "release/v0.3",
-        "release/v0.4",
-        "release/v0.5",
-        "release/v0.6",
-        "release/v0.7"
+        "/^release/v.*/"
       ]
     }
   ],
