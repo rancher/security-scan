@@ -10,8 +10,9 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write 
       # write is needed for:
+      # - needed for creating releases
       # - OIDC for cosign's use in ecm-distro-tools/publish-image.
       # - Read vault secrets in rancher-eio/read-vault-secrets.
       id-token: write
@@ -63,3 +64,14 @@ jobs:
           prime-repo: rancher
           prime-username: ${{ env.PRIME_REGISTRY_USERNAME }}
           prime-password: ${{ env.PRIME_REGISTRY_PASSWORD }}
+      - name: Create release
+        if: matrix.tag-suffix == ''   # only run for the main image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required for creating GH release
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }} # specify the tag to be released
+        id: goreleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean --verbose
