@@ -1,10 +1,10 @@
 # Platform specific images which must support all target architectures.
 FROM registry.suse.com/bci/bci-micro:15.6 AS final
-FROM registry.suse.com/bci/golang:1.23 AS golang
+FROM registry.suse.com/bci/golang:1.25 AS golang
 
 # Builder and xx only need to support the host architecture.
 FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.5.0 AS xx
-FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.23 AS builder
+FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.25 AS builder
 
 # Bring xx supporting tools to the builder layer, but as it is at / it
 # won't be copied to the final image.
