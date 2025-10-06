@@ -65,13 +65,7 @@ jobs:
           prime-username: ${{ env.PRIME_REGISTRY_USERNAME }}
           prime-password: ${{ env.PRIME_REGISTRY_PASSWORD }}
       - name: Create release
-        if: matrix.tag-suffix == ''   # only run for the main image
+        run: |
+          gh release create ${{ github.ref_name }} --verify-tag --title "${{ github.ref_name }}" --generate-notes
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required for creating GH release
-          GORELEASER_CURRENT_TAG: ${{ github.ref_name }} # specify the tag to be released
-        id: goreleaser
-        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6
-        with:
-          distribution: goreleaser
-          version: "~> v2"
-          args: release --clean --verbose
+          GH_TOKEN: ${{ github.token }}
