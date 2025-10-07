@@ -431,6 +431,12 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
+  "rke2-cis-1.11":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
 
   # K3S
   # k3s: Generic
@@ -491,6 +497,12 @@ target_mapping:
     - "etcd"
     - "policies"
   "k3s-cis-1.10":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
+  "k3s-cis-1.11":
     - "master"
     - "node"
     - "controlplane"
