@@ -6,7 +6,7 @@ KUBERNETES_VERSION ?= v$(KUBECTL_VERSION)
 GOLANGCI_VERSION = v2.3.0
 
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench
-KUBE_BENCH_VERSION ?= v0.11.1
+KUBE_BENCH_VERSION ?= v0.13.0
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.11.1
 KUBE_BENCH_SUM_arm64 ?= 9e9c50f586349d53f1f84454eb939025ed07a68124195eca3f1e1a7420702d13
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.11.1
