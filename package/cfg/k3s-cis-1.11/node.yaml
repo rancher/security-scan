@@ -212,26 +212,23 @@ groups:
         audit: "journalctl -m -u k3s -u k3s-agent | grep 'Running kubelet' | tail -n1"
         audit_config: "/bin/sh -c 'if test -e $kubeletconf; then /bin/cat $kubeletconf; fi' "
         tests:
-          bin_op: or
           test_items:
             - flag: "--read-only-port"
               path: '{.readOnlyPort}'
               compare:
                 op: eq
                 value: 0
-            - flag: "--read-only-port"
-              path: '{.readOnlyPort}'
-              set: false
         remediation: |
-          By default, K3s sets the --read-only-port to 0. If you have set this to a different value, you
-          should set it back to 0. If using the K3s config file /etc/rancher/k3s/config.yaml, remove any lines similar to below.
-          kubelet-arg:
-            - "read-only-port=XXXX"
-          If using the command line, edit the K3s service file and remove the below argument.
-          --kubelet-arg="read-only-port=XXXX"
-          Based on your system, restart the k3s service. For example,
-          systemctl daemon-reload
-          systemctl restart k3s.service
+          By default, K3s sets the --read-only-port to 0 (which disables the read only kubelet API traditionally served on port 10255, preventing unauthenticated access to potentially sensitive cluster information).
+          If you have changed this value, revert it.
+          Config File (/etc/rancher/k3s/config.yaml): Remove lines similar to:
+           kubelet-arg:
+             - "read-only-port=XXXX"
+          Command Line Argument: Remove the argument from the K3s service file:
+             --kubelet-arg="read-only-port=XXXX"
+          Restart the K3s service after making the modification:
+           systemctl daemon-reload
+           systemctl restart k3s.service
         scored: true
 
       - id: 4.2.5
