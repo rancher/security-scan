@@ -6,7 +6,7 @@ require (
 	github.com/aquasecurity/kube-bench v0.13.0
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
-	github.com/urfave/cli/v3 v3.4.1
+	github.com/urfave/cli/v3 v3.5.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
