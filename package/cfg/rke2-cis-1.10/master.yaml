@@ -516,7 +516,9 @@ groups:
 
       - id: 1.2.11
         text: "Ensure that the admission control plugin AlwaysPullImages is set (Manual)"
-        audit: "/bin/ps -fC $apiserverbin"
+        # RKE2 breaks the compacted enable-admissions-plugins into seperate arguments
+        # so we need to use a specific regex to find the specific AlwaysPullImages entry
+        audit: "/bin/ps -fC $apiserverbin | grep -o -- '--enable-admission-plugins=AlwaysPullImages'"
         tests:
           test_items:
             - flag: "--enable-admission-plugins"
@@ -529,10 +531,10 @@ groups:
           "This setting could impact offline or isolated clusters, which have images pre-loaded and
           do not have access to a registry to pull in-use images. This setting is not appropriate for
           clusters which use this configuration."
-          Edit the RKE2 config file /etc/rancher/rke2/config.yaml
-          on the control plane node and set the --enable-admission-plugins parameter to include
+          Edit the RKE2 config file /etc/rancher/rke2/config.yaml on the control plane node and set the --enable-admission-plugins parameter to include
           AlwaysPullImages.
-          --enable-admission-plugins=...,AlwaysPullImages,...
+          kube-apiserver-arg:
+            "enable-admission-plugins=...,AlwaysPullImages,..."
         scored: false
 
       - id: 1.2.12
