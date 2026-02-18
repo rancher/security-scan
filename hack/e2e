@@ -35,8 +35,16 @@ EOF
   kind load docker-image "${IMAGE}" --name "${CLUSTER_NAME}"
 
   echo "> Pull and load ${SONOBUOY_IMAGE} into kind cluster"
-  docker pull "${SONOBUOY_IMAGE}"
-  kind load docker-image "${SONOBUOY_IMAGE}" --name "${CLUSTER_NAME}"
+  docker pull --platform linux/amd64 "${SONOBUOY_IMAGE}" || true
+  
+  # Pull directly into kind node using crictl instead of 'kind load'.
+  # Background: Docker 29.x introduced stricter multi-platform manifest handling.
+  # When 'kind load' uses 'docker save --all-platforms', it fails on registry images
+  # that reference platforms (arm64, arm/v7) whose layers weren't downloaded.
+  # Solution: Use crictl to pull directly into the kind node's containerd runtime.
+  # This bypasses Docker's manifest handling and uses CRI (Container Runtime Interface),
+  # the same mechanism kubelet uses to pull images.
+  docker exec "${CLUSTER_NAME}-control-plane" crictl pull "${SONOBUOY_IMAGE}"
 
   kind export kubeconfig --name "${CLUSTER_NAME}"
 }
