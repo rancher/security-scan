@@ -17,7 +17,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6
       with:
-        go-version: 'stable'
+        go-version-file: 'go.mod'
     - run: make validate
 
   test:
@@ -38,7 +38,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6
       with:
-        go-version: 'stable'
+        go-version-file: 'go.mod'
   
     - run: make test
     - name: Verify licenses
