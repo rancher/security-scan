@@ -501,3 +501,9 @@ target_mapping:
     - "controlplane"
     - "etcd"
     - "policies"
+  "k3s-cis-1.12":
+    - "master"
+    - "node"
+    - "controlplane"
+    - "etcd"
+    - "policies"
