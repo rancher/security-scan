@@ -1,5 +1,5 @@
-github.com/aquasecurity/kube-bench v0.14.1 h1:Z/NcXfuwIQJ8jJQ5Qy2QXXVuBkJiIekl/oQ/rM56phA=
-github.com/aquasecurity/kube-bench v0.14.1/go.mod h1:Rhb4OXJYLq51jSiEC001GtdsjGY+J65SJINDYhsuckE=
+github.com/aquasecurity/kube-bench v0.15.0 h1:KTP+OAZNbWNdYSjpspBOBeAZKYrGtS27HF85kYaR+PE=
+github.com/aquasecurity/kube-bench v0.15.0/go.mod h1:DeuORjfZuobE94fcG+tl3XLrtdJj3xP+iJAuDObWAf4=
 github.com/aws/aws-sdk-go-v2 v1.41.1 h1:ABlyEARCDLN034NhxlRUSZr4l71mh+T5KAeGh6cerhU=
 github.com/aws/aws-sdk-go-v2 v1.41.1/go.mod h1:MayyLB8y+buD9hZqkCW3kX1AKq07Y5pXxtgB+rRFhz0=
 github.com/aws/aws-sdk-go-v2/service/securityhub v1.67.3 h1:FEs3IkfJWp+Sz3ZY6sAxmebBF0lr1wBcTWkuFW1OFJg=
