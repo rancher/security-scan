@@ -35,7 +35,6 @@ EOF
   kind load docker-image "${IMAGE}" --name "${CLUSTER_NAME}"
 
   echo "> Pull and load ${SONOBUOY_IMAGE} into kind cluster"
-  docker pull --platform linux/amd64 "${SONOBUOY_IMAGE}" || true
 
   # Pull directly into kind node using crictl instead of 'kind load'.
   # Background: Docker 29.x introduced stricter multi-platform manifest handling.
