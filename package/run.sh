@@ -77,18 +77,18 @@ KBS_OUTPUT_DIR=${KB_SUMMARIZER_ROOT}/output
 KBS_OUTPUT_FILENAME=output.json
 
 get_k8s_api_version() {
-  set +x # don't print the token
-  KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
-  api_version=$(curl -sSk \
-      -H "Authorization: Bearer $KUBE_TOKEN" \
-      "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
-  if pgrep rke2 &>/dev/null; then
-    api_version=$(curl -sSk \
-      -H "Authorization: Bearer $KUBE_TOKEN" \
-      "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.gitVersion')
+  set +x
+  CA=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  TOKEN=$(< /var/run/secrets/kubernetes.io/serviceaccount/token)
+  URL="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version"
+  V=$(curl -sS --cacert "$CA" -H "Authorization: Bearer $TOKEN" "$URL")
+  if pgrep rke2 >/dev/null; then
+    v=$(echo "$V" | jq -r '.gitVersion')
+  else
+    v=$(echo "$V" | jq -r '.major + "." + .minor')
   fi
   set -x
-  echo "${api_version}"
+  echo "$v"
 }
 
 if [[ "${RANCHER_K8S_VERSION}" == "" ]]; then

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -eEx
-
+sleep 2000
 DEBUG_TIME_IN_SEC=${DEBUG_TIME_IN_SEC:-300}
 
 while test $# != 0
@@ -30,15 +30,15 @@ if pgrep k3s; then
   IS_K3S=true
 fi
 
-set +x # don't print the token
-KUBE_TOKEN=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
-K8S_API_VERSION=$(curl -sSk \
-  -H "Authorization: Bearer $KUBE_TOKEN" \
-  "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.major + "." +.minor')
-if [ ${IS_RKE2} ] || [ ${IS_K3S} ] ; then
-  K8S_API_VERSION=$(curl -sSk \
-    -H "Authorization: Bearer $KUBE_TOKEN" \
-    "https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version" | jq -r '.gitVersion')
+set +x
+CA=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+TOKEN=$(< /var/run/secrets/kubernetes.io/serviceaccount/token)
+URL="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version"
+VER=$(curl -sS --cacert "$CA" -H "Authorization: Bearer $TOKEN" "$URL")
+if [ "$IS_RKE2" ] || [ "$IS_K3S" ]; then
+  K8S_API_VERSION=$(echo "$VER" | jq -r '.gitVersion')
+else
+  K8S_API_VERSION=$(echo "$VER" | jq -r '.major + "." + .minor')
 fi
 set -x
 
