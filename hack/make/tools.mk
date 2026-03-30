@@ -8,11 +8,11 @@ GOLANGCI := $(TOOLS_BIN)/golangci-lint-$(GOLANGCI_VERSION)
 GOLANGCI_VERSION_TRIMMED := $(GOLANGCI_VERSION:v%=%)
 $(GOLANGCI):
 	tmp=$$(mktemp -d); \
-	url="https://github.com/golangci/golangci-lint/releases/download/$(GOLANGCI_VERSION)/golangci-lint-$(GOLANGCI_VERSION_TRIMMED)-$(OS_NAME)-$(OS_ARCH).tar.gz"; \
+	url="https://github.com/golangci/golangci-lint/releases/download/$(GOLANGCI_VERSION)/golangci-lint-$(GOLANGCI_VERSION_TRIMMED)-linux-amd64.tar.gz"; \
 	curl -sSfL -o $$tmp/pkg.tgz "$$url"; \
 	echo "$(GOLANGCI_SUM_$(OS_ARCH))  $$tmp/pkg.tgz" | shasum -a 256 -c -; \
 	tar -xf $$tmp/pkg.tgz -C $$tmp; \
-	mv $$tmp/golangci-lint-$(GOLANGCI_VERSION_TRIMMED)-$(OS_NAME)-$(OS_ARCH)/golangci-lint $(GOLANGCI); \
+	mv $$tmp/golangci-lint-$(GOLANGCI_VERSION_TRIMMED)-linux-amd64/golangci-lint $(GOLANGCI); \
 	chmod u+x $(GOLANGCI); \
 	rm -rf $$tmp
 

@@ -65,7 +65,8 @@ RUN xx-verify /chroot/usr/bin/curl && \
 
 # Define build arguments.
 ARG KUBE_BENCH_VERSION KUBE_BENCH_SUM_arm64 KUBE_BENCH_SUM_amd64 \
-    KUBECTL_VERSION KUBECTL_SUM_arm64 KUBECTL_SUM_amd64
+    KUBECTL_VERSION KUBECTL_SUM_arm64 KUBECTL_SUM_amd64 \
+    KUBE_BENCH_CFG_SUM
 
 # Stage kubectl into builder.
 ADD --chown=root:root --chmod=0755 \
@@ -81,10 +82,16 @@ RUN curl --output /tmp/kubebench.tar.gz -sLf "https://github.com/aquasecurity/ku
     echo "${!KUBE_BENCH_SUM}  /tmp/kubebench.tar.gz" | sha256sum -c - && \
     tar -xvzf /tmp/kubebench.tar.gz -C /chroot/usr/bin
 
-# Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
+# Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/
 RUN mkdir -p /chroot/etc/kube-bench/ && \
-    curl --output - -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/${KUBE_BENCH_VERSION}.tar.gz" | \
-    tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${KUBE_BENCH_VERSION#v}/cfg"
+    curl -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/${KUBE_BENCH_VERSION}.tar.gz" \
+        -o /tmp/kubebench-cfg.tar.gz && \
+    echo "${KUBE_BENCH_CFG_SUM}  /tmp/kubebench-cfg.tar.gz" | sha256sum -c - && \
+    tar xzf /tmp/kubebench-cfg.tar.gz \
+        -C /chroot/etc/kube-bench/ \
+        --strip-components=1 \
+        "kube-bench-${KUBE_BENCH_VERSION#v}/cfg" && \
+    rm /tmp/kubebench-cfg.tar.gz
 
 WORKDIR /src
 COPY go.sum \

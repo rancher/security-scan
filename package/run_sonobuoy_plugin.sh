@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -eEx
-sleep 2000
+
 DEBUG_TIME_IN_SEC=${DEBUG_TIME_IN_SEC:-300}
 
 while test $# != 0

@@ -83,12 +83,12 @@ get_k8s_api_version() {
   URL="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_PORT_443_TCP_PORT}/version"
   V=$(curl -sS --cacert "$CA" -H "Authorization: Bearer $TOKEN" "$URL")
   if pgrep rke2 >/dev/null; then
-    v=$(echo "$V" | jq -r '.gitVersion')
+    api_version=$(echo "$V" | jq -r '.gitVersion')
   else
-    v=$(echo "$V" | jq -r '.major + "." + .minor')
+    api_version=$(echo "$V" | jq -r '.major + "." + .minor')
   fi
   set -x
-  echo "$v"
+  echo "$api_version"
 }
 
 if [[ "${RANCHER_K8S_VERSION}" == "" ]]; then
