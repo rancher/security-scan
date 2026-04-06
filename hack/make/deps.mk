@@ -4,6 +4,10 @@ KUBERNETES_VERSION ?= v$(KUBECTL_VERSION)
 
 # renovate: datasource=github-release-attachments depName=golangci/golangci-lint
 GOLANGCI_VERSION = v2.3.0
+# renovate: datasource=github-release-attachments depName=golangci/golangci-lint digestVersion=v2.3.0
+GOLANGCI_SUM_amd64=b15f994fe7b9885e3862d394e159025fc2ca808d0dccf2ce3d6a242896c2be0c
+# renovate: datasource=github-release-attachments depName=golangci/golangci-lint digestVersion=v2.3.0
+GOLANGCI_SUM_arm64=e29bfa8b9d507548b43e10bfc4a87916d5d8e7ccea484df58d28a11bb61e4e37
 
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench
 KUBE_BENCH_VERSION ?= v0.14.1
@@ -21,11 +25,14 @@ SONOBUOY_SUM_arm64 ?= 958edd774ff6a23f8eaefc2ea2c361b05caa8d7980ab8443e552e7f7bf
 # renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy digestVersion=v0.57.3
 SONOBUOY_SUM_amd64 ?= 6728e04f62068465c56e2d317f4a5392520bf00c836aeaba970ae913f943718c
 
+# renovate: datasource=github-release-attachments depName=kubernetes/kubectl
 KUBECTL_VERSION ?= 1.33.7
-KUBECTL_SUM_arm64 ?= $(shell curl -L "https://dl.k8s.io/release/v$(KUBECTL_VERSION)/bin/linux/arm64/kubectl.sha256")
-KUBECTL_SUM_amd64 ?= $(shell curl -L "https://dl.k8s.io/release/v$(KUBECTL_VERSION)/bin/linux/amd64/kubectl.sha256")
+# renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=1.33.7
+KUBECTL_SUM_arm64 ?= fa7ee98fdb6fba92ae05b5e0cde0abd5972b2d9a4a084f7052a1fd0dce6bc1de
+# renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=1.33.7
+KUBECTL_SUM_amd64 ?= 471d94e208a89be62eb776700fc8206cbef11116a8de2dc06fc0086b0015375b
 
 # Reduces the code duplication on Makefile by keeping all args into a single variable.
 IMAGE_ARGS := --build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) --build-arg SONOBUOY_SUM_arm64=$(SONOBUOY_SUM_arm64) --build-arg SONOBUOY_SUM_amd64=$(SONOBUOY_SUM_amd64) \
-			  --build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION) --build-arg KUBE_BENCH_SUM_arm64=$(KUBE_BENCH_SUM_arm64) --build-arg KUBE_BENCH_SUM_amd64=$(KUBE_BENCH_SUM_amd64) \
-			  --build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) --build-arg KUBECTL_SUM_arm64=$(KUBECTL_SUM_arm64) --build-arg KUBECTL_SUM_amd64=$(KUBECTL_SUM_amd64)
+              --build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION) --build-arg KUBE_BENCH_SUM_arm64=$(KUBE_BENCH_SUM_arm64) --build-arg KUBE_BENCH_SUM_amd64=$(KUBE_BENCH_SUM_amd64) \
+              --build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) --build-arg KUBECTL_SUM_arm64=$(KUBECTL_SUM_arm64) --build-arg KUBECTL_SUM_amd64=$(KUBECTL_SUM_amd64)
