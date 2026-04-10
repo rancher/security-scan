@@ -15,8 +15,6 @@ KUBE_BENCH_VERSION ?= v0.15.0
 KUBE_BENCH_SUM_arm64 ?= e38362567fd6d42b1c230cd2880a650c055dc0f10bc41cbf5b386cbcb29b2f51
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.0
 KUBE_BENCH_SUM_amd64 ?= 29cf96002be26fd0e27f80e19747b5dc06879bcbefdd6f34fe0f31418db34b14
-# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.0
-KUBE_BENCH_CFG_SUM ?= 7d9e894863998800a57cc5045a62dd5b7e958951347f172a96aea0907f200b19
 
 # renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy
 SONOBUOY_VERSION ?= v0.57.3
@@ -37,5 +35,4 @@ KUBECTL_SUM_amd64 ?= 924eb50779153f20cb668117d141440b95df2f325a64452d78dff946914
 # Reduces the code duplication on Makefile by keeping all args into a single variable.
 IMAGE_ARGS := --build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) --build-arg SONOBUOY_SUM_arm64=$(SONOBUOY_SUM_arm64) --build-arg SONOBUOY_SUM_amd64=$(SONOBUOY_SUM_amd64) \
               --build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION) --build-arg KUBE_BENCH_SUM_arm64=$(KUBE_BENCH_SUM_arm64) --build-arg KUBE_BENCH_SUM_amd64=$(KUBE_BENCH_SUM_amd64) \
-              --build-arg KUBE_BENCH_CFG_SUM=$(KUBE_BENCH_CFG_SUM)  \
               --build-arg KUBECTL_VERSION=$(KUBECTL_VERSION) --build-arg KUBECTL_SUM_arm64=$(KUBECTL_SUM_arm64) --build-arg KUBECTL_SUM_amd64=$(KUBECTL_SUM_amd64)
