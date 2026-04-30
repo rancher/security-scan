@@ -26,7 +26,7 @@ SONOBUOY_SUM_arm64 ?= 958edd774ff6a23f8eaefc2ea2c361b05caa8d7980ab8443e552e7f7bf
 SONOBUOY_SUM_amd64 ?= 6728e04f62068465c56e2d317f4a5392520bf00c836aeaba970ae913f943718c
 
 # renovate: datasource=github-release-attachments depName=kubernetes/kubectl
-KUBECTL_VERSION ?= 1.35.2
+KUBECTL_VERSION ?= 1.36.0
 # renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=v1.35.2
 KUBECTL_SUM_arm64 ?= cd859449f54ad2cb05b491c490c13bb836cdd0886ae013c0aed3dd67ff747467
 # renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=v1.35.2
