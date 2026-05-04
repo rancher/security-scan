@@ -4,7 +4,7 @@ FROM registry.suse.com/bci/golang:1.25 AS golang
 
 # Builder and xx only need to support the host architecture.
 FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.6.1 AS xx
-FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.25 AS builder
+FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.26.2 AS builder
 
 # Bring xx supporting tools to the builder layer, but as it is at / it
 # won't be copied to the final image.
