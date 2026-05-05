@@ -85,7 +85,7 @@ func main() {
 
 	if err := app.Run(context.TODO(), os.Args); err != nil {
 		slog.Error("fatal error running application",
-			slog.String("error", err.Error()),
+			slog.Any("error", err),
 		)
 		os.Exit(1)
 	}
