@@ -3,18 +3,17 @@ KIND_VERSION ?= 0.30.0
 KUBERNETES_VERSION ?= v$(KUBECTL_VERSION)
 
 # renovate: datasource=github-release-attachments depName=golangci/golangci-lint
-GOLANGCI_VERSION = v2.5.0
-# renovate: datasource=github-release-attachments depName=golangci/golangci-lint digestVersion=v2.5.0
-GOLANGCI_SUM_amd64=c77313a77e19b06123962c411d9943cc0d092bbec76b956104d18964e274902e
-# renovate: datasource=github-release-attachments depName=golangci/golangci-lint digestVersion=v2.5.0
-GOLANGCI_SUM_arm64=48693a98a7f4556d1117300aae240d0fe483df8d6f36dfaba56504626101a66e
+GOLANGCI_VERSION = v2.11.4
+# renovate: datasource=github-release-attachments depName=golangci/golangci-lint digestVersion=v2.11.4
+GOLANGCI_SUM_amd64=200c5b7503f67b59a6743ccf32133026c174e272b930ee79aa2aa6f37aca7ef1
+# renovate: datasource=github-release-attachments depName=golangci/golangci-lint digestVersion=v2.11.4
+GOLANGCI_SUM_arm64=3bcfa2e6f3d32b2bf5cd75eaa876447507025e0303698633f722a05331988db4
 
-# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench
-KUBE_BENCH_VERSION ?= v0.14.1
-# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.14.1
-KUBE_BENCH_SUM_arm64 ?= 4450dcd502a2f8647c8cc9d5dfe09cd310ff42f28c953d001bffc534f7d09fd0
-# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.14.1
-KUBE_BENCH_SUM_amd64 ?= 73312e994bc2011b90ba1491f41cfeb440439b7923b6e2562027cbf573121963
+KUBE_BENCH_VERSION ?= v0.15.4
+# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.4
+KUBE_BENCH_SUM_arm64 ?= 58504862a53ccf56c416484ce9f0fa951b882b316efe32c4356de2ed6da62bc6
+# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.4
+KUBE_BENCH_SUM_amd64 ?= 7ff96e2a5056e61a8f9aa6d0d64c9eb90e78968e67b66252b6f9ca4faea2d029
 
 # renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy
 SONOBUOY_VERSION ?= v0.57.3
