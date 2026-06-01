@@ -3,10 +3,10 @@ module github.com/rancher/security-scan
 go 1.26.2
 
 require (
-	github.com/aquasecurity/kube-bench v0.15.4
+	github.com/aquasecurity/kube-bench v0.15.5
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
-	github.com/urfave/cli/v3 v3.8.0
+	github.com/urfave/cli/v3 v3.9.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -32,5 +32,5 @@ require (
 	golang.org/x/text v0.37.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	k8s.io/client-go v0.36.0 // indirect
+	k8s.io/client-go v0.36.1 // indirect
 )
