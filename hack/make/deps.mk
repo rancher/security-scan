@@ -10,11 +10,11 @@ GOLANGCI_SUM_amd64=200c5b7503f67b59a6743ccf32133026c174e272b930ee79aa2aa6f37aca7
 GOLANGCI_SUM_arm64=3bcfa2e6f3d32b2bf5cd75eaa876447507025e0303698633f722a05331988db4
 
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench
-KUBE_BENCH_VERSION ?= v0.15.4
-# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.4
-KUBE_BENCH_SUM_arm64 ?= 58504862a53ccf56c416484ce9f0fa951b882b316efe32c4356de2ed6da62bc6
-# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.4
-KUBE_BENCH_SUM_amd64 ?= 7ff96e2a5056e61a8f9aa6d0d64c9eb90e78968e67b66252b6f9ca4faea2d029
+KUBE_BENCH_VERSION ?= v0.15.6
+# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.6
+KUBE_BENCH_SUM_arm64 ?= 69a3870f5ce3578429de8d5d771b7703a062eec64b8d7e6d014b15350fcb4a35
+# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.6
+KUBE_BENCH_SUM_amd64 ?= 783882d23a13837ffd9d2a3dc713d86bed121802f51c93465f47add4dae9eb23
 
 # renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy
 SONOBUOY_VERSION ?= v0.57.3
@@ -26,11 +26,11 @@ SONOBUOY_SUM_arm64 ?= 958edd774ff6a23f8eaefc2ea2c361b05caa8d7980ab8443e552e7f7bf
 SONOBUOY_SUM_amd64 ?= 6728e04f62068465c56e2d317f4a5392520bf00c836aeaba970ae913f943718c
 
 # renovate: datasource=github-release-attachments depName=kubernetes/kubectl
-KUBECTL_VERSION ?= 1.33.7
-# renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=1.33.7
-KUBECTL_SUM_arm64 ?= fa7ee98fdb6fba92ae05b5e0cde0abd5972b2d9a4a084f7052a1fd0dce6bc1de
-# renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=1.33.7
-KUBECTL_SUM_amd64 ?= 471d94e208a89be62eb776700fc8206cbef11116a8de2dc06fc0086b0015375b
+KUBECTL_VERSION ?= 1.33.12
+# renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=1.33.12
+KUBECTL_SUM_arm64 ?= d1a1f7b86859108406e997430a59c95c72a77cc33cdc4faccd046407aff2cfac
+# renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=1.33.12
+KUBECTL_SUM_amd64 ?= fe80ae4133b44fa2077db4af144e80765eb1b3b2eede55fbff6933c4374d8c6e
 
 # Reduces the code duplication on Makefile by keeping all args into a single variable.
 IMAGE_ARGS := --build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) --build-arg SONOBUOY_SUM_arm64=$(SONOBUOY_SUM_arm64) --build-arg SONOBUOY_SUM_amd64=$(SONOBUOY_SUM_amd64) \
