@@ -1,9 +1,9 @@
 module github.com/rancher/security-scan
 
-go 1.26.2
+go 1.26.3
 
 require (
-	github.com/aquasecurity/kube-bench v0.15.4
+	github.com/aquasecurity/kube-bench v0.15.6
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
 	github.com/urfave/cli/v3 v3.4.1
