@@ -16,13 +16,13 @@ KUBE_BENCH_SUM_arm64 ?= 58504862a53ccf56c416484ce9f0fa951b882b316efe32c4356de2ed
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.4
 KUBE_BENCH_SUM_amd64 ?= 7ff96e2a5056e61a8f9aa6d0d64c9eb90e78968e67b66252b6f9ca4faea2d029
 # renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy
-SONOBUOY_VERSION ?= v0.57.3
+SONOBUOY_VERSION ?= v0.57.5
 SONOBUOY_IMAGE ?= rancher/mirrored-sonobuoy-sonobuoy:$(SONOBUOY_VERSION)
 
-# renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy digestVersion=v0.57.3
-SONOBUOY_SUM_arm64 ?= 958edd774ff6a23f8eaefc2ea2c361b05caa8d7980ab8443e552e7f7bf100ab1
-# renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy digestVersion=v0.57.3
-SONOBUOY_SUM_amd64 ?= 6728e04f62068465c56e2d317f4a5392520bf00c836aeaba970ae913f943718c
+# renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy digestVersion=v0.57.5
+SONOBUOY_SUM_arm64 ?= ec482b5d1ec237f4c94b6fd7be5a69f95678a4331001b3edcb6ad7835ec40695
+# renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy digestVersion=v0.57.5
+SONOBUOY_SUM_amd64 ?= 7c5c2250e5103c98f4dad2bcab86baf954e319c57c419c113f28f5060e62f129
 
 # renovate: datasource=github-release-attachments depName=kubernetes/kubectl
 KUBECTL_VERSION ?= 1.36.1
