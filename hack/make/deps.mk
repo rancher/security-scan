@@ -6,11 +6,11 @@ KUBERNETES_VERSION ?= v$(KUBECTL_VERSION)
 GOLANGCI_VERSION = v2.0.2
 
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench
-KUBE_BENCH_VERSION ?= v0.14.1
-# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.14.1
-KUBE_BENCH_SUM_arm64 ?= 4450dcd502a2f8647c8cc9d5dfe09cd310ff42f28c953d001bffc534f7d09fd0
-# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.14.1
-KUBE_BENCH_SUM_amd64 ?= 73312e994bc2011b90ba1491f41cfeb440439b7923b6e2562027cbf573121963
+KUBE_BENCH_VERSION ?= v0.15.6
+# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.6
+KUBE_BENCH_SUM_arm64 ?= 69a3870f5ce3578429de8d5d771b7703a062eec64b8d7e6d014b15350fcb4a35
+# renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench digestVersion=v0.15.6
+KUBE_BENCH_SUM_amd64 ?= 783882d23a13837ffd9d2a3dc713d86bed121802f51c93465f47add4dae9eb23
 
 # renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy
 SONOBUOY_VERSION ?= v0.57.5
