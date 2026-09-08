@@ -25,11 +25,11 @@ SONOBUOY_SUM_arm64 ?= ec482b5d1ec237f4c94b6fd7be5a69f95678a4331001b3edcb6ad7835e
 SONOBUOY_SUM_amd64 ?= 7c5c2250e5103c98f4dad2bcab86baf954e319c57c419c113f28f5060e62f129
 
 # renovate: datasource=github-release-attachments depName=kubernetes/kubectl
-KUBECTL_VERSION ?= 1.36.3
-# renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=v1.36.3
-KUBECTL_SUM_arm64 ?= 3d86f24401c41ae5a46ac50eef8865fe891d3647d324a0836f6c63757a126e62
-# renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=v1.36.3
-KUBECTL_SUM_amd64 ?= ebbd080e7c2e275093b55915722043257eb24004363e20acb3c4d71919f88336
+KUBECTL_VERSION ?= 1.37.0
+# renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=v1.37.0
+KUBECTL_SUM_arm64 ?= 922df28df248cc00a9e025f947704f1d1482de64ece54cfe57e61f19eaf1eef3
+# renovate: datasource=github-release-attachments depName=kubernetes/kubectl digestVersion=v1.37.0
+KUBECTL_SUM_amd64 ?= 6129359f4e1f3848a5572ccb0b26cf28b8ca08cef38c95a765b2f64a2c961a2f
 
 # Reduces the code duplication on Makefile by keeping all args into a single variable.
 IMAGE_ARGS := --build-arg SONOBUOY_VERSION=$(SONOBUOY_VERSION) --build-arg SONOBUOY_SUM_arm64=$(SONOBUOY_SUM_arm64) --build-arg SONOBUOY_SUM_amd64=$(SONOBUOY_SUM_amd64) \
