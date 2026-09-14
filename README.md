@@ -1,6 +1,6 @@
 security-scan
 ========
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/rancher/security/badge)](https://scorecard.dev/viewer/?uri=github.com/rancher/security-scan)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/rancher/security-scan/badge)](https://scorecard.dev/viewer/?uri=github.com/rancher/security-scan)
 
 Please submit any new inquiries in the [compliance-operator](https://github.com/rancher/compliance-operator) repo.
 For the current branch strategy related to the `security-scan`, please refer to  [Branches and Releases](https://github.com/rancher/compliance-operator?tab=readme-ov-file#branches-and-releases)
