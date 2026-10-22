@@ -1,10 +1,18 @@
 # Platform specific images which must support all target architectures.
-FROM registry.suse.com/bci/bci-micro:15.7 AS final
-FROM registry.suse.com/bci/golang:1.27 AS golang
+# bci-nano is the base of the final image, as recommended by RFD 0070. It has
+# no shell, package manager or OS tools, so whatever the image needs on top of
+# it is installed explicitly further down.
+FROM registry.suse.com/bci/bci-nano:15.7 AS nano
+# Only used as the source of the zypper repositories and product files for the
+# target architecture.
+FROM registry.suse.com/bci/bci-base:15.7 AS base
 
 # Builder and xx only need to support the host architecture.
 FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.6.1 AS xx
-FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.27 AS builder
+# Builds with the Go compiler from BCI golang, which is a deviation from
+# RFD 0070 (rancher/rancher#57914). Pinned to MAJOR.MINOR.PATCH, matching
+# go.mod, so the toolchain is deterministic and bumped by Renovate.
+FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.27.2 AS builder
 
 # Bring xx supporting tools to the builder layer, but as it is at / it
 # won't be copied to the final image.
@@ -22,9 +30,10 @@ ARG TARGETPLATFORM TARGETARCH
 RUN mkdir -p /run/lock
 
 # Set the final image base contents.
-COPY --from=final / /chroot/
+COPY --from=nano / /chroot/
 
-RUN cd /go/src/github.com/vmware-tanzu/sonobuoy && \
+RUN --mount=type=cache,target=/go/pkg/mod \
+    cd /go/src/github.com/vmware-tanzu/sonobuoy && \
     xx-go build -o /chroot/usr/bin/sonobuoy \
         -ldflags "-s -w -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.Version=${SONOBUOY_VERSION}-rancher -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.GitSHA=$(git rev-parse HEAD)"
 RUN xx-verify /chroot/usr/bin/sonobuoy
@@ -37,27 +46,40 @@ RUN echo "[main]" > /etc/zypp/zypp.conf && \
 
 # Zypper uses the architecture defined on the files within /etc/products.d/
 # when fetching packages. Note that we are overriding host-based products.d
-# files, with the same files from golang for the target architecture.
+# files, with the same files from bci-base for the target architecture.
 #
 # On an amd64 host and arm64 target, this will ensure the files used are based
 # on the arm64 version of /etc/products.d/.
-COPY --from=golang /etc/products.d/ /etc/products.d/
+COPY --from=base /etc/products.d/ /etc/products.d/
 # The zypper operations below will use an installroot. This copies the repository
 # information (based on target arch) to chroot, so that the zypper operation works.
-COPY --from=golang /etc/zypp/ /chroot/etc/zypp/
+COPY --from=base /etc/zypp/ /chroot/etc/zypp/
 
-# OS binaries to run kube-bench audit commands.
-# Before removing dependencies here, ensure they are not needed by
-# the compliance-operator, security-scan or any of the existing kube-bench
-# tests.
+# OS packages to run the kube-bench audit commands, the helper scripts and the
+# packaging of the Sonobuoy results. bci-nano has none of them, so the basic
+# ones that other BCI images provide implicitly are listed too. Everything else
+# that ends up installed is a dependency of these packages.
+# Before removing one, ensure it is not needed by security-scan or any of the
+# existing kube-bench tests:
+# - bash, coreutils, grep, sed: the shell, and the file and text utilities
+#   (stat, cat, tail, chmod...) that the audits and package/ scripts call.
+# - findutils: find and xargs.
+# - gawk: awk, used by the helper scripts that check the kubelet CA file.
+# - procps: ps, to inspect the processes of the node.
+# - systemd: systemctl and journalctl, to check the services of the node.
+# - jq: processing of JSON output.
+# - curl: audits that call API endpoints.
+# - diffutils: diff.
+# - tar and gzip: packaging and unpacking the Sonobuoy results (tar -z).
 RUN zypper --non-interactive --releasever=15.6 refresh && \
-    zypper --installroot /chroot -n in --no-recommends findutils tar jq gawk diffutils procps systemd gzip curl && \
+    zypper --installroot /chroot -n in --no-recommends bash coreutils grep sed findutils gawk procps systemd jq curl diffutils tar gzip && \
     zypper --installroot /chroot clean -a && \
     rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/* /chroot/etc/zypp/
 
 # Safety net to ensure we did not mess up on the zypper operations above,
 # and that the binaries are valid for the target architecture.
-RUN xx-verify /chroot/usr/bin/curl && \
+RUN xx-verify /chroot/usr/bin/bash && \
+    xx-verify /chroot/usr/bin/curl && \
     xx-verify /chroot/usr/bin/diff && \
     xx-verify /chroot/usr/bin/tar && \
     xx-verify /chroot/usr/bin/jq && \
@@ -81,7 +103,7 @@ RUN curl --output /tmp/kubebench.tar.gz -sLf "https://github.com/aquasecurity/ku
     echo "${!KUBE_BENCH_SUM}  /tmp/kubebench.tar.gz" | sha256sum -c - && \
     tar -xvzf /tmp/kubebench.tar.gz -C /chroot/usr/bin
 
-# Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
+# Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into the image
 RUN mkdir -p /chroot/etc/kube-bench/ && \
     curl --output - -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/${KUBE_BENCH_VERSION}.tar.gz" | \
     tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${KUBE_BENCH_VERSION#v}/cfg"
@@ -91,7 +113,8 @@ COPY go.sum \
      go.mod \
      Makefile \
      /src
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
 COPY pkg /src/pkg
 COPY hack /src/hack
@@ -104,7 +127,8 @@ RUN xx-go --wrap
 # a second time (inside the Docker build process). Therefore, removing the need
 # to access the .git dir.
 ARG VERSION
-RUN VERSION=${VERSION} TARGET_BIN=/chroot/usr/bin/kb-summarizer make build
+RUN --mount=type=cache,target=/go/pkg/mod \
+    VERSION=${VERSION} TARGET_BIN=/chroot/usr/bin/kb-summarizer make build
 
 # Ensures that the binary that was built is valid for the target platform.
 RUN xx-verify --static /chroot/usr/bin/kb-summarizer
@@ -115,7 +139,7 @@ COPY package/cfg/ /chroot/etc/kube-bench/cfg/
 
 # By using scratch we avoid duplicating files on the final image,
 # as otherwise the COPY below would override the differences between
-# /chroot and "final", increasing the image layer by ~10MB. 
+# /chroot and the nano base, increasing the image layer by ~10MB. 
 FROM scratch
 
 COPY --from=builder /chroot/ /

@@ -9,7 +9,9 @@ permissions:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    # Requires yamllint, which the ci-image does not ship, so it runs on a
+    # non-containerized runner.
+    runs-on: runs-on,runner=4cpu-linux-x64,image=ubuntu22-full-x64,run-id=${{ github.run_id }}
     steps:
     - name: Checkout code
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -21,12 +23,29 @@ jobs:
     - run: make validate
 
   test:
+    runs-on: org-${{ github.repository_owner_id }}-amd64-k8s
+    container: ghcr.io/rancher/ci-image/go1.27 # zizmor: ignore[unpinned-images] -- internal image is exempt from this rule
+    needs: [ validate ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+    - run: make test
+    - name: Verify licenses
+      run: |
+        go install github.com/google/go-licenses@latest
+        go-licenses check ./... --allowed_licenses=Apache-2.0,MIT,BSD-3-Clause
+
+  test-cross-platform:
     strategy:
       fail-fast: false
       matrix:
-        # Run tests across all platforms, to ensure developers
-        # can use any environment to run basic tests.
-        platform: [ubuntu-latest, windows-latest, macos-latest]
+        # Run tests on non-Linux platforms, to ensure developers can use
+        # any environment to run basic tests. These are not covered by the
+        # self-hosted runners used here, so they remain on GitHub-hosted
+        # runners.
+        platform: [windows-latest, macos-latest]
     
     runs-on: ${{ matrix.platform }}
     needs: [ validate ]
@@ -51,9 +70,9 @@ jobs:
       fail-fast: false
       matrix:
         k8s-version: [v1.33.0, v1.34.0, v1.35.0]
-        platform: [ubuntu-latest]
     
-    runs-on: ${{ matrix.platform }}
+    # Requires a Docker daemon, so it runs on a non-containerized runner.
+    runs-on: runs-on,runner=4cpu-linux-x64,image=ubuntu22-full-x64,run-id=${{ github.run_id }}
     needs: [ validate ]
 
     steps:
@@ -70,7 +89,8 @@ jobs:
       run: make e2e
 
   build-image:
-    runs-on: ubuntu-latest
+    # Requires a Docker daemon, so it runs on a non-containerized runner.
+    runs-on: runs-on,runner=4cpu-linux-x64,image=ubuntu22-full-x64,run-id=${{ github.run_id }}
     needs: [ validate ]
 
     steps:
