@@ -10,11 +10,6 @@ FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.27 AS builder
 # won't be copied to the final image.
 COPY --from=xx / /
 
-ARG SONOBUOY_VERSION
-# The upstream project hasn't been released in almost one year, which
-# caused it to accumulate several stdlib Golang vulnerabilities.
-RUN git clone --depth=1 https://github.com/vmware-tanzu/sonobuoy --branch "${SONOBUOY_VERSION}" --single-branch /go/src/github.com/vmware-tanzu/sonobuoy
-
 # From this point onwards, although everything will be executed at the
 # host architecture, it will fork and run separately for each target
 # arch/platform.
@@ -23,11 +18,6 @@ RUN mkdir -p /run/lock
 
 # Set the final image base contents.
 COPY --from=final / /chroot/
-
-RUN cd /go/src/github.com/vmware-tanzu/sonobuoy && \
-    xx-go build -o /chroot/usr/bin/sonobuoy \
-        -ldflags "-s -w -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.Version=${SONOBUOY_VERSION}-rancher -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.GitSHA=$(git rev-parse HEAD)"
-RUN xx-verify /chroot/usr/bin/sonobuoy
 
 # The final image does not have zypper, so we amend the host zypper to
 # look for the target architecture instead, so we can avoid cross-emulation.
@@ -50,8 +40,18 @@ COPY --from=golang /etc/zypp/ /chroot/etc/zypp/
 # Before removing dependencies here, ensure they are not needed by
 # the compliance-operator, security-scan or any of the existing kube-bench
 # tests.
-RUN zypper --non-interactive --releasever=15.6 refresh && \
+#
+# kube-bench, sonobuoy and kubectl come from the cowboy-builder RPM packages,
+# which are rebuilt with the latest Go patch version and have fixes for CVEs in their dependencies.
+ARG KUBECTL_PACKAGE=kubectl-1.37
+RUN rpm --import https://raw.githubusercontent.com/rancher/rancher/refs/heads/main/rancher-rpm-pkgs.key && \
+    rpm --root /chroot --import https://raw.githubusercontent.com/rancher/rancher/refs/heads/main/rancher-rpm-pkgs.key && \
+    zypper ar -f https://rpm.rancher.io/pkgs/prime pkgs && \
+    zypper --non-interactive --releasever=15.6 refresh && \
     zypper --installroot /chroot -n in --no-recommends findutils tar jq gawk diffutils procps systemd gzip curl && \
+    zypper --installroot /chroot -n in --no-recommends -r pkgs kube-bench sonobuoy ${KUBECTL_PACKAGE} && \
+    install -D -o root -g root -m 0755 /chroot/usr/bin/${KUBECTL_PACKAGE} /chroot/usr/local/bin/kubectl && \
+    rm -f /chroot/usr/bin/${KUBECTL_PACKAGE} && \
     zypper --installroot /chroot clean -a && \
     rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/* /chroot/etc/zypp/
 
@@ -61,25 +61,13 @@ RUN xx-verify /chroot/usr/bin/curl && \
     xx-verify /chroot/usr/bin/diff && \
     xx-verify /chroot/usr/bin/tar && \
     xx-verify /chroot/usr/bin/jq && \
-    xx-verify /chroot/usr/bin/gzip
+    xx-verify /chroot/usr/bin/gzip && \
+    xx-verify /chroot/usr/bin/kube-bench && \
+    xx-verify /chroot/usr/bin/sonobuoy && \
+    xx-verify /chroot/usr/local/bin/kubectl
 
 # Define build arguments.
-ARG KUBE_BENCH_VERSION KUBE_BENCH_SUM_arm64 KUBE_BENCH_SUM_amd64 \
-    KUBECTL_VERSION KUBECTL_SUM_arm64 KUBECTL_SUM_amd64
-
-# Stage kubectl into builder.
-ADD --chown=root:root --chmod=0755 \
-    "https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/${TARGETARCH}/kubectl" \
-    /chroot/usr/local/bin/kubectl
-
-ENV KUBECTL_SUM="KUBECTL_SUM_${TARGETARCH}"
-RUN echo "${!KUBECTL_SUM}  /chroot/usr/local/bin/kubectl" | sha256sum -c -
-
-# Stage kube-bench into builder.
-ENV KUBE_BENCH_SUM="KUBE_BENCH_SUM_${TARGETARCH}"
-RUN curl --output /tmp/kubebench.tar.gz -sLf "https://github.com/aquasecurity/kube-bench/releases/download/${KUBE_BENCH_VERSION}/kube-bench_${KUBE_BENCH_VERSION#v}_linux_${TARGETARCH}.tar.gz" && \
-    echo "${!KUBE_BENCH_SUM}  /tmp/kubebench.tar.gz" | sha256sum -c - && \
-    tar -xvzf /tmp/kubebench.tar.gz -C /chroot/usr/bin
+ARG KUBE_BENCH_VERSION
 
 # Copy the files within /cfg straight from the immutable GitHub source to /etc/kube-bench/cfg/ into micro
 RUN mkdir -p /chroot/etc/kube-bench/ && \
