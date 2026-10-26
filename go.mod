@@ -1,6 +1,6 @@
 module github.com/rancher/security-scan
 
-go 1.26.9
+go 1.26.10
 
 require (
 	github.com/aquasecurity/kube-bench v0.16.0
@@ -30,7 +30,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/sys v0.46.0 // indirect
-	golang.org/x/text v0.39.0 // indirect
+	golang.org/x/text v0.41.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	k8s.io/client-go v0.36.3 // indirect
