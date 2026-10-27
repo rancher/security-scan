@@ -3,11 +3,11 @@ KIND_VERSION ?= 0.33.0
 KUBERNETES_VERSION ?= v$(KUBECTL_VERSION)
 
 # renovate: datasource=github-release-attachments depName=golangci/golangci-lint
-GOLANGCI_VERSION = v2.14.0
-# renovate: datasource=github-release-attachments depName=golangci/golangci-lint digestVersion=v2.14.0
-GOLANGCI_SUM_amd64=ab90aeb7b066f92a33415b638a50fe5344bbb75a0d32ad30cc248d88f81032ab
-# renovate: datasource=github-release-attachments depName=golangci/golangci-lint digestVersion=v2.14.0
-GOLANGCI_SUM_arm64=ee7ec5f3453d15ddf106fae5a4d6c71737712348a979d1fe9cd52ec7ea299bae
+GOLANGCI_VERSION = v2.15.0
+# renovate: datasource=github-release-attachments depName=golangci/golangci-lint digestVersion=v2.15.0
+GOLANGCI_SUM_amd64=9b7fe6a6bf6334b98decf8d86b11415ea7889afdabdd1959fdce23af2a9ebcea
+# renovate: datasource=github-release-attachments depName=golangci/golangci-lint digestVersion=v2.15.0
+GOLANGCI_SUM_arm64=b4d8f17068b35ee6060cc2f69a16fb48740d706fbba81661c318649c114a6998
 
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench
 KUBE_BENCH_VERSION ?= v0.16.0
