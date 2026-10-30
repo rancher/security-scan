@@ -7,21 +7,20 @@ FROM registry.suse.com/bci/bci-nano:15.7 AS nano
 # target architecture.
 FROM registry.suse.com/bci/bci-base:15.7 AS base
 
-# Builder and xx only need to support the host architecture.
+# xx only needs to support the host architecture.
 FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.6.1 AS xx
-# Builds with the Go compiler from BCI golang, which is a deviation from
-# RFD 0070 (rancher/rancher#57914). Pinned to MAJOR.MINOR.PATCH, matching
-# go.mod, so the toolchain is deterministic and bumped by Renovate.
-FROM --platform=$BUILDPLATFORM registry.suse.com/bci/golang:1.27.2 AS builder
 
-# Bring xx supporting tools to the builder layer, but as it is at / it
+# Assembles the final root filesystem for the target architecture in /chroot.
+# It runs on the host architecture and uses zypper from BCI base, as neither
+# bci-nano nor the AppCo Go image have a package manager.
+FROM --platform=$BUILDPLATFORM registry.suse.com/bci/bci-base:15.7 AS rootfs
+
+# file is needed by xx-verify.
+RUN zypper --non-interactive install --no-recommends file
+
+# Bring xx supporting tools to the rootfs layer, but as it is at / it
 # won't be copied to the final image.
 COPY --from=xx / /
-
-ARG SONOBUOY_VERSION
-# The upstream project hasn't been released in almost one year, which
-# caused it to accumulate several stdlib Golang vulnerabilities.
-RUN git clone --depth=1 https://github.com/vmware-tanzu/sonobuoy --branch "${SONOBUOY_VERSION}" --single-branch /go/src/github.com/vmware-tanzu/sonobuoy
 
 # From this point onwards, although everything will be executed at the
 # host architecture, it will fork and run separately for each target
@@ -31,12 +30,6 @@ RUN mkdir -p /run/lock
 
 # Set the final image base contents.
 COPY --from=nano / /chroot/
-
-RUN --mount=type=cache,target=/go/pkg/mod \
-    cd /go/src/github.com/vmware-tanzu/sonobuoy && \
-    xx-go build -o /chroot/usr/bin/sonobuoy \
-        -ldflags "-s -w -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.Version=${SONOBUOY_VERSION}-rancher -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.GitSHA=$(git rev-parse HEAD)"
-RUN xx-verify /chroot/usr/bin/sonobuoy
 
 # The final image does not have zypper, so we amend the host zypper to
 # look for the target architecture instead, so we can avoid cross-emulation.
@@ -108,6 +101,41 @@ RUN mkdir -p /chroot/etc/kube-bench/ && \
     curl --output - -sLf "https://github.com/aquasecurity/kube-bench/archive/refs/tags/${KUBE_BENCH_VERSION}.tar.gz" | \
     tar xvz -C /chroot/etc/kube-bench/ --strip-components=1 "kube-bench-${KUBE_BENCH_VERSION#v}/cfg"
 
+# Override kube-bench cfg files without duplicating them on the final image.
+COPY package/cfg/ /chroot/etc/kube-bench/cfg/
+
+# The AppCo Go image has no package manager, so the extra tools needed by
+# the build (git, make) and by xx (file, flock, sed, grep) are installed
+# from BCI base. Its SLE version must match the one AppCo Go is based on.
+FROM --platform=$BUILDPLATFORM registry.suse.com/bci/bci-base:15.7 AS tools
+RUN zypper --non-interactive refresh && \
+    zypper --non-interactive --installroot /tools install --no-recommends \
+        git-core make file sed grep util-linux
+
+# Builds with the Go compiler from the AppCo Go image, as recommended by
+# RFD 0070. Pinned to MAJOR.MINOR.PATCH, matching go.mod, so the toolchain
+# is deterministic and bumped by Renovate.
+FROM --platform=$BUILDPLATFORM registry.suse.com/rancher/appco-go:1.27.2 AS builder
+
+COPY --from=tools /tools /
+# Bring xx supporting tools to the builder layer, but as it is at / it
+# won't be copied to the final image.
+COPY --from=xx / /
+
+ARG SONOBUOY_VERSION
+# The upstream project hasn't been released in almost one year, which
+# caused it to accumulate several stdlib Golang vulnerabilities.
+RUN git clone --depth=1 https://github.com/vmware-tanzu/sonobuoy --branch "${SONOBUOY_VERSION}" --single-branch /go/src/github.com/vmware-tanzu/sonobuoy
+
+ARG TARGETPLATFORM
+RUN mkdir -p /run/lock
+
+RUN --mount=type=cache,target=/go/pkg/mod \
+    cd /go/src/github.com/vmware-tanzu/sonobuoy && \
+    xx-go build -o /out/sonobuoy \
+        -ldflags "-s -w -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.Version=${SONOBUOY_VERSION}-rancher -X github.com/vmware-tanzu/sonobuoy/pkg/buildinfo.GitSHA=$(git rev-parse HEAD)"
+RUN xx-verify /out/sonobuoy
+
 WORKDIR /src
 COPY go.sum \
      go.mod \
@@ -128,13 +156,10 @@ RUN xx-go --wrap
 # to access the .git dir.
 ARG VERSION
 RUN --mount=type=cache,target=/go/pkg/mod \
-    VERSION=${VERSION} TARGET_BIN=/chroot/usr/bin/kb-summarizer make build
+    VERSION=${VERSION} TARGET_BIN=/out/kb-summarizer make build
 
 # Ensures that the binary that was built is valid for the target platform.
-RUN xx-verify --static /chroot/usr/bin/kb-summarizer
-
-# Override kube-bench cfg files without duplicating them on the final image.
-COPY package/cfg/ /chroot/etc/kube-bench/cfg/
+RUN xx-verify --static /out/kb-summarizer
 
 
 # By using scratch we avoid duplicating files on the final image,
@@ -142,7 +167,8 @@ COPY package/cfg/ /chroot/etc/kube-bench/cfg/
 # /chroot and the nano base, increasing the image layer by ~10MB. 
 FROM scratch
 
-COPY --from=builder /chroot/ /
+COPY --from=rootfs /chroot/ /
+COPY --from=builder /out/ /usr/bin/
 COPY package/run.sh \
     package/run_sonobuoy_plugin.sh \
     package/helper_scripts/check_files_permissions.sh \

@@ -8,8 +8,7 @@ on:
 jobs:
 
   publish:
-    # Requires a Docker daemon, so it runs on a non-containerized runner.
-    runs-on: runs-on,runner=4cpu-linux-x64,image=ubuntu22-full-x64,run-id=${{ github.run_id }}
+    runs-on: ubuntu-latest
     permissions:
       contents: write 
       # write is needed for:

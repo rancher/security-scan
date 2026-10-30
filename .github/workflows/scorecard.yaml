@@ -16,8 +16,6 @@ permissions: read-all
 jobs:
   analysis:
     name: Scorecard analysis
-    # Exception to the self-hosted runner policy: publish_results needs a
-    # GitHub-hosted Ubuntu runner for the Scorecard API to accept the results.
     runs-on: ubuntu-latest
     permissions:
       # Needed to upload the results to code-scanning dashboard.
