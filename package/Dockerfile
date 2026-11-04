@@ -67,6 +67,8 @@ COPY --from=base /etc/zypp/ /chroot/etc/zypp/
 #
 # kube-bench, sonobuoy and kubectl come from the cowboy-builder RPM packages,
 # which are rebuilt with the latest Go patch version and have fixes for CVEs in their dependencies.
+# The kubectl package installs a versioned binary, so a relative symlink exposes
+# it as kubectl without touching the files owned by the package.
 ARG KUBECTL_PACKAGE=kubectl-1.37
 RUN rpm --import https://raw.githubusercontent.com/rancher/rancher/refs/heads/main/rancher-rpm-pkgs.key && \
     rpm --root /chroot --import https://raw.githubusercontent.com/rancher/rancher/refs/heads/main/rancher-rpm-pkgs.key && \
@@ -74,8 +76,8 @@ RUN rpm --import https://raw.githubusercontent.com/rancher/rancher/refs/heads/ma
     zypper --non-interactive --releasever=15.6 refresh && \
     zypper --installroot /chroot -n in --no-recommends bash coreutils grep sed findutils gawk procps systemd jq curl diffutils tar gzip && \
     zypper --installroot /chroot -n in --no-recommends -r pkgs kube-bench sonobuoy ${KUBECTL_PACKAGE} && \
-    install -D -o root -g root -m 0755 /chroot/usr/bin/${KUBECTL_PACKAGE} /chroot/usr/local/bin/kubectl && \
-    rm -f /chroot/usr/bin/${KUBECTL_PACKAGE} && \
+    mkdir -p /chroot/usr/local/bin && \
+    ln -sf ../../bin/${KUBECTL_PACKAGE} /chroot/usr/local/bin/kubectl && \
     zypper --installroot /chroot clean -a && \
     rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/* /chroot/etc/zypp/
 
