@@ -1,5 +1,6 @@
 {
   "extends": [
+    "github>rancher/renovate-config//default#release",
     "github>rancher/renovate-config//rancher-main#release"
   ],
   "baseBranchPatterns": [
