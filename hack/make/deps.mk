@@ -19,7 +19,7 @@ SONOBUOY_VERSION ?= v0.57.5
 SONOBUOY_IMAGE ?= rancher/mirrored-sonobuoy-sonobuoy:$(SONOBUOY_VERSION)
 
 # renovate: datasource=github-release-attachments depName=kubernetes/kubectl
-KUBECTL_VERSION ?= 1.37.1
+KUBECTL_VERSION ?= 1.37.2
 
 # Reduces the code duplication on Makefile by keeping all args into a single variable.
 IMAGE_ARGS := --build-arg KUBE_BENCH_VERSION=$(KUBE_BENCH_VERSION)
