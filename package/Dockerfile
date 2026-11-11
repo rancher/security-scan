@@ -69,6 +69,9 @@ COPY --from=base /etc/zypp/ /chroot/etc/zypp/
 # which are rebuilt with the latest Go patch version and have fixes for CVEs in their dependencies.
 # The kubectl package installs a versioned binary, so a relative symlink exposes
 # it as kubectl without touching the files owned by the package.
+# compliance-operator uses this image as the Sonobuoy worker image, and Sonobuoy
+# starts its worker sidecar with the hardcoded command /sonobuoy, so a symlink
+# exposes the packaged binary at that path too.
 ARG KUBECTL_PACKAGE=kubectl-1.37
 RUN rpm --import https://raw.githubusercontent.com/rancher/rancher/refs/heads/main/rancher-rpm-pkgs.key && \
     rpm --root /chroot --import https://raw.githubusercontent.com/rancher/rancher/refs/heads/main/rancher-rpm-pkgs.key && \
@@ -78,6 +81,7 @@ RUN rpm --import https://raw.githubusercontent.com/rancher/rancher/refs/heads/ma
     zypper --installroot /chroot -n in --no-recommends -r pkgs kube-bench sonobuoy ${KUBECTL_PACKAGE} && \
     mkdir -p /chroot/usr/local/bin && \
     ln -sf ../../bin/${KUBECTL_PACKAGE} /chroot/usr/local/bin/kubectl && \
+    ln -sf usr/bin/sonobuoy /chroot/sonobuoy && \
     zypper --installroot /chroot clean -a && \
     rm -rf /chroot/var/cache/zypp/* /chroot/var/log/zypp/* /chroot/etc/zypp/
 
@@ -91,6 +95,7 @@ RUN xx-verify /chroot/usr/bin/bash && \
     xx-verify /chroot/usr/bin/gzip && \
     xx-verify /chroot/usr/bin/kube-bench && \
     xx-verify /chroot/usr/bin/sonobuoy && \
+    xx-verify /chroot/sonobuoy && \
     xx-verify /chroot/usr/local/bin/kubectl
 
 # Define build arguments.
