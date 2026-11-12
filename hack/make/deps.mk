@@ -11,12 +11,9 @@ GOLANGCI_SUM_arm64=44cd40a8c76c86755375adfeea52cfd3533cb43d7bd647771e0ae065e166d
 
 # The kube-bench, sonobuoy and kubectl binaries come from the cowboy-builder RPM
 # packages (see package/Dockerfile). The versions below only define the kube-bench
-# config files and tooling, the sonobuoy image and the kind cluster of the e2e tests.
+# config files and tooling and the kind cluster of the e2e tests.
 # renovate: datasource=github-release-attachments depName=aquasecurity/kube-bench
 KUBE_BENCH_VERSION ?= v0.16.0
-# renovate: datasource=github-release-attachments depName=vmware-tanzu/sonobuoy
-SONOBUOY_VERSION ?= v0.57.5
-SONOBUOY_IMAGE ?= rancher/mirrored-sonobuoy-sonobuoy:$(SONOBUOY_VERSION)
 
 # renovate: datasource=github-release-attachments depName=kubernetes/kubectl
 KUBECTL_VERSION ?= 1.37.1
