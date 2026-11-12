@@ -120,7 +120,7 @@ RUN zypper --non-interactive refresh && \
 # Builds with the Go compiler from the AppCo Go image, as recommended by
 # RFD 0070. Pinned to MAJOR.MINOR.PATCH, matching go.mod, so the toolchain
 # is deterministic and bumped by Renovate.
-FROM --platform=$BUILDPLATFORM registry.suse.com/rancher/appco-go:1.26.10 AS builder
+FROM --platform=$BUILDPLATFORM registry.suse.com/rancher/appco-go:1.26.11 AS builder
 
 COPY --from=tools /tools /
 # Bring xx supporting tools to the builder layer, but as it is at / it
