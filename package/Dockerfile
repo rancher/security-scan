@@ -2,10 +2,10 @@
 # bci-nano is the base of the final image, as recommended by RFD 0070. It has
 # no shell, package manager or OS tools, so whatever the image needs on top of
 # it is installed explicitly further down.
-FROM registry.suse.com/bci/bci-nano:15.7 AS nano
+FROM registry.suse.com/bci/bci-nano:16.0 AS nano
 # Only used as the source of the zypper repositories and product files for the
 # target architecture.
-FROM registry.suse.com/bci/bci-base:15.7 AS base
+FROM registry.suse.com/bci/bci-base:16.0 AS base
 
 # xx only needs to support the host architecture.
 FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.6.1 AS xx
@@ -13,10 +13,10 @@ FROM --platform=$BUILDPLATFORM rancher/mirrored-tonistiigi-xx:1.6.1 AS xx
 # Assembles the final root filesystem for the target architecture in /chroot.
 # It runs on the host architecture and uses zypper from BCI base, as neither
 # bci-nano nor the AppCo Go image have a package manager.
-FROM --platform=$BUILDPLATFORM registry.suse.com/bci/bci-base:15.7 AS rootfs
+FROM --platform=$BUILDPLATFORM registry.suse.com/bci/bci-base:16.0 AS rootfs
 
-# file is needed by xx-verify.
-RUN zypper --non-interactive install --no-recommends file
+# file and flock (util-linux) are needed by xx-verify.
+RUN zypper --non-interactive install --no-recommends file util-linux
 
 # Bring xx supporting tools to the rootfs layer, but as it is at / it
 # won't be copied to the final image.
@@ -76,7 +76,7 @@ ARG KUBECTL_PACKAGE=kubectl-1.37
 RUN rpm --import https://raw.githubusercontent.com/rancher/rancher/refs/heads/main/rancher-rpm-pkgs.key && \
     rpm --root /chroot --import https://raw.githubusercontent.com/rancher/rancher/refs/heads/main/rancher-rpm-pkgs.key && \
     zypper ar -f https://rpm.rancher.io/pkgs/prime pkgs && \
-    zypper --non-interactive --releasever=15.6 refresh && \
+    zypper --non-interactive refresh && \
     zypper --installroot /chroot -n in --no-recommends bash coreutils grep sed findutils gawk procps systemd jq curl diffutils tar gzip && \
     zypper --installroot /chroot -n in --no-recommends -r pkgs kube-bench sonobuoy ${KUBECTL_PACKAGE} && \
     mkdir -p /chroot/usr/local/bin && \
