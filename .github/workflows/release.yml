@@ -46,24 +46,42 @@ jobs:
             secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | DOCKER_PASSWORD ;
             secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials registry | PRIME_REGISTRY ;
             secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials username | PRIME_REGISTRY_USERNAME ;
-            secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials password | PRIME_REGISTRY_PASSWORD
+            secret/data/github/repo/${{ github.repository }}/rancher-prime-registry/credentials password | PRIME_REGISTRY_PASSWORD ;
+            secret/data/github/repo/${{ github.repository }}/rancher-prime-stg-registry/credentials registry | STAGE_REGISTRY ;
+            secret/data/github/repo/${{ github.repository }}/rancher-prime-stg-registry/credentials username | STAGE_REGISTRY_USERNAME ;
+            secret/data/github/repo/${{ github.repository }}/rancher-prime-stg-registry/credentials password | STAGE_REGISTRY_PASSWORD
 
-      - name: Publish manifest
-        uses: rancher/ecm-distro-tools/actions/publish-image@e72fccc212c7179d2ff65d173371d8183e95453e # v0.77.7
+      - name: Publish images to public and staging
+        uses: rancher/ecm-distro-tools/actions/publish-image@b8127344173a5750da03068316ee40c547652c15 # v0.78.3
         with:
           image: security-scan
           tag: ${{ github.ref_name }}${{ matrix.tag-suffix }}
           platforms: ${{ matrix.platforms }}
-
+          push-to-public: true
           public-registry: docker.io
           public-repo: rancher
           public-username: ${{ env.DOCKER_USERNAME }}
           public-password: ${{ env.DOCKER_PASSWORD }}
-
+          make-target: push-image
+          prime-repo: rancher
+          identity-registry: ${{ env.PRIME_REGISTRY }}
+          prime-registry: ${{ env.STAGE_REGISTRY }}
+          prime-username: ${{ env.STAGE_REGISTRY_USERNAME }}
+          prime-password: ${{ env.STAGE_REGISTRY_PASSWORD }}
+          prime-make-target: push-prime-image
+      - name: Publish images to Prime
+        if: ${{ !contains(github.ref_name, '-rc') }} # never push pre-release images to prime
+        uses: rancher/ecm-distro-tools/actions/publish-image@b8127344173a5750da03068316ee40c547652c15 # v0.78.3
+        with:
+          image: security-scan
+          tag: ${{ github.ref_name }}${{ matrix.tag-suffix }}
+          platforms: ${{ matrix.platforms }}
+          push-to-public: false
           prime-registry: ${{ env.PRIME_REGISTRY }}
           prime-repo: rancher
           prime-username: ${{ env.PRIME_REGISTRY_USERNAME }}
           prime-password: ${{ env.PRIME_REGISTRY_PASSWORD }}
+          prime-make-target: push-prime-image
       - name: Create release
         if: matrix.tag-suffix == ''
         run: |
