@@ -36,7 +36,7 @@ endif
 RUNNER := docker
 IMAGE_BUILDER := $(RUNNER) buildx
 MACHINE := rancher
-BUILDX_ARGS ?= --sbom=true --attest type=provenance,mode=max
+BUILDX_ARGS ?=
 
 ifeq ($(TAG),)
 	TAG = $(VERSION)
